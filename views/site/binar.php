@@ -25,14 +25,6 @@ $this->title = 'Бинар';
             <div id="binarInfo">
             </div>
         </div>
-        <div class="xCard" style="min-height: 300px ">
-            <div>
-                <h1>lokoko</h1>
-                <?php
-                echo var_dump($data);
-                ?>
-            </div>
-        </div>
     </div>
 </div>
 

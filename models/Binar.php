@@ -29,11 +29,9 @@ class Binar extends \yii\db\ActiveRecord
         'data' => 'Unknown error'
     ];
 
-    private $_leftChild;
-    private $_rightChild;
     private $_nodeInfo;
-
-
+    private $_allParents;
+    private $_allChildren;
 
     /**
      * {@inheritdoc}
@@ -63,12 +61,12 @@ class Binar extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'parent_id' => 'Parent ID',
-            'position' => 'Position',
-            'path' => 'Path',
-            'level' => 'Level',
-            'name' => 'Name',
+            'id' => 'Идентификатор',
+            'parent_id' => 'ID родителя',
+            'position' => 'Позиция',
+            'path' => 'Путь',
+            'level' => 'Уровень',
+            'name' => 'Название',
         ];
     }
 
@@ -81,31 +79,6 @@ class Binar extends \yii\db\ActiveRecord
     {
         return $this->hasOne(self::class, ['id' => 'parent_id']);
     }
-
-    /**
-     * @return mixed
-     */
-    public function getLeftChild()
-    {
-        $this->_leftChild = self::find()
-            ->where(['parent_id' => $this->id])
-            ->andWhere(['position' => self::POSITION_LEFT])
-            ->one();
-        return $this->_leftChild;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRightChild()
-    {
-        $this->_rightChild = self::find()
-            ->where(['parent_id' => $this->id])
-            ->andWhere(['position' => self::POSITION_RIGHT])
-            ->one();
-        return $this->_rightChild;
-    }
-
 
     public function getChildrenArray()
     {
@@ -129,6 +102,56 @@ class Binar extends \yii\db\ActiveRecord
         return $this->_nodeInfo;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getAllParents()
+    {
+        //$parentsPath = str_replace('.' . $this->id, '', $this->path);
+        $parentsIds = explode('.', $this->path);
+        $this->_allParents = self::find()
+            ->where(['IN', 'id', $parentsIds])
+            ->andWhere(['!=', 'id', $this->id])
+            ->orderBy('path')
+            ->all();
+
+        return $this->_allParents;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAllChildren()
+    {
+        $this->_allChildren = self::find()
+            ->where(['LIKE', 'path', $this->path . '.'])
+            ->orderBy('path')
+            ->all();
+
+        return $this->_allChildren;
+    }
+
+    public function showAllChildren()
+    {
+        $result = '';
+        foreach ($this->allChildren as $binar) {
+            $result .= $binar->path . '<br>';
+        }
+
+        return $result;
+    }
+
+    public function showAllParents()
+    {
+        $result = '';
+        $allParents = $this->allParents;
+        foreach ($this->allParents as $binar) {
+            $result .= $binar->path . '<br>';
+        }
+
+        return $result;
+    }
+
     public function setPathAndLevel()
     {
         $this->path = (string)$this->id;
@@ -139,7 +162,7 @@ class Binar extends \yii\db\ActiveRecord
             $this->level++;
             $parent = $parent->parent;
         }
-        $this->name = 'Binar ' . $this->level . ' ' . $this->id;
+        $this->name = 'Binar ' . $this->path ;
     }
 
     /**
@@ -148,6 +171,7 @@ class Binar extends \yii\db\ActiveRecord
      * @param $target
      * @return bool
      */
+
     public static function getChildrenIds($parent_id, &$target)
     {
         $children = (new \yii\db\Query)
@@ -178,7 +202,7 @@ class Binar extends \yii\db\ActiveRecord
         return $binar;
     }
 
-    public static function makeBinarWithChildren($parent_id, $position)
+    public static function makeBinarWithChildren___($parent_id, $position)
     {
         $parent_id = self::makeBinar($parent_id, $position);
         foreach ([self::POSITION_LEFT, self::POSITION_RIGHT] as $childrenPosition) {
@@ -199,31 +223,25 @@ class Binar extends \yii\db\ActiveRecord
 
     public static function makeTestBinars($parent_id=0)
     {
-        $tmp = 1;
         $parentBinar = self::findOne($parent_id);
         if (empty($parentBinar)){
-            //-- нет родителя
             $binar = self::makeBinar($parent_id, self::POSITION_ROOT);
             $children = self::makeBinarsChildren($binar->id);
             foreach ($children as $child) {
                 self::makeTestBinars($child->id);
             }
         } else {
-            //-- есть родитель
-            if ($parentBinar->level <= 2) {
+            if ($parentBinar->level <= 4) {
                 switch (count($parentBinar->children)) {
                     case 0:
-                        //-- у будущуего родителя еще нет потомков
-                        $binar = self::makeBinar($parent_id, Binar::POSITION_LEFT);
+                        self::makeBinar($parent_id, Binar::POSITION_LEFT);
                         self::makeTestBinars($parent_id);
                         break;
                     case 1:
-                        //-- у родителя есть левый потомок
-                        $binar = self::makeBinar($parent_id, Binar::POSITION_RIGHT);
+                        self::makeBinar($parent_id, Binar::POSITION_RIGHT);
                         self::makeTestBinars($parent_id);
                         break;
                     case 2:
-                        //-- у родителя есть левый и правый потомки
                         $children = $parentBinar->children;
                         foreach ($children as $child) {
                             self::makeTestBinars($child->id);
@@ -232,7 +250,6 @@ class Binar extends \yii\db\ActiveRecord
                 }
             }
         }
-        return true;
     }
 
     public static function deleteAll($condition = null, $params = [])

@@ -65,26 +65,6 @@ AppAsset::register($this);
         <?= Alert::widget() ?>
         <?= $content ?>
     </div>
-    <div id="xModal">
-        <div id="xModalWindow">
-            <table class="table xModalHeader">
-                <tr>
-                    <td>
-                        <span id="xModalHeader"></span>
-
-                    </td>
-                    <td align="right">
-                        <button id="xModalCloseBtn" onclick="hideModal();">
-                            <span class="glyphicon glyphicon-remove-circle" ></span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-            <div id="xModalContent">
-                <b>lokoko</b>
-            </div>
-        </div>
-    </div>
 
 </div>
 

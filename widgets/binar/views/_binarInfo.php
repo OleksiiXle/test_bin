@@ -12,19 +12,22 @@ echo DetailView::widget([
         'position',
         'path',
         'level',
-        'name',
-        /*
         [
-            'label' => 'Статус по PID',
+            'label' => 'Все родители',
             'format' => 'html',
             'value' => function($data)
             {
-                return ($data->isRunning)
-                    ? "<span class='blink_text_no_active_waiting_to_active' >Працюе</span>"
-                    : "<span>Не працюе</span>";
+                return $data->showAllParents();
             }
         ],
-        */
+        [
+            'label' => 'Все потомки',
+            'format' => 'html',
+            'value' => function($data)
+            {
+                return $data->showAllChildren();
+            }
+        ],
     ],
 ]);
 

@@ -31,10 +31,5 @@ $this->registerJs("
             ]);
             ?>
         </div>
-
-
-
     <?php endif;?>
 </div>
-<script>
-</script>

@@ -13,7 +13,7 @@ class BinarController extends Controller
     ];
 
 
-    public function actionGetDefaultTree()
+    public function actionGetRoot()
     {
         $root = Binar::findOne(['parent_id' => 0]);
         $this->result = [
@@ -68,7 +68,6 @@ class BinarController extends Controller
 
     public function actionAddChild()
     {
-        $r=2;
         if ($data = \Yii::$app->request->post('Binar')){
             $binar = Binar::findOne($data['id']);
             if (!empty($binar)){

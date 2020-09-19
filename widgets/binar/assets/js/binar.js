@@ -103,7 +103,7 @@ var BINAR_TREE = {
     drawDefaultTree: function (tree_id) {
         var that = this;
         $.ajax({
-            url: '/binar/get-default-tree',
+            url: '/binar/get-root',
             type: "POST",
             data: {'_csrf':_csrfT},
             dataType: 'json',
