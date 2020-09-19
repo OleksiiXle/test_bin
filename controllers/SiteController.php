@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Binar;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -61,8 +62,17 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        Binar::deleteAll();
+        Binar::makeTestBinars(0);
+        $data = Binar::find()
+            ->asArray()
+            ->all();
+        return $this->render('binar', [
+            'data' => $data,
+        ]);
     }
+
+
 
     /**
      * Login action.
