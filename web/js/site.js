@@ -1,6 +1,5 @@
 
 function clickItemFunction(tree_id, id){
-    console.log('tree_id = ' + tree_id + ' new_id = ' + id);
     $.ajax({
         url: '/binar/get-binar-info',
         type: "GET",

@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "binar".
  *
@@ -41,7 +39,6 @@ class Binar extends \yii\db\ActiveRecord
         return 'binar';
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -70,26 +67,25 @@ class Binar extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getChildren()
     {
         return $this->hasMany(self::class, ['parent_id' => 'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getParent()
     {
         return $this->hasOne(self::class, ['id' => 'parent_id']);
     }
 
-    public function getChildrenArray()
-    {
-        $this->_childrenArray = [];
-        foreach ($this->children as $child){
-            $this->_childrenArray[] = $child->nodeInfo;
-        }
-
-        return $this->_childrenArray;
-    }
-
+    /**
+     * @return array
+     */
     public function getNodeInfo()
     {
         $this->_nodeInfo = [
@@ -107,7 +103,6 @@ class Binar extends \yii\db\ActiveRecord
      */
     public function getAllParents()
     {
-        //$parentsPath = str_replace('.' . $this->id, '', $this->path);
         $parentsIds = explode('.', $this->path);
         $this->_allParents = self::find()
             ->where(['IN', 'id', $parentsIds])
@@ -131,6 +126,9 @@ class Binar extends \yii\db\ActiveRecord
         return $this->_allChildren;
     }
 
+    /**
+     * @return string
+     */
     public function showAllChildren()
     {
         $result = '';
@@ -141,10 +139,12 @@ class Binar extends \yii\db\ActiveRecord
         return $result;
     }
 
+    /**
+     * @return string
+     */
     public function showAllParents()
     {
         $result = '';
-        $allParents = $this->allParents;
         foreach ($this->allParents as $binar) {
             $result .= $binar->path . '<br>';
         }
@@ -152,6 +152,9 @@ class Binar extends \yii\db\ActiveRecord
         return $result;
     }
 
+    /**
+     *
+     */
     public function setPathAndLevel()
     {
         $this->path = (string)$this->id;
@@ -172,6 +175,13 @@ class Binar extends \yii\db\ActiveRecord
      * @return bool
      */
 
+
+    /**
+     * Writes the identifiers of all descendants to the $target array
+     * @param $parent_id
+     * @param $target
+     * @return bool
+     */
     public static function getChildrenIds($parent_id, &$target)
     {
         $children = (new \yii\db\Query)
@@ -185,10 +195,15 @@ class Binar extends \yii\db\ActiveRecord
                 $target[] = $child['id'];
                 self::getChildrenIds($child['id'], $target);
             }
-            return true;
         }
     }
 
+    /**
+     * Creating a binar
+     * @param $parent_id
+     * @param $position
+     * @return Binar
+     */
     public static function makeBinar($parent_id, $position)
     {
         $binar = new self();
@@ -202,16 +217,11 @@ class Binar extends \yii\db\ActiveRecord
         return $binar;
     }
 
-    public static function makeBinarWithChildren___($parent_id, $position)
-    {
-        $parent_id = self::makeBinar($parent_id, $position);
-        foreach ([self::POSITION_LEFT, self::POSITION_RIGHT] as $childrenPosition) {
-            $result[$childrenPosition] = self::makeBinar($parent_id, $childrenPosition);
-        }
-
-        return $result;
-    }
-
+    /**
+     * Create left and right child of a binar
+     * @param $parent_id
+     * @return array
+     */
     public static function makeBinarsChildren($parent_id)
     {
         $result[] = self::makeBinar($parent_id, Binar::POSITION_LEFT);
@@ -221,6 +231,10 @@ class Binar extends \yii\db\ActiveRecord
 
     }
 
+    /**
+     * Automatic filling of binar up to level 5
+     * @param int $parent_id
+     */
     public static function makeTestBinars($parent_id=0)
     {
         $parentBinar = self::findOne($parent_id);
@@ -252,6 +266,12 @@ class Binar extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * @param null $condition
+     * @param array $params
+     * @return int
+     * @throws \yii\db\Exception
+     */
     public static function deleteAll($condition = null, $params = [])
     {
         $result = parent::deleteAll($condition, $params);
@@ -262,9 +282,13 @@ class Binar extends \yii\db\ActiveRecord
         return  $result;
     }
 
+    /**
+     * Adding a child to a binar
+     * @param $data
+     * @return bool
+     */
     public function appendChild($data)
     {
-        $tmp = 1;
         switch (count($this->children)) {
             case 1:
                 $alreadyExists = Binar::find()
@@ -296,6 +320,13 @@ class Binar extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * @param $id
+     * @return array
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     * @throws \yii\db\StaleObjectException
+     */
     public static function deleteWithChildren($id)
     {
         $result['status'] = false;
@@ -303,11 +334,9 @@ class Binar extends \yii\db\ActiveRecord
         $binarDel = self::findOne($id);
         $parent_id = $binarDel->parent_id;
 
-        //-- определить потомков
         $childrenIds = [];
         self::getChildrenIds($binarDel->id, $childrenIds);
         if (count($childrenIds) > 0){
-            //-- удаляем потомков
             $childrenDelCount = self::deleteAll(['IN', 'id', $childrenIds]);
             if ($childrenDelCount <> count($childrenIds)){
                 $result['data'] = 'Не удалось удалить потомков';
@@ -315,13 +344,11 @@ class Binar extends \yii\db\ActiveRecord
             }
         }
 
-        //-- удаляем узел
         if ($binarDel->delete() === 0) {
             $result['data'] = 'Не удалось удалить';
             return $result;
         }
 
-        //-- если был предок - возвращаем информацию о нем
         $binarParent = self::findOne($parent_id);
         if (isset($binarParent)){
             $result = [
@@ -340,9 +367,7 @@ class Binar extends \yii\db\ActiveRecord
                 ]
             ];
         }
+
         return $result;
-
     }
-
-
 }

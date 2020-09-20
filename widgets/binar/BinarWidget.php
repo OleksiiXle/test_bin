@@ -4,16 +4,24 @@ namespace app\widgets\binar;
 
 use yii\base\Widget;
 
+/**
+ * Class BinarWidget
+ * @package app\widgets\binar
+ */
 class BinarWidget extends Widget
 {
+    /**
+     * @var
+     */
     public $binar_id;
+    /**
+     * @var
+     */
     public $params;
 
-    public function init()
-    {
-        parent::init();
-    }
-
+    /**
+     * @return string
+     */
     public function run()
     {
         $view = $this->getView();

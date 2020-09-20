@@ -1,5 +1,4 @@
 <?php
-use yii\helpers\Html;
 use \yii\widgets\DetailView;
 ?>
 
@@ -30,5 +29,4 @@ echo DetailView::widget([
         ],
     ],
 ]);
-
 ?>

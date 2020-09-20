@@ -63,7 +63,6 @@ var BINAR_TREE = {
                 ' data-tree_id="' + this.tree_id + '"' +
                 ' data-id="' + data['id'] + '" ' +
                 ' data-parent_id="' + data['parent_id'] + '"' +
-                // ' onClick="' + that.drawChildren(this.dataset.id)+ ';"'
                 '>' +
                 ICON_CLOSE  +
                 '</a>  ';
@@ -74,7 +73,6 @@ var BINAR_TREE = {
             ' data-tree_id="' + this.tree_id + '" ' +
             ' data-id="' + data['id'] + '" ' +
             ' data-parent_id="' + data['parent_id'] +'" ' +
-            // ' onClick="' + that.clickItem(this) + ';"'  +
             '> ' +
             data['name'] +
             '</a></li>' ;
@@ -126,7 +124,6 @@ var BINAR_TREE = {
 
     //-- рисует потомков первого уровня узлу parent_id
     clickIcon: function (parent) {
-        //   console.log(parent.innerHTML);
         var parent_id = parent.dataset.id;
         var that = this;
         switch (parent.innerHTML){
@@ -159,7 +156,6 @@ var BINAR_TREE = {
                                 $.each(children, function(index, value){
                                     $(parent_ul).append(that.getItem(value))
                                 });
-
                             }
                             that.selectedIdChange(parent_id);
                         } else {
@@ -182,8 +178,6 @@ var BINAR_TREE = {
     },
 
     clickItem: function (item) {
-      //  console.log(item);
-     //   alert('item ' + item.dataset.id);
         this.selectedIdChange(item.dataset.id);
     },
 
@@ -192,10 +186,7 @@ var BINAR_TREE = {
         if (typeof clickItemFunction == 'function'){
             clickItemFunction(this.tree_id, new_id);
         }
-
         var that = this;
-        //  $.post(_urlSetConserve, {'id' : new_id, 'type' : type, 'staffOrder_id': _treeParams[tree_id]['staffOrder_id'], 'tree_id' : tree_id});
-
         var old_selected_id = that.selected_id;
         var new_selected_id = new_id;
         var oldNode =$("#" + that.item_id + old_selected_id);
@@ -208,8 +199,6 @@ var BINAR_TREE = {
         var container = $("#" + that.tree_id),
             scrollTo = $('#' + new_selected_id);
         if (container.length > 0 && scrollTo.length > 0){
-            //    console.log(container);
-            //    console.log(scrollTo);
             container.stop().animate({
                 scrollTop: scrollTo.offset().top -
                 container.offset().top +
@@ -247,8 +236,6 @@ var BINAR_TREE = {
                     var new_node_data = response['data']['newNode'];
                     var parent_node_data = response['data']['parentNode'];
                     var new_parent_icon = $("#" + that.icon_id + parent_node_data['id']);
-                    // console.log("#" + that.icon_id + parent_node_data['id']);
-                    //  console.log(new_parent_icon);
                     var new_node_li = that.getItem(new_node_data);
                     if (new_parent_icon.length > 0){
                         //-- у нового родителя node2_id уже есть иконка
@@ -259,14 +246,12 @@ var BINAR_TREE = {
                             var children_li = parent_ul.find("li");
                             var last_li_id = children_li[children_li.length - 1].dataset.id;
                             $("#" + that.li_id + last_li_id).after(new_node_li);
-                            //console.log(first_child_li);
 
                         } else {
                             //-- иконка закрыта и потомки скрыты
                             //-- имитировать нажатие на иконку
                             that.clickIcon(new_parent_icon[0]);
                         }
-
                     } else {
                         //-- у нового родителя node2_id еще нет иконки и нет потомков
                         //-- вставить закрытую иконку в ли перед итемом
@@ -275,10 +260,8 @@ var BINAR_TREE = {
                         new_parent_item.before(that.getIcon(parent_node_data, 'close'));
                         new_parent_icon = $("#" + that.icon_id + parent_node_data['id'])[0];
                         console.log("#" + that.icon_id + parent_node_data['id']);
-
                         that.clickIcon(new_parent_icon);
                     }
-
                     $("#main-modal-md").modal("hide");
                 } else {
                     alert(response['data']);
@@ -296,7 +279,6 @@ var BINAR_TREE = {
 
     //--удаление наименования вместе с потомками
     deleteItem : function () {
-    //  alert(this.tree_id + ' deleteItem ' + this.selected_id);
         if (confirm('Подтвердите удаление')){
             var that = this;
             $.ajax({
@@ -313,14 +295,10 @@ var BINAR_TREE = {
                         var prev_item_li = removed_item_li.prev('LI');
                         var parent_id = removed_item_li[0].dataset.parent_id;
                         var new_selected_id = 0;
-
                         removed_item_li.remove();
-
                         if ((typeof response['data']['node2'] === 'object') && !response['data']['node2']['hasChildren']){
-
                             $("#" + that.icon_id + response['data']['node2']['id'] ).remove();
                         }
-
                         if (prev_item_li.length > 0){
                             new_selected_id = prev_item_li[0].dataset.id;
                         } else {
@@ -339,21 +317,7 @@ var BINAR_TREE = {
                     console.log(errorThrown);
                 }
             });
-
         }
-
     },
-
-
-
-
 };
-
-
-/*
-$(document).ready ( function(){
-    var tree1 = Object.create(MENU_TREE);
-    tree1.init(_menu_id);
-});
-*/
 

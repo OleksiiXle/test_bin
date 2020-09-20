@@ -1,11 +1,8 @@
 <?php
-
-use yii\helpers\Html;
 use app\widgets\binar\BinarWidget;
 use yii\bootstrap\Modal;
 
 $this->title = 'Бинар';
-
 ?>
 <div class="container-fluid">
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" >

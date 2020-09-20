@@ -16,7 +16,6 @@ class BinarAssets extends AssetBundle
         'js/binar.js',
         'js/init.js',
     ];
-
     public $depends = [
         'yii\web\JqueryAsset',
         'yii\web\YiiAsset',
