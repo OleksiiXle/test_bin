@@ -169,14 +169,6 @@ class Binar extends \yii\db\ActiveRecord
     }
 
     /**
-     * Записывает в массив $target идентификаторы всех потомков
-     * @param $parent_id
-     * @param $target
-     * @return bool
-     */
-
-
-    /**
      * Writes the identifiers of all descendants to the $target array
      * @param $parent_id
      * @param $target
