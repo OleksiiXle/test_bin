@@ -9,7 +9,7 @@ use app\models\Binar;
     <div class="row">
         <div class="col-md-11">
             <?php
-            echo $form->field($binar, 'id', ['inputOptions' => ['disabled' => true]])->label('ID родителя');
+            echo $form->field($binar, 'id')->label('ID родителя');
             echo $form->field($binar, 'position')
                 ->dropDownList(Binar::POSITIONS, ['options' => [ $binar->position => ['Selected' => true]],]);
             ?>

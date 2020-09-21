@@ -92,6 +92,7 @@ class BinarController extends Controller
      */
     public function actionAddChild()
     {
+        $tmp = 1;
         if ($data = \Yii::$app->request->post('Binar')){
             $binar = Binar::findOne($data['id']);
             if (!empty($binar)){
@@ -100,6 +101,8 @@ class BinarController extends Controller
                 } else {
                     $this->result['data'] = $binar->result['data'];
                 }
+            } else {
+                $this->result['data'] = ' Бинар с ИД=' . $data['id'] . ' не найден';
             }
         }
 
