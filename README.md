@@ -1,3 +1,18 @@
+mysql -u root -p
+CREATE DATABASE xle;
+CREATE USER 'xle'@'localhost' IDENTIFIED BY '222';
+GRANT ALL ON xle.* TO 'xle'@'localhost' IDENTIFIED BY '222' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EXIT;
+
+
+
+
+
+
+
+
+
 Тестовый бинар
 
 Уствновка для LAMP

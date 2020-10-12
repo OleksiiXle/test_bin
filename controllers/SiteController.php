@@ -14,9 +14,6 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        Binar::deleteAll();
-        Binar::makeTestBinars(0);
-
-        return $this->render('binar');
+        return $this->render('index');
     }
 }
