@@ -22,9 +22,21 @@ $config = [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
+        'authManager' => [
+            'class' => 'app\components\DbManager', // or use 'yii\rbac\DbManager'
+            'cache' => 'cache'
+        ],
         'user' => [
-            'identityClass' => 'app\models\User',
-            'enableAutoLogin' => true,
+            'class' => 'app\components\UserX',
+            'identityClass' => 'app\modules\adminxx\models\User',
+            'loginUrl' => ['adminxx/user/login'],
+            'enableAutoLogin' => false,
+        ],
+        'configs' => [
+            'class' => 'app\components\ConfigsComponent',
+        ],
+        'conservation' => [
+            'class' => 'app\components\conservation\ConservationComponent',
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -52,6 +64,20 @@ $config = [
             'rules' => [
             ],
         ],
+    ],
+    'modules' => [
+        'adminxx' => [
+            'class' => 'app\modules\adminxx\Adminxx',
+        ],
+    ],
+    'as access' => [
+        'class' => 'app\components\AccessControl',
+        'allowActions' => [
+            'site/error',
+            'debug/*',
+            'gii/*',
+            //   '*/*'
+        ]
     ],
     'params' => $params,
 ];

@@ -5,6 +5,20 @@ GRANT ALL ON xle.* TO 'xle'@'localhost' IDENTIFIED BY '222' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 EXIT;
 
+migrate
+
+5. Добавить недостающие разрешения и роли (из консоли)
+   php yii adminxx/common-roles-init
+
+6. Инициализировать новое меню (из консоли), старое - останется.
+   php yii adminxx/menu-init
+
+6.1 Сщздание администраторов (по выбору)
+   php yii adminxx/make-admin
+
+6.2 Создание суперадмина
+   php yii adminxx/make-super-admin
+
 
 
 
