@@ -29,7 +29,7 @@ class UserM extends MainModel
     const SCENARIO_RESET_PASSWORD  = 'resetPassword';
 
 
-    const USER_NAME_PATTERN           = '/^[А-ЯІЇЄҐ]{1}[а-яіїєґ\']+([-]?[А-ЯІЇЄҐ]{1}[а-яіїєґ\']+)?$/u'; //--маска для нимени
+    const USER_NAME_PATTERN           = '/^[А-ЯІЇЄҐ]{1}[а-яіїєґ0-9 \']+([-]?[А-ЯІЇЄҐ]{1}[а-яіїєґ0-9 \']+)?$/u'; //--маска для нимени
     const USER_NAME_ERROR_MESSAGE     = 'Використовуйте українські літери, починаючи із великої. 
                                          Апостроф - в англійській розкладці на букві є. Подвійні імена - через тире!'; //--сообщение об ошибке
     const USER_PASSWORD_PATTERN       = '/^[a-zA-Z0-9_]+$/ui'; //--маска для пароля

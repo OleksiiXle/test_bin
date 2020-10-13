@@ -2,14 +2,10 @@
 
 namespace app\modules\adminxx\controllers;
 
-use app\modules\adminxx\components\AccessControl;
 use Yii;
+use app\components\AccessControl;
 use app\modules\adminxx\models\RuleX;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
-use yii\filters\VerbFilter;
-use yii\web\NotFoundHttpException;
-//use app\modules\adminxx\components\Helper;
 
 /**
  * Class RuleController

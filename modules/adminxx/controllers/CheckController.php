@@ -3,10 +3,7 @@
 namespace app\modules\adminxx\controllers;
 
 use app\components\conservation\ActiveDataProviderConserve;
-use app\models\DepartmentCommon;
-use app\models\PersonalCommon;
-use app\models\PositionCommon;
-use app\modules\adminxx\components\AccessControl;
+use app\components\AccessControl;
 use app\modules\adminxx\models\filters\UControlFilter;
 use app\modules\adminxx\models\filters\UserActivityFilter;
 use app\modules\adminxx\models\UControl;

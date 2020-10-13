@@ -26,7 +26,6 @@ use yii\filters\VerbFilter;
  */
 class UserController extends MainController
 {
-
     public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -35,12 +34,12 @@ class UserController extends MainController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['login', 'forget-password', 'test', ],
+                    'actions' => [ 'forget-password', 'test', ],
                     'roles' => ['?'],
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['logout', 'test', 'change-password', 'update-profile', 'conservation'],
+                    'actions' => ['test', 'change-password', 'update-profile', 'conservation'],
                     'roles' => ['@'],
                 ],
                 [
@@ -275,7 +274,7 @@ class UserController extends MainController
      */
     public function actionLogin()
     {
-        $this->layout = '@app/views/layouts/commonLayout.php';
+      //  $this->layout = '@app/views/layouts/commonLayout.php';
         $model = new Login();
         if ($model->load(\Yii::$app->getRequest()->post()) && $model->login()) {
             $query = 'SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode, "ONLY_FULL_GROUP_BY,", ""))';

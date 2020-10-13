@@ -374,12 +374,6 @@ class MenuXX extends MainModel
         }
     }
 
-
-
-
-
-
-
     //*****************************************************************************    ДРУГИЕ МЕТОДЫ
 
     public static function getDefaultTree()
@@ -394,26 +388,6 @@ class MenuXX extends MainModel
         }
         return $ret;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * Возаращает массив прямых потомков для вывода их при раскрытии узла дерева
@@ -491,35 +465,6 @@ class MenuXX extends MainModel
     }
 
     /**
-     * Записывает в массив $target идентификаторы всех потомков
-     * @param $parent_id
-     * @param $target
-     * @return bool
-     */
-    public static function getChildrenArray__($parent_id, &$target)
-    {
-        //--
-        $children = self::find()
-            ->where(['parent_id' => $parent_id])
-        //    ->asArray()
-            ->all();
-        if (count($children) > 0) {
-            foreach ($children as $child) {
-                $target[]=  [
-                    'id' => $child['id'],
-                    'parent_id' => $child['parent_id'],
-                    'name' => $child['name'],
-                    'hasChildren'   => (count($child->children) > 0),
-                ];
-                self::getChildrenArray($child['id'], $target);
-            }
-            return true;
-        }
-    }
-
-
-
-    /**
      * Возвращает строку с ид потомков
      * @param $tree - массив дерева типа self::find()->asArray()->all();
      * @param $parent_id - родительский элемент
@@ -536,42 +481,39 @@ class MenuXX extends MainModel
         return $html;
     }
 
-
     /**
      * Возвращает строку с деревом
      * @param $tree - полный массив дерева
      * @param $pid - корень
      * @return string
      */
-    public static function getTree($tree, $pid){
+    public static function getTree($tree, $pid, $showLevel=0){
         $html = '';
+
         foreach ($tree as $row) {
             if ($row['parent_id'] == $pid) {
-                if ($pid > 0){
-                    $hasChildren = self::find()->where(['parent_id' => $row['id']])->count();
-                    if ($hasChildren){
-                        $content = '<a class="node" '
-                            . ' onclick="clickAction(this);"'
-                            . '> ' . $row['name']
-                            . '</a>';
-                    } else {
-                        $content = Html::a($row['name'], Url::to($row['route'], true),
-                            [
-                                'class' => 'route',
-                            ]);
-                    }
-                    $html .= '<li>'
-                        . $content
-                        . self::getTree($tree, $row['id'])
-                        . '</li>';
-
-                } else{
-                    $html .= self::getTree($tree, $row['id']);
-
+                $hasChildren = self::find()->where(['parent_id' => $row['id']])->count();
+                $parentsCount = self::parentsCount($row['id']);
+                if ($hasChildren){
+                    $content = '<a class="node" '
+                        . ' onclick="clickAction(this);" '
+                        . '> ' . \Yii::t('app', $row['name'])
+                        . '</a>';
+                } else {
+                    $content = Html::a(\Yii::t('app', $row['name']), Url::to($row['route'], true),
+                        [
+                            'class' => 'route',
+                        ]);
                 }
+                $html .= '<li >'
+                    . $content
+                    . self::getTree($tree, $row['id'], $showLevel)
+                    . '</li>';
             }
         }
-        return $html ? '<ul class="ulMenuX" style="padding-left: 15px">' . $html . '</ul>' : '';
+        $uClass = (isset($parentsCount) && $parentsCount > $showLevel) ? 'submenu' : '';
+        //  $hidden = (isset($parentsCount) && $parentsCount > $showLevel) ? 'display:none' : '';
+        return $html ? '<ul class="ulMenuX ' . $uClass . '" style="padding-left: 15px; ">' . $html . '</ul>' : '';
     }
 
     /**
@@ -597,4 +539,14 @@ class MenuXX extends MainModel
         }
     }
 
+    public static function parentsCount($id){
+        $ret = 0;
+        $im = self::findOne($id);
+        $parent = self::findOne($im->parent_id);
+        while (isset($parent)){
+            $ret++;
+            $parent = self::findOne($parent->parent_id);
+        }
+        return $ret;
+    }
 }

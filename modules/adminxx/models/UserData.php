@@ -51,7 +51,7 @@ class UserData extends MainModel
         return [
             [['user_id', 'first_name', 'middle_name', 'last_name'], 'required'],
             [['user_id', 'last_rout_time', 'activityInterval'], 'integer'],
-            [['email', 'first_name', 'middle_name', 'last_name'], 'string', 'max' => 255],
+            [['emails', 'first_name', 'middle_name', 'last_name'], 'string', 'max' => 255],
             [['last_rout', ], 'string', 'max' => 100],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(),
                 'targetAttribute' => ['user_id' => 'id']],
@@ -67,7 +67,7 @@ class UserData extends MainModel
         return [
             'id' => 'ID',
             'user_id' => 'ІД',
-            'email' => 'Emails',
+            'emails' => 'Emails',
             'first_name' => 'Імя',
             'middle_name' => 'По батькові',
             'last_name' => 'Прізвище',

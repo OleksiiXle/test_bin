@@ -1,22 +1,22 @@
 mysql -u root -p
 CREATE DATABASE xle;
-CREATE USER 'xle'@'localhost' IDENTIFIED BY '222';
-GRANT ALL ON xle.* TO 'xle'@'localhost' IDENTIFIED BY '222' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
 EXIT;
 
 migrate
 
-5. Добавить недостающие разрешения и роли (из консоли)
+1. Добавить недостающие разрешения и роли (из консоли)
    php yii adminxx/common-roles-init
 
-6. Инициализировать новое меню (из консоли), старое - останется.
+2. Инициализировать новое меню (из консоли), старое - останется.
    php yii adminxx/menu-init
+   
+3. Инициализировать дефолтных пользователей.
+   php yii adminxx/users-init
 
-6.1 Сщздание администраторов (по выбору)
+4 Сщздание администраторов (по выбору)
    php yii adminxx/make-admin
 
-6.2 Создание суперадмина
+5 Создание суперадмина
    php yii adminxx/make-super-admin
 
 

@@ -5,7 +5,7 @@ namespace app\modules\adminxx\controllers;
 use app\commands\backgroundTasks\models\BackgroundTask;
 use app\modules\adminxx\models\filters\BackgroundTaskFilter;
 use app\components\conservation\ActiveDataProviderConserve;
-use app\modules\adminxx\components\AccessControl;
+use app\components\AccessControl;
 
 /**
  * Class BackgroundTasksController

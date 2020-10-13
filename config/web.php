@@ -29,7 +29,7 @@ $config = [
         'user' => [
             'class' => 'app\components\UserX',
             'identityClass' => 'app\modules\adminxx\models\User',
-            'loginUrl' => ['adminxx/user/login'],
+            'loginUrl' => ['site/login'],
             'enableAutoLogin' => false,
         ],
         'configs' => [
@@ -72,12 +72,13 @@ $config = [
     ],
     'as access' => [
         'class' => 'app\components\AccessControl',
+        /*
         'allowActions' => [
             'site/error',
             'debug/*',
             'gii/*',
-            //   '*/*'
         ]
+        */
     ],
     'params' => $params,
 ];

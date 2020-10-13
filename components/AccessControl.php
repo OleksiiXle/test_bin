@@ -3,13 +3,13 @@
 namespace app\components;
 
 use Yii;
+use yii\base\ActionFilter;
 use yii\web\ForbiddenHttpException;
 use yii\web\User;
 use yii\di\Instance;
 use yii\helpers\StringHelper;
 
-
-class AccessControl extends \yii\base\ActionFilter
+class AccessControl extends ActionFilter
 {
     /**
      * @var User User for check access.
@@ -67,15 +67,12 @@ class AccessControl extends \yii\base\ActionFilter
 
     public function beforeAction($action)
     {
+        $tmp = 1;
         if (isset($action->controller->module) && is_a($action->controller->module, 'yii\debug\Module')){
             return true;
         }
 
         $userPermissions = \Yii::$app->authManager->getUserRolesPermissions() ;
-        if (isset($userPermissions['orgstatTestDB'])){
-            \Yii::$app->set('db', \Yii::$app->dbTest)   ; //\Yii::createObject($dbTest);
-            $ret = \Yii::$app->db;
-        }
 
         $user = $this->user;
         $request = Yii::$app->getRequest();
@@ -97,7 +94,8 @@ class AccessControl extends \yii\base\ActionFilter
             }
         }
         //todo когда "as access" уйдет из web.php эту хреновину убрать
-        $actionId = $action->getUniqueId();
+        /*
+                 $actionId = $action->getUniqueId();
         if (in_array($actionId,  $this->allowActions) ){
             return true;
         }
@@ -117,16 +115,12 @@ class AccessControl extends \yii\base\ActionFilter
                     return true;
                 } else {
                     $this->denyAccess($user);
-                    /*
-                    $response = new Response();
-                    $response->statusCode = 403;
-                    $response->send();
-                    exit();
-                    */
                 }
             }
             $this->denyAccess($user);
         }
+
+         */
 
 
 

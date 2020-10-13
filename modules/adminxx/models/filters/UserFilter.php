@@ -12,7 +12,7 @@ class UserFilter extends Model
     public $middle_name;
     public $last_name;
     public $username;
-    public $email;
+    public $emails;
 
     public $role;
     public $permission;
@@ -51,7 +51,7 @@ class UserFilter extends Model
     public function rules()
     {
         return [
-            [['first_name', 'middle_name', 'last_name', 'role', 'username', 'email'], 'string', 'max' => 50],
+            [['first_name', 'middle_name', 'last_name', 'role', 'username', 'emails'], 'string', 'max' => 50],
             [['first_name', 'middle_name', 'last_name'],  'match', 'pattern' => UserM::USER_NAME_PATTERN,
                 'message' => \Yii::t('app', UserM::USER_NAME_ERROR_MESSAGE)],
             [['username'],  'match', 'pattern' => UserM::USER_PASSWORD_PATTERN,
@@ -59,7 +59,7 @@ class UserFilter extends Model
             [['id', ], 'integer'],
             [['first_name', 'middle_name', 'last_name', 'role'], 'string', 'max' => 50],
             [[ 'showStatusAll', 'showStatusActive', 'showStatusInactive'], 'boolean'],
-            ['email', 'email'],
+            ['emails', 'email'],
 
 
 
@@ -84,7 +84,7 @@ class UserFilter extends Model
             'oldPassword' => 'Старий пароль',
             'retypePassword' => 'Підтвердждення паролю',
             'password_reset_token' => 'Токен збросу паролю',
-            'email' => 'Email',
+            'emails' => 'Email',
             'status' => 'Status',
             'created_at_str' => 'Створений',
             'updated_at_str' => 'Змінений',
@@ -101,7 +101,9 @@ class UserFilter extends Model
 
 
 
-    public function getQuery($params = null){
+    public function getQuery($params = null)
+    {
+        $tmp = 1;
 
         $query = UserM::find()
             ->joinWith(['userDatas'])
@@ -119,8 +121,8 @@ class UserFilter extends Model
             return $query;
         }
 
-        if (!empty($this->email)) {
-            $query->andWhere(['user.email' => $this->email]);
+        if (!empty($this->emails)) {
+            $query->andWhere(['LIKE', 'user.emails', $this->emails]);
         }
 
         if (!empty($this->username)) {
@@ -151,7 +153,7 @@ class UserFilter extends Model
         if ($this->showStatusInactive =='1'){
             $query->andWhere(['user.status' => UserM::STATUS_INACTIVE]);
         }
-        //   $e = $query->createCommand()->getSql();
+           $e = $query->createCommand()->getSql();
 
         return $query;
 
@@ -177,8 +179,8 @@ class UserFilter extends Model
             $this->_filterContent .= ' Логін *' . $this->username . '*;' ;
         }
 
-        if (!empty($this->email)) {
-            $this->_filterContent .= ' Email *' . $this->email . '*;' ;
+        if (!empty($this->emails)) {
+            $this->_filterContent .= ' Email *' . $this->emails . '*;' ;
         }
 
         if (!empty($this->role)) {

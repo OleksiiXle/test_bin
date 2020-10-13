@@ -120,8 +120,8 @@ class RuleX extends ActiveRecord
 
     public static function getRulesClasses()
     {
-        $pathToFile = \Yii::getAlias('@app/modules/adminxx/components/rules');
-        $namespace = 'app\modules\adminxx\components\rules';
+        $pathToFile = \Yii::getAlias('@app/modules/adminxx/rules');
+        $namespace = 'app\modules\adminxx\rules';
 
         $ret = [];
         if ($handle = opendir($pathToFile)) {

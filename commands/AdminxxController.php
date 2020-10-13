@@ -138,8 +138,8 @@ class AdminxxController extends Controller
         return true;
     }
 
-    public function actionUserInit_all(){
-
+    public function actionUsersInit()
+    {
         $users = require(__DIR__ . '/data/userInit.php');
         $auth = \Yii::$app->authManager;
         foreach ($users as $user){
@@ -156,9 +156,15 @@ class AdminxxController extends Controller
                     return false;
                 }
                 $userData = new UserData();
-                $userData->setAttributes($user);
+               // $userData->setAttributes($user);
+
+
                 $userData->user_id = $model->id;
-                if (!$userData->save()){
+                $userData->emails = $model->email;
+                $userData->first_name = $user['first_name'];
+                $userData->middle_name = $user['middle_name'];
+                $userData->last_name = $user['last_name'];
+               if (!$userData->save()){
                     echo var_dump($userData->getErrors()) . PHP_EOL;
                     return false;
                 }

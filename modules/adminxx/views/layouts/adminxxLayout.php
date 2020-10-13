@@ -1,8 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use app\assets\AppAsset;
-use \app\components\widgets\menuX\MenuXWidget;
+use \app\widgets\menuX\MenuXWidget;
 use \app\modules\adminxx\assets\AdminxxLayoutAsset;
 
 AdminxxLayoutAsset::register($this);
@@ -14,7 +13,7 @@ if (Yii::$app->session->getAllFlashes()){
 
 ?>
 <?php
-$this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => \yii\helpers\Url::to(['/images/np_logo.png'])]);?>
+$this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => \yii\helpers\Url::to(['/images/sun_61831.png'])]);?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
@@ -39,7 +38,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => \yii\h
             <!--  <button id="open-menu-btn" onclick="showModal(500,600, 'lokoko the best');" class="xMenuBtn" >-->
             <a href="/adminxx" title="На гоговну сторінку">
                  <span class ="img-rounded">
-                        <img  src="<?=\yii\helpers\Url::to('@web/images/np_logo.png');?>" height="40px" width="40px;">
+                        <img  src="<?=\yii\helpers\Url::to('@web/images/sun_61831.png');?>" height="40px" width="40px;">
                  </span>
             </a>
             <button id="open-menu-btn" onclick="showMenu();" class="xMenuBtn" >
@@ -55,16 +54,15 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => \yii\h
         <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2" align="center" style="padding-left: 1px">
             <?php
             if (!Yii::$app->user->isGuest){
-                $icon = \yii\helpers\Url::to('@web/images/Gnome-Application-Exit-64.png');
-                echo Html::beginForm(['/adminx/user/logout'], 'post');
+                $icon = \yii\helpers\Url::to('@web/images/log_logout_door_1563.png');
+                echo Html::beginForm(['/site/logout'], 'post');
                 echo Html::submitButton(
-                    '<span>' . Yii::$app->user->getIdentity()->username . ' <img  src="' . $icon . '" height="30px" width="30px;" ></span>',
+                    '<span> <img  src="' . $icon . '" height="30px" width="30px;">' . Yii::$app->user->getIdentity()->username .  '</span>',
                     ['class' => 'btn btn-link ']
                 );
                 echo Html::endForm();
             }
             ?>
-
         </div>
     </div>
     <div class="xLayoutContent">
@@ -75,21 +73,21 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => \yii\h
         <?= $content ?>
         <div class="xFooter">
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                <p>Є питання? Пишіть (пріоритетний контакт - цілодобово): dev.univd@gmail.com</p>
+                <p>О сколько нам открытий чудных готовит просвещенья дух</p>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
                 <div>
-                    Телефони (з 9 до 18, 12-13 - перерва)
+                    И опыт, сын ошибок трудных
                 </div>
                 <div>
-                    068-756-01-94 (WhatsApp, Viber)
+                    И гений, просвещенья друг ...
                     <br>
-                    050-864-33-04
+                    А.С. Пушкин
                 </div>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
                 <br>
-                 НП України, ХНУВС, 2017 - <?= date('Y') ?>
+                 Lokoko inc. LTD - <?= date('Y') ?>
             </div>
         </div>
     </div>
@@ -103,7 +101,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => \yii\h
         <div id="xMenuContent" >
         <button class="xMenuCloseBtn" onclick="hideMenu();">
             <span class ="img-rounded">
-                <img  src="<?=\yii\helpers\Url::to('@web/images/np_logo.png');?>" height="50px" width="50px;">
+                <img  src="<?=\yii\helpers\Url::to('@web/images/sun_61831.png');?>" height="50px" width="50px;">
             </span>
 
         </button>

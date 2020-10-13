@@ -2,10 +2,9 @@
 
 namespace app\modules\adminxx\controllers;
 
-use app\modules\adminxx\components\AccessControl;
+use app\components\AccessControl;
 use app\modules\adminxx\models\MenuXX;
 use app\modules\adminxx\models\Route;
-use yii\web\Controller;
 
 /**
  * Class MenuxController

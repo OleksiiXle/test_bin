@@ -2,13 +2,11 @@
 namespace app\modules\adminxx\controllers;
 
 use Yii;
-use app\modules\adminxx\components\AccessControl;
-use app\modules\adminxx\models\Assignment;
-use yii\filters\VerbFilter;
+use app\components\AccessControl;
 
 class DefaultController extends MainController
 {
-    /**
+   /**
      * @inheritdoc
      */
     public function behaviors()
@@ -26,6 +24,7 @@ class DefaultController extends MainController
                 ],
             ],
         ];
+
         return $behaviors;
     }
 
@@ -104,5 +103,4 @@ class DefaultController extends MainController
                 'buttons' => $buttons,
             ]);
     }
-
 }

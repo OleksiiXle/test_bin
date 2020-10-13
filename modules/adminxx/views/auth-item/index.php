@@ -1,8 +1,8 @@
 <?php
 use yii\helpers\Html;
-use yii\grid\GridView;
-use \yii\widgets\Pjax;
-use \app\modules\adminxx\models\AuthItemX;
+use yii\widgets\Pjax;
+use app\modules\adminxx\models\AuthItemX;
+use app\widgets\xlegrid\Xlegrid;
 
 ?>
 
@@ -36,7 +36,7 @@ $this->title =  'Дозвіли, ролі';
 <div class="row xContent">
     <div class="xCard">
         <?php Pjax::begin(['id' => 'gridPermission']);
-        echo \app\components\widgets\xlegrid\Xlegrid::widget([
+        echo Xlegrid::widget([
             'dataProvider' => $dataProvider,
             'gridTitle' => '',
             'additionalTitle' => 'qq',

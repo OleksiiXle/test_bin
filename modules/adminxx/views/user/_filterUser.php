@@ -33,16 +33,11 @@ $this->registerJs("
                         echo $form->field($filter, 'last_name');
                         echo $form->field($filter, 'first_name');
                         echo $form->field($filter, 'middle_name');
-                        echo $form->field($filter, 'email');
+                        echo $form->field($filter, 'emails');
                         ?>
                     </div>
                     <div class="col-md-12 col-lg-6">
                         <?php
-                        echo $form->field($filter, 'spec_document');
-                        echo $form->field($filter, 'direction', ['inputOptions' =>
-                            ['class' => 'form-control', 'tabindex' => '4']])
-                            ->dropDownList(UserData::$directionArray,
-                                ['options' => [ $filter->direction => ['Selected' => true]],]);
                         echo $form->field($filter, 'role', ['inputOptions' =>
                             ['class' => 'form-control', 'tabindex' => '4']])
                             ->dropDownList($filter->roleDict,
@@ -59,45 +54,6 @@ $this->registerJs("
                 </div>
             </div>
             <div class="col-md-12 col-lg-6 ">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-11">
-                                <?= $form->field($filter, 'treeDepartmentName')->textInput(['disabled' =>true])
-                                    ->label('Місце роботи (аттест.)');?>
-                            </div>
-                            <div class="col-md-1">
-                                <?= Html::a('<span class="glyphicon glyphicon-chevron-down"></span>', null, [
-                                    'onclick' => 'showHideTree(this);',
-                                ]);?>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div id="selectTree" class="simpleBlock" style=" height: 50vh; width: auto; overflow: auto; display: none; ">
-                                    <?= \app\widgets\tree\TreeWidget::widget([
-                                        'showFilter' => false,
-                                        'useConserve' => false,
-                                        'noShowPositions' => 1,
-                                        'treeHeight' => '40vh',
-                                        'searchDepartmentId' => $filter->treeDepartment_id,
-                                    ]);
-                                    ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <?= $form->field($filter, 'job_name')->label('Місце роботи (не аттест.)');?>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <?= $form->field($filter, 'treeDepartment_id')->hiddenInput()->label(false);?>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="row">
@@ -137,16 +93,9 @@ $this->registerJs("
         $("#userfilter-first_name"). attr('value', '');
         $("#userfilter-middle_name"). attr('value', '');
        // $("#userfilter-role"). attr('value', '');
-        $("#userfilter-job_name"). attr('value', '');
-      //  $("#userfilter-direction"). attr('value', '');
-        $("#userfilter-spec_document"). attr('value', '');
-      //  $("#userfilter-treedepartment_id"). attr('value', 14005);
 
         document.getElementById('userfilter-role').value = null;
-        document.getElementById('userfilter-email').value = null;
-        document.getElementById('userfilter-direction').value = null;
-        document.getElementById('userfilter-treedepartment_id').value = 14005;
-
+        document.getElementById('userfilter-emails').value = null;
 
         $('.showStatus').prop('checked', false);
         $('.checkBoxAll').prop('checked', true);

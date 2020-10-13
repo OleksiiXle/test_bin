@@ -2,7 +2,7 @@
 namespace app\modules\adminxx\controllers;
 
 use app\components\conservation\ActiveDataProviderConserve;
-use app\modules\adminxx\components\AccessControl;
+use app\components\AccessControl;
 use app\modules\adminxx\models\AuthItemX;
 use app\modules\adminxx\models\filters\AuthItemFilter;
 use yii\rbac\Item;

@@ -39,8 +39,10 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
+            ['label' => 'About', 'url' => ['/site/about']],
+            ['label' => 'Contact', 'url' => ['/site/contact']],
             Yii::$app->user->isGuest ? (
-            ['label' => 'Login', 'url' => ['/site/login']]
+                ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
                 '<li>'
                 . Html::beginForm(['/site/logout'], 'post')
@@ -51,30 +53,18 @@ AppAsset::register($this);
                 . Html::endForm()
                 . '</li>'
             )
-
         ],
     ]);
-
     NavBar::end();
-    ?>
-    <?php
-    /*
-    if (!Yii::$app->user->isGuest){
-        $icon = \yii\helpers\Url::to('@web/images/log_logout_door_1563.png');
-        echo Html::beginForm(['/site/logout'], 'post');
-        echo Html::submitButton(
-            '<span> <img  src="' . $icon . '" height="30px" width="30px;">' . Yii::$app->user->getIdentity()->username .  '</span>',
-            ['class' => 'btn btn-link ']
-        );
-        echo Html::endForm();
-    }
-    */
     ?>
 
     <div class="container">
+        <?= Breadcrumbs::widget([
+            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+        ]) ?>
+        <?= Alert::widget() ?>
         <?= $content ?>
     </div>
-
 </div>
 
 <footer class="footer">

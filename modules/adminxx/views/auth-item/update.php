@@ -1,8 +1,6 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-use \yii\helpers\Url;
-use \app\widgets\changePosDep\ChangePosDepWidget;
 use \app\modules\adminxx\models\AuthItemX;
 
 switch ($model->type){
