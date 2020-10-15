@@ -50,8 +50,8 @@ $this->title =  'Користувачі';
                                 'action3' => 'action3***',
                             ],
                             'options' => [
+                                'class' => 'checkActionsSelect',
                                 'onchange' => 'actionWithChecked(this);',
-                                'style' => 'color:red;'
                             ],
                      ],
                     'pager' => [

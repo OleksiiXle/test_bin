@@ -12,7 +12,7 @@ class XlegridAsset extends AssetBundle {
         'js/xlegrid.js',
     ];
     public $css = [
-
+        'css/xlegrid.css',
     ];
 
     public $depends = [

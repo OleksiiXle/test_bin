@@ -8,7 +8,7 @@ use yii\base\Model;
 class UserFilter extends Model
 {
     public $checkedIds = [];
-    public $chekedAll = false;
+    public $showOnlyChecked;
 
     public $id;
     public $first_name;
@@ -37,23 +37,15 @@ class UserFilter extends Model
     public $permissionDict;
     public $additionalTitle = '';
 
-  //  public $showStatusAll;
     public $showStatusActive;
     public $showStatusInactive;
 
     private $_filterContent;
 
-
-
-
-    public function __construct(array $config = [])
-    {
-        parent::__construct($config);
-    }
-
     public function rules()
     {
         return [
+            [[ 'showStatusActive', 'showStatusInactive', 'showOnlyChecked'], 'boolean'],
             [['first_name', 'middle_name', 'last_name', 'role', 'username', 'emails'], 'string', 'max' => 50],
             [['first_name', 'middle_name', 'last_name'],  'match', 'pattern' => UserM::USER_NAME_PATTERN,
                 'message' => \Yii::t('app', UserM::USER_NAME_ERROR_MESSAGE)],
@@ -61,7 +53,6 @@ class UserFilter extends Model
                 'message' => \Yii::t('app', UserM::USER_PASSWORD_ERROR_MESSAGE)],
             [['id', ], 'integer'],
             [['first_name', 'middle_name', 'last_name', 'role'], 'string', 'max' => 50],
-            [[ 'showStatusActive', 'showStatusInactive'], 'boolean'],
             ['emails', 'email'],
 
 
@@ -75,11 +66,12 @@ class UserFilter extends Model
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
             'username' => 'Логін',
             'first_name' => 'Імя',
             'middle_name' => 'По батькові',
             'last_name' => 'Прізвище',
+            'showOnlyChecked' => 'Только выбранные',
+
             'phone' => 'Телефон',
             'auth_key' => 'Ключ авторізації',
             'password' => 'Пароль',
@@ -100,14 +92,16 @@ class UserFilter extends Model
         ];
     }
 
-
     public function getQuery($params = null)
     {
         $tmp = 1;
         $query = UserM::find()
-            ->joinWith(['userDatas'])
-          //  ->joinWith(['userDatas.personal']);
-        ;
+            ->joinWith(['userDatas']);
+
+        if ($this->showOnlyChecked =='1' && !empty($this->checkedIds)) {
+            $query->andWhere(['IN', 'user.id', $this->showOnlyChecked]);
+            return $query;
+        }
 
         if (!$this->validate()) {
             return $query;

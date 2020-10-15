@@ -88,15 +88,10 @@ class Xlegrid extends GridView
         $r=1;
         if (isset($this->filterView) && isset($this->dataProvider->filterModel)){
             $filter = $this->dataProvider->filterModel;
-            /*
-            $filterButton = Html::a('<span class="glyphicon glyphicon-search"></span>', null, [
-                'title' => \Yii::t('app', 'Фільтр'),
+            $filterButton = Html::button('<span class="glyphicon glyphicon-chevron-down"></span>', [
+              //  'title' => \Yii::t('app', 'Фільтр'),
                 'onclick' => 'buttonFilterShow(this);',
-            ]);
-            */
-            $filterButton = Html::button('<span class="glyphicon glyphicon-search"></span>', [
-                'title' => \Yii::t('app', 'Фільтр'),
-                'onclick' => 'buttonFilterShow(this);',
+                'class' => 'show-filter-btn',
             ]);
 
             $filterContent = '';
@@ -324,74 +319,5 @@ class Xlegrid extends GridView
     {
         $checkBox = '<input type="checkbox" id="row-check-"' .  $key . '" class="row-check" data-id = "' . $key . '" onChange="checkRow(this);" >';
         return Html::tag('td', $checkBox);
-    }
-
-
-
-    public function renderFilters___()
-    {
-        $r=1;
-        if (isset($this->filterView) && isset($this->dataProvider->filterModel)){
-            $filter = $this->dataProvider->filterModel;
-            $filterButton = Html::a('<span class="glyphicon glyphicon-search"></span>', null, [
-                'title' => \Yii::t('app', 'Фільтр'),
-                'onclick' => 'buttonFilterShow(this);',
-            ]);
-            $filterBody ='
-        <td colspan='. count($this->columns) . '>
-        <div class="row">
-             <div class="col-md-6">
-                    <b>' . $this->gridTitle .  '</b>'
-                . ' ' . (isset($this->dataProvider->filterModel->additionalTitle) ? $this->dataProvider->filterModel->additionalTitle : '') .
-                '</div>
-            <div class="col-md-6" align="right">
-                    ' . $filterButton . '
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12" style="display: none" id="filterZone">
-                    ' . $this->render($this->filterView, [
-                    'filter' => $filter,
-                ]) . '
-            </div>
-        </div>
-        </td>
-
-        ';
-        } else {
-            $filterBody ='
-        <td colspan='. count($this->columns) . '>
-        <div class="row">
-             <div class="col-md-6">
-                    <b>' . $this->gridTitle .  '</b>
-            </div>
-        </div>
-        </td>
-
-        ';
-
-        }
-        return $filterBody;
-    }
-
-    /**
-     * Renders the table header.
-     * @return string the rendering result.
-     */
-    public function renderTableHeader___()
-    {
-        $cells = [];
-        foreach ($this->columns as $column) {
-            /* @var $column Column */
-            $cells[] = $column->renderHeaderCell();
-        }
-        $content = Html::tag('tr', implode('', $cells), $this->headerRowOptions);
-        if ($this->filterPosition === self::FILTER_POS_HEADER) {
-            $content = $this->renderFilters() . $content;
-        } elseif ($this->filterPosition === self::FILTER_POS_BODY) {
-            $content .= $this->renderFilters();
-        }
-
-        return "<thead>\n" . $content . "\n</thead>";
     }
 }

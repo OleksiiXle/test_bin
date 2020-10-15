@@ -32,6 +32,8 @@ $(document).ready(function(){
 
 function doPjax(href) {
     var hr = getHrefWithFilter(href);
+    console.log(checkedIds);
+
     $.pjax({
         type: 'POST',
         url: hr,
@@ -43,26 +45,34 @@ function doPjax(href) {
 }
 
 function useFilter() {
-    checkedIds = [];
+  //  checkedIds = [];
     doPjax(window.location.href);
 }
 
 function getHrefWithFilter(href) {
-    var hr = href;
+    //http://test/adminxx/user?filter=1&role=user&filterEnd=1
     getFilterQuery();
+    var hr = href;
+    var filterFragment = '';
     var hasFilter = false;
-    var filterStart = hr.indexOf('&filter');
+    var filterStart = hr.indexOf('&filter=1');
     var filterEnd;
     if (filterStart > 0) {
+        console.log(filterStart);
         hasFilter = true;
     } else {
-        filterStart = hr.indexOf('?filter');
+        filterStart = hr.indexOf('?filter=1');
         if (filterStart > 0) {
+            console.log(filterStart);
             hasFilter = true;
         }
     }
     if (hasFilter) {
-        filterEnd = hr.indexOf('&filterEnd');
+        filterEnd = hr.indexOf('&filterEnd=1');
+        filterFragment = hr.substring(filterStart, filterEnd + 12);
+        console.log(filterEnd);
+        console.log(hr);
+        console.log(filterFragment);
         hr = hr.substr(0, filterStart) + hr.substr(filterEnd + 12, hr.length);
     }
     if (filterQuery.length > 0){
@@ -118,6 +128,7 @@ function checkRow(checkbox){
             checkedIds.splice(ind, 1);
         }
     }
+    console.log(checkedIds);
 }
 
 function actionWithChecked(action) {
@@ -125,37 +136,24 @@ function actionWithChecked(action) {
     console.log(checkedIds);
 }
 
-
-
-
-function hello(){
-    alert('hello');
-}
-
 function buttonFilterShow(button) {
-
     if ($("#filterZone").is(":hidden")) {
         $("#filterZone").show("slow");
         $(button).css("color", "#daa520");
+        $(button)[0].innerHTML = '<span class="glyphicon glyphicon-chevron-up"></span>';
         if (typeof clickButtonFilterShowFunction == 'function'){
             clickButtonFilterShowFunction();
         }
     } else {
         $("#filterZone").hide("slow");
         $(button).css("color", "#00008b");
+        $(button)[0].innerHTML = '<span class="glyphicon glyphicon-chevron-down"></span>';
         if (typeof clickButtonFilterHideFunction == 'function'){
             clickButtonFilterHideFunction();
         }
 
-    };
+    }
 }
-
-/*
-jQuery(".btn-filter-apply").on("click", function (e) {
-    e.preventDefault();
-  //  alert('asdasd');
-});
-*/
 
 function getGridFilterData(modelName, formId, urlName, container_id) {
     //   alert(modelName + ' ' + formId + ' ' + urlName + ' ' + container_id);
@@ -178,6 +176,32 @@ function getGridFilterData(modelName, formId, urlName, container_id) {
 
 
 }
+
+function cleanFilter(){
+    var params = window
+        .location
+        .search
+        .replace('?','')
+        .split('&')
+        .reduce(
+            function(p,e){
+                var a = e.split('=');
+                p[ decodeURIComponent(a[0])] = decodeURIComponent(a[1]);
+                return p;
+            },
+            {}
+        );
+
+    console.log(params);
+    console.log(window.location);
+    console.log(window.location.origin +  window.location.pathname);
+    $('input[type="text"][ id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val('');
+    $('input[type="checkbox"][id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').prop('checked', false);
+    $('select[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val(0);
+    history.pushState({}, '', window.location.origin +  window.location.pathname);
+    useFilter();
+}
+
 
 
 

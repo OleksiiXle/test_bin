@@ -53,6 +53,9 @@ $this->registerJs("
                 </div>
             </div>
             <div class="col-md-12 col-lg-6 ">
+                <?php
+                echo $form->field($filter, 'showOnlyChecked')->checkbox();
+                ?>
             </div>
         </div>
         <div class="row">
@@ -93,19 +96,6 @@ $this->registerJs("
 </div>
 
 <script>
-    function cleanFilter(){
-        $("#userfilter-username"). attr('value', '');
-        $("#userfilter-last_name"). attr('value', '');
-        $("#userfilter-first_name"). attr('value', '');
-        $("#userfilter-middle_name"). attr('value', '');
-       // $("#userfilter-role"). attr('value', '');
-
-        document.getElementById('userfilter-role').value = null;
-        document.getElementById('userfilter-emails').value = null;
-
-        $('.showStatus').prop('checked', false);
-        $("#subBtn").click();
-    }
 
 /*
     $(".checkBoxAll").change(function() {
