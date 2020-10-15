@@ -34,14 +34,26 @@ $this->title =  'Користувачі';
 </div>
 <div class="row xContent">
         <div class="usersGrid xCard">
-            <?php Pjax::begin([
-                //   'id' => 'gridUsers',
-                'id' => 'users-grid-container',
-            ]);
+            <?php
+             //Pjax::begin(['id' => 'users-grid-container1',]);
             ?>
-            <div id="users-grid" class="grid-view">
+            <div id="users-grid-container" >
                 <?php
                 echo Xlegrid::widget([
+                    'usePjax' => true,
+                    'pjaxContainerId' => 'users-grid-container',
+                    'useCheckForRows' => true,
+                    'checkActionList' => [
+                            'actions' => [
+                                'action1' => 'action1***',
+                                'action2' => 'action2***',
+                                'action3' => 'action3***',
+                            ],
+                            'options' => [
+                                'onchange' => 'actionWithChecked(this);',
+                                'style' => 'color:red;'
+                            ],
+                     ],
                     'pager' => [
                         'firstPageLabel' => '<<<',
                         'lastPageLabel'  => '>>>'
@@ -57,6 +69,13 @@ $this->title =  'Користувачі';
                     ],
                     //-------------------------------------------
                     'columns' => [
+                        [
+                            'label' => '',
+                            'headerOptions' => ['style' => 'width: 2%;overflow: hidden; '],
+                            'contentOptions' => ['style' => 'width: 2%; white-space: nowrap; overflow: hidden;'],
+                            'options' => ['class' => 'row-check'],
+                            //'content' => '',
+                        ],
                         [
                             'class' => 'yii\grid\SerialColumn',
                             'headerOptions' => ['style' => 'width: 3%;'],
@@ -158,7 +177,8 @@ $this->title =  'Користувачі';
                     ],
 
                 ]);
-                Pjax::end() ?>
+                ?>
+                <?php //Pjax::end() ?>
 
             </div>
 

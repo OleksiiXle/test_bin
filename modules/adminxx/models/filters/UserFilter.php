@@ -7,6 +7,9 @@ use yii\base\Model;
 
 class UserFilter extends Model
 {
+    public $checkedIds = [];
+    public $chekedAll = false;
+
     public $id;
     public $first_name;
     public $middle_name;
@@ -34,7 +37,7 @@ class UserFilter extends Model
     public $permissionDict;
     public $additionalTitle = '';
 
-    public $showStatusAll;
+  //  public $showStatusAll;
     public $showStatusActive;
     public $showStatusInactive;
 
@@ -58,7 +61,7 @@ class UserFilter extends Model
                 'message' => \Yii::t('app', UserM::USER_PASSWORD_ERROR_MESSAGE)],
             [['id', ], 'integer'],
             [['first_name', 'middle_name', 'last_name', 'role'], 'string', 'max' => 50],
-            [[ 'showStatusAll', 'showStatusActive', 'showStatusInactive'], 'boolean'],
+            [[ 'showStatusActive', 'showStatusInactive'], 'boolean'],
             ['emails', 'email'],
 
 
@@ -98,17 +101,17 @@ class UserFilter extends Model
     }
 
 
-
-
-
     public function getQuery($params = null)
     {
         $tmp = 1;
-
         $query = UserM::find()
             ->joinWith(['userDatas'])
           //  ->joinWith(['userDatas.personal']);
         ;
+
+        if (!$this->validate()) {
+            return $query;
+        }
 
         if (!empty($this->role)) {
             $query ->innerJoin('auth_assignment aa', 'user.id=aa.user_id')
@@ -117,9 +120,6 @@ class UserFilter extends Model
             ;
         }
 
-        if (!$this->validate()) {
-            return $query;
-        }
 
         if (!empty($this->emails)) {
             $query->andWhere(['LIKE', 'user.emails', $this->emails]);

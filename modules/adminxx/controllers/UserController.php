@@ -118,7 +118,7 @@ class UserController extends MainController
            // 'searchId' => $id,
             'filterModelClass' => UserFilter::class,
             'conserveName' => 'userAdminGrid',
-            'pageSize' => 15,
+            'pageSize' => 5,
             'sort' => ['attributes' => [
                 'id',
                 'username',
@@ -158,9 +158,11 @@ class UserController extends MainController
 
         ]);
         $r=1;
+        /*
         if (\Yii::$app->request->isPost){
             return $this->redirect('index');
         }
+        */
         return $this->render('index',[
             'dataProvider' => $dataProvider,
         ]);

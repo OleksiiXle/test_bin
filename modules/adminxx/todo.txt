@@ -38,4 +38,10 @@
 Откат:
 переключиться на сервере на ветку девелоп
 
+We want the browser to maintain two separate internal caches: one
+for pjax'd partial page loads and one for normal page loads.
+Without adding this secret parameter, some browsers will often
+confuse the two.
+
+
 

@@ -45,7 +45,6 @@ $this->registerJs("
                         ?>
                         <div>
                             <?php
-                            echo $form->field($filter, 'showStatusAll')->checkbox(['class' => 'checkBoxAll']);
                             echo $form->field($filter, 'showStatusActive')->checkbox(['class' => 'showStatus']);
                             echo $form->field($filter, 'showStatusInactive')->checkbox(['class' => 'showStatus']);
                             ?>
@@ -58,7 +57,14 @@ $this->registerJs("
         </div>
         <div class="row">
             <div class="form-group" align="center" style="padding: 20px">
-                <?= Html::submitButton('Шукати', ['class' => 'btn btn-primary', 'id' => 'subBtn']) ?>
+                <?php
+              //  echo  Html::submitButton('Шукати', ['class' => 'btn btn-primary', 'id' => 'subBtn']);
+                echo  Html::button('Шукати', [
+                    'class' => 'btn btn-primary',
+                    'id' => 'subBtn',
+                    'onclick' => 'useFilter();'
+                    ]);
+                ?>
                 <?= Html::button('Очистити фільтр', [
                     'class' => 'btn btn-danger',
                     'id' => 'cleanBtn',
@@ -98,27 +104,10 @@ $this->registerJs("
         document.getElementById('userfilter-emails').value = null;
 
         $('.showStatus').prop('checked', false);
-        $('.checkBoxAll').prop('checked', true);
         $("#subBtn").click();
     }
 
-    function showHideTree(item)
-    {
-        switch (item.innerHTML) {
-            case '<span class="glyphicon glyphicon-chevron-down"></span>':
-                $("#selectTree").show('slow');
-                item.innerHTML = '<span class="glyphicon glyphicon-chevron-up"></span>';
-                break;
-            case '<span class="glyphicon glyphicon-chevron-up"></span>':
-                $("#selectTree").hide('slow');
-                item.innerHTML = '<span class="glyphicon glyphicon-chevron-down"></span>';
-                break;
-
-
-        }
-     //   console.log(item.innerHTML);
-    }
-
+/*
     $(".checkBoxAll").change(function() {
         if(this.checked) {
             $('.showStatus').prop('checked', false);
@@ -129,6 +118,7 @@ $this->registerJs("
             $('.checkBoxAll').prop('checked', false);
         }
     });
+    */
 
 </script>
 

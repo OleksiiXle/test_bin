@@ -23,10 +23,10 @@ class ActiveDataProviderConserve extends ActiveDataProvider
         'filter' => [],
         'sort' => [],
     ];
+    public $filterClassShortName = '';
 
     public function __construct(array $config = [])
     {
-
         $session = \Yii::$app->session;
         if ($session->get('searchIid')){
             $this->searchId = $session->get('searchIid');
@@ -34,7 +34,9 @@ class ActiveDataProviderConserve extends ActiveDataProvider
         }
 
         parent::__construct($config);
-        $this->getConserves();
+        if (!empty($this->conserveName)) {
+            $this->getConserves();
+        }
         $this->pagination = [
             'class'            => 'app\components\conservation\PaginationConserve',
             'conserveName' => $this->conserveName,
@@ -46,14 +48,51 @@ class ActiveDataProviderConserve extends ActiveDataProvider
         //-- фильтр
         if (isset($this->filterModelClass)){
             $this->exportQuery['filterModelClass'] = $this->filterModelClass;
-            $params = [];
             if (!$this->filterModel){
                 $this->filterModel = new $this->filterModelClass;
+                $this->filterClassShortName = $this->filterModel->formName();
             }
 
-            if (\Yii::$app->request->isPost){ //-- пришел новый фильтр
-                $params = \Yii::$app->request->post();
+            //-- пытаемся определить фильтр
+            $params = [];
+            if(\Yii::$app->request->isPost) {
+                $_post = \Yii::$app->request->post();
+                if (isset($_post['checkedIds']) && $this->filterModel->hasProperty('checkedIds')) {
+                    $this->filterModel->checkedIds =  $_post['checkedIds'];
+                }
+
+                $_get = \Yii::$app->request->get();
+                if (isset($_get['filter'])) {
+                    $params = [
+                        $this->filterModel->formName() => $_get,
+                    ];
+                } else {
+                    $params = $_post;
+                }
+            }
+
+            if (!empty($params)) {
+                //-- фильтр пришел
                 $this->filterModel->load($params);
+                if (!empty($this->conserveName)) {
+                    $cJSON = \Yii::$app->conservation->setConserveGridDB(
+                            $this->conserveName,
+                            'filter',
+                            json_encode($this->filterModel->getAttributes())
+                        );
+                    $cJSON = \Yii::$app->conservation->setConserveGridDB($this->conserveName, $this->pagination->pageParam, 1);
+                }
+                $this->pagination->startPage = 0;
+            } elseif(!empty($this->conserveName)) {
+                //-- фильтр не пришел
+                $params = (array) $this->conserves['filter'];
+                $this->filterModel->setAttributes($params);
+            }
+
+            /*
+            if (\Yii::$app->request->isPost) { //-- пришел новый фильтр
+                $params = self::prepareParams(\Yii::$app->request->post());
+                $this->filterModel->load($params, '');
                 $cJSON = \Yii::$app->conservation
                     ->setConserveGridDB(
                         $this->conserveName,
@@ -67,18 +106,13 @@ class ActiveDataProviderConserve extends ActiveDataProvider
                 $params = (array) $this->conserves['filter'];
                 $this->filterModel->setAttributes($params);
             }
-          //  \Yii::trace(\yii\helpers\VarDumper::dumpAsString($this->filterModel), 'dbg');
+            */
+
             $this->query = $this->filterModel->getQuery();
-
             $this->exportQuery['filter']= $this->filterModel->getAttributes();
-         //   \Yii::trace(\yii\helpers\VarDumper::dumpAsString($this->query), 'dbg');
-
         } else {
             $this->query = $this->baseModel;
-
         }
-
-
     }
 
     public function getConserves(){
@@ -141,5 +175,15 @@ class ActiveDataProviderConserve extends ActiveDataProvider
         }
 
         return $query->all($this->db);
+    }
+
+    private function prepareParams($params)
+    {
+        $ret = [];
+        foreach ($params['query'] as $param) {
+            $ret[$param['name']] = $param['value'];
+        }
+
+        return $ret;
     }
 }

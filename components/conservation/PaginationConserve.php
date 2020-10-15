@@ -55,7 +55,4 @@ class PaginationConserve extends Pagination
 
         return $pageSize < 1 ? 0 : $this->getPage() * $pageSize;
     }
-
-
-
 }
