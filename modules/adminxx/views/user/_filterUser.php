@@ -54,7 +54,9 @@ $this->registerJs("
             </div>
             <div class="col-md-12 col-lg-6 ">
                 <?php
-                echo $form->field($filter, 'showOnlyChecked')->checkbox();
+                echo $form->field($filter, 'showOnlyChecked')->checkbox([
+                        'onchange' => 'checkOnlyChecked(this);'
+                ]);
                 ?>
             </div>
         </div>
@@ -71,7 +73,7 @@ $this->registerJs("
                 <?= Html::button('Очистити фільтр', [
                     'class' => 'btn btn-danger',
                     'id' => 'cleanBtn',
-                    'onclick' => 'cleanFilter();',
+                    'onclick' => 'cleanFilter(true);',
                 ]) ?>
                 <!--
                               Html::a('У файл', ['/adminxx/user/export-to-exel', 'exportQuery' => $exportQuery],

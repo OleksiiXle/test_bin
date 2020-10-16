@@ -64,7 +64,7 @@ class ActiveDataProviderConserve extends ActiveDataProvider
                 $_get = \Yii::$app->request->get();
                 if (isset($_get['filter'])) {
                     $params = [
-                        $this->filterModel->formName() => $_get,
+                        $this->filterModel->formName() => self::encodeFilter($_get['filter']),
                     ];
                 } else {
                     $params = $_post;
@@ -177,10 +177,11 @@ class ActiveDataProviderConserve extends ActiveDataProvider
         return $query->all($this->db);
     }
 
-    private function prepareParams($params)
+    private function encodeFilter($codedFilter)
     {
+        $encodedFilter = json_decode($codedFilter, true);
         $ret = [];
-        foreach ($params['query'] as $param) {
+        foreach ($encodedFilter as $param) {
             $ret[$param['name']] = $param['value'];
         }
 

@@ -13,6 +13,7 @@ const PJAX_CONTAINER_ID = '#users-grid-container'
  */
 
 var filterQuery = [];
+var filterQueryJSON = '{}';
 var checkedIds = [];
 
 
@@ -27,12 +28,18 @@ $(document).ready(function(){
             event.stopPropagation();
             doPjax(this.href);
         });
+        $('#' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-showonlychecked').prop('checked', false);
+
+        getFilterQuery();
+        useFilter();
     }
 });
 
 function doPjax(href) {
     var hr = getHrefWithFilter(href);
-    console.log(checkedIds);
+   // console.log(checkedIds);
+   // console.log('+++++ doPjax for ++' + hr);
+ //  return;
 
     $.pjax({
         type: 'POST',
@@ -46,53 +53,40 @@ function doPjax(href) {
 
 function useFilter() {
   //  checkedIds = [];
+    console.log(checkedIds);
     doPjax(window.location.href);
 }
 
 function getHrefWithFilter(href) {
-    //http://test/adminxx/user?filter=1&role=user&filterEnd=1
+   // console.log('**************************');
     getFilterQuery();
-    var hr = href;
-    var filterFragment = '';
-    var hasFilter = false;
-    var filterStart = hr.indexOf('&filter=1');
-    var filterEnd;
-    if (filterStart > 0) {
-        console.log(filterStart);
-        hasFilter = true;
-    } else {
-        filterStart = hr.indexOf('?filter=1');
-        if (filterStart > 0) {
-            console.log(filterStart);
-            hasFilter = true;
-        }
+    var url = parseUrl(href);
+  //  console.log(url.params);
+    var newHref = url.path;
+    if (filterQuery.length > 0) {
+        url.params['filter'] = filterQueryJSON;
     }
-    if (hasFilter) {
-        filterEnd = hr.indexOf('&filterEnd=1');
-        filterFragment = hr.substring(filterStart, filterEnd + 12);
-        console.log(filterEnd);
-        console.log(hr);
-        console.log(filterFragment);
-        hr = hr.substr(0, filterStart) + hr.substr(filterEnd + 12, hr.length);
-    }
-    if (filterQuery.length > 0){
-        if (hr.indexOf('?') < 0) {
-            hr += '?filter=1';
+ //   console.log(url.params);
+    var first = true;
+    for (var key in url.params) {
+        if (first) {
+            first = false;
+            newHref += '?' + key + '=' + url.params[key];
         } else {
-            hr += '&filter=1';
+            newHref += '&' + key + '=' + url.params[key];
         }
-        $(filterQuery).each(function (index, value) {
-            hr += '&' + value['name'] + '=' + value['value'];
-        });
-        hr += '&filterEnd=1';
-
     }
 
-    return hr;
+ //   console.log(href);
+ //   console.log(newHref);
+ //   console.log('**************************');
+
+    return newHref;
 }
 
 function getFilterQuery() {
     filterQuery = [];
+    filterQueryJSON = '{}';
     var bufName;
     $('[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').each(function(index, value) {
         if (value.value.length > 0) {
@@ -115,7 +109,9 @@ function getFilterQuery() {
             filterQuery.push({'name' : bufName, 'value' : value.value });
         }
     });
-    console.log(filterQuery);
+    filterQueryJSON = JSON.stringify(filterQuery);
+   // console.log(filterQuery);
+   // console.log(filterQueryJSON);
 }
 
 function checkRow(checkbox){
@@ -128,7 +124,7 @@ function checkRow(checkbox){
             checkedIds.splice(ind, 1);
         }
     }
-    console.log(checkedIds);
+   // console.log(checkedIds);
 }
 
 function actionWithChecked(action) {
@@ -177,13 +173,42 @@ function getGridFilterData(modelName, formId, urlName, container_id) {
 
 }
 
-function cleanFilter(){
-    var params = window
-        .location
-        .search
-        .replace('?','')
-        .split('&')
-        .reduce(
+function cleanFilter(reload){
+  //  console.log(parseUrl());
+  //  console.log(window.location);
+ //   console.log(window.location.origin +  window.location.pathname);
+    $('input[type="text"][ id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val('');
+    $('input[type="checkbox"][id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').prop('checked', false);
+    $('select[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val(0);
+    history.pushState({}, '', window.location.origin +  window.location.pathname);
+    if (reload) {
+        useFilter();
+    }
+}
+
+function parseUrl(href) {
+//    console.log(window.location);
+   // console.log('**** parseUrl ');
+  //  console.log(href);
+    var paramsStr = '';
+    var res = {
+        path : window.location.origin +  window.location.pathname,
+        params : {}
+    };
+    if (href == undefined) {
+     //   console.log('href == undefined');
+        paramsStr = window.location.search;
+    } else {
+   //     console.log('href != undefined');
+       // console.log(href);
+        var startParams = href.indexOf('?');
+        if (startParams > 0) {
+            paramsStr = href.substr(startParams);
+        }
+    }
+  //  console.log('paramsStr = ' + paramsStr);
+    if (paramsStr !== '') {
+        res.params = paramsStr.replace('?','').split('&').reduce(
             function(p,e){
                 var a = e.split('=');
                 p[ decodeURIComponent(a[0])] = decodeURIComponent(a[1]);
@@ -191,17 +216,63 @@ function cleanFilter(){
             },
             {}
         );
+    }
+  //  console.log(res);
+  //  console.log('**** parseUrl ');
 
-    console.log(params);
-    console.log(window.location);
-    console.log(window.location.origin +  window.location.pathname);
-    $('input[type="text"][ id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val('');
-    $('input[type="checkbox"][id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').prop('checked', false);
-    $('select[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val(0);
-    history.pushState({}, '', window.location.origin +  window.location.pathname);
-    useFilter();
+    return res;
 }
 
+function checkOnlyChecked(item) {
+    if ($(item).prop('checked')) {
+        $('input[type="text"][ id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val('');
+        $('input[type="checkbox"][id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-][id!=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-showonlychecked]')
+            .prop('checked', false);
+        $('select[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val(0);
+        history.pushState({}, '', window.location.origin +  window.location.pathname);
+    }
+
+}
+
+
+
+
+function getHrefWithFilter__COPY(href) {
+    var hr = href;
+    var filterFragment = '';
+    var hasFilter = false;
+    var filterStart = hr.indexOf('&filter=1');
+    var filterEnd;
+    if (filterStart > 0) {
+        hasFilter = true;
+    } else {
+        filterStart = hr.indexOf('?filter=1');
+        if (filterStart > 0) {
+            hasFilter = true;
+        }
+    }
+    if (hasFilter) {
+        filterEnd = hr.indexOf('&filterEnd=1');
+        filterFragment = hr.substring(filterStart, filterEnd + 12);
+        console.log(hr);
+        console.log(filterFragment);
+        hr = hr.substr(0, filterStart) + hr.substr(filterEnd + 12, hr.length);
+    }
+    if (filterQuery.length > 0){
+        if (hr.indexOf('?') < 0) {
+            hr += '?filter=1';
+        } else {
+            hr += '&filter=1';
+        }
+        $(filterQuery).each(function (index, value) {
+            hr += '&' + value['name'] + '=' + value['value'];
+        });
+        hr += '&filterEnd=1';
+
+    }
+
+    return hr;
+}
 
 
 

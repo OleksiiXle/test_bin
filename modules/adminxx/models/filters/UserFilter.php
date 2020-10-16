@@ -99,7 +99,7 @@ class UserFilter extends Model
             ->joinWith(['userDatas']);
 
         if ($this->showOnlyChecked =='1' && !empty($this->checkedIds)) {
-            $query->andWhere(['IN', 'user.id', $this->showOnlyChecked]);
+            $query->andWhere(['IN', 'user.id', $this->checkedIds]);
             return $query;
         }
 
@@ -187,6 +187,10 @@ class UserFilter extends Model
 
         if ($this->showStatusInactive =='1'){
             $this->_filterContent .= ' * Тількі неактивні*;' ;
+        }
+
+        if ($this->showOnlyChecked =='1'){
+            $this->_filterContent .= ' * Только отмеченные*;' ;
         }
 
         return $this->_filterContent;
