@@ -2,11 +2,8 @@
 
 use yii\helpers\Html;
 use yii\widgets\Pjax;
-use yii\helpers\Url;
 use yii\bootstrap\Modal;
-use app\components\widgets\xlegrid\Xlegrid;
-use app\commands\backgroundTasks\models\BackgroundTask;
-use app\components\widgets\menuAction\MenuActionWidget;
+use app\widgets\xlegrid\Xlegrid;
 use app\modules\adminxx\assets\AdminxxBackgroundTaskAsset;
 
 AdminxxBackgroundTaskAsset::register($this);

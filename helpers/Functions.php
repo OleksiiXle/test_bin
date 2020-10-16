@@ -107,10 +107,9 @@ class Functions
     /**
      * Вывод трех мерного ассоциативного массива в CSV файл
      * - ключи первого подмассива будут в превом ряду
-     * @param $data - массив
-     * @param $pathToFile
-     * @param $department_id
-     * @param string $title
+     * @param array $data - массив
+     * @param string $pathToFile
+    * @param string $fileMask
      * @return mixed
      */
     public static function exportToCSV($data, $pathToFile, $fileMask = 'report'){

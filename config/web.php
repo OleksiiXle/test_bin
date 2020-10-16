@@ -2,6 +2,7 @@
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
+$backGroundDb = require(__DIR__ . '/backGroundDb.php');
 
 $config = [
     'id' => 'basic',
@@ -10,9 +11,6 @@ $config = [
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
-    ],
-    'controllerMap' => [
-        'binar' => 'app\widgets\binar\controllers\BinarController',
     ],
     'components' => [
         'request' => [
@@ -58,6 +56,7 @@ $config = [
             ],
         ],
         'db' => $db,
+        'backGroundDb' => $backGroundDb,
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,

@@ -1,6 +1,7 @@
 <?php
 
 use \yii\helpers\Html;
+use app\widgets\menuUpdate\MenuUpdateWidget;
 
 //\app\components\widgets\menuUpdate\MenuUpdateAssets::register($this);
 \app\modules\adminxx\assets\AdminxxMenuAsset::register($this);
@@ -12,7 +13,7 @@ $this->title = \Yii::t('app', 'Редактор меню');
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" >
             <div class="xCard" style="min-height: 300px ">
                 <?php
-                echo \app\components\widgets\menuUpdate\MenuUpdateWidget::widget([
+                echo MenuUpdateWidget::widget([
                     'menu_id' => 'NumberOne',
                     'params' => [
                         'mode' => 'update'

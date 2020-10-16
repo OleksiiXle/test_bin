@@ -2,6 +2,7 @@
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
+$backGroundDb = require(__DIR__ . '/backGroundDb.php');
 
 $config = [
     'id' => 'basic-console',
@@ -31,6 +32,7 @@ $config = [
             ],
         ],
         'db' => $db,
+        'backGroundDb' => $backGroundDb,
     ],
     'params' => $params,
     /*

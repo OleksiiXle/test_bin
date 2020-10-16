@@ -3,6 +3,7 @@
 namespace app\modules\adminxx\controllers;
 
 use app\commands\backgroundTasks\models\BackgroundTask;
+use app\commands\backgroundTasks\tasks\TestTaskWorker;
 use app\modules\adminxx\models\filters\BackgroundTaskFilter;
 use app\components\conservation\ActiveDataProviderConserve;
 use app\components\AccessControl;
@@ -13,7 +14,6 @@ use app\components\AccessControl;
  */
 class BackgroundTasksController extends MainController
 {
-
     /**
      * @return array
      */
@@ -29,6 +29,7 @@ class BackgroundTasksController extends MainController
                         'index', 'modal-open-background-task',
                         'modal-open-background-task-delete-confirm', 'background-task-delete',
                         'modal-open-background-task-logs',
+                        'start-background-task', 'run-background-task', 'run-background-task-ajax'
                     ],
                     'roles'      => ['adminSystem'],
                 ],
@@ -146,5 +147,102 @@ class BackgroundTasksController extends MainController
             'content' => $content,
         ]);
     }
+
+    //*********************************************************************************** TESTING
+
+    public function actionStartBackgroundTask()
+    {
+        $model = TestTaskWorker::class;
+        $arguments = [
+            'id' => 777,
+        ];
+
+        $taskIsAlreadyRunning = BackgroundTask::taskIsRunning($model, $arguments);
+        if ($taskIsAlreadyRunning) {
+            //-- todo NB - запускать только, если по логике софта не должно быть запущено два идентичных таска одновременно
+            $taskArguments = json_encode($arguments);
+            $result =
+                [
+                    'status' => false,
+                    'message' => 'Реалізація не почалась. Аналогичные процессы сейчас запущены и работают',
+                    'data' => BackgroundTask::find()
+                        ->where(['model' => $model, 'arguments' => $taskArguments])
+                        ->asArray()
+                        ->all(),
+                ];
+        } else {
+            $task = BackgroundTask::newTask($model, $arguments);
+            if ($task->startRun()) {
+                $result = [
+                    'status' => true,
+                    'message' => 'Реалізація почалась ...',
+                    'data' => $task->getAttributes(),
+                    'taskId' => $task->id,
+                    'modelId' => 777,
+                ];
+            } else {
+                $result = [
+                    'status' => false,
+                    'message' => 'Реалізація не почалась',
+                    'data' => $task->getErrors(),
+                ];
+            }
+        }
+
+
+        return $this->render('backgroundTask', [
+            'mode' => 'Start background task processing without waiting of ending',
+            'id' => $arguments['id'],
+            'result' => $result,
+            'model' => $model,
+            'arguments' => $arguments,
+        ]);
+    }
+
+    public function actionRunBackgroundTask()
+    {
+        $model = TestTaskWorker::class;
+        $arguments = [
+            'id' => 7745,
+        ];
+
+        $task = BackgroundTask::newTask($model, $arguments);
+
+        if (!$task->hasErrors()) {
+            $result = BackgroundTask::runTask($task->id);
+        } else {
+            $result = $task->getErrors();
+        }
+
+        return $this->render('backgroundTask', [
+            'mode' => 'Run background task processing with waiting without AJAX',
+            'id' => $arguments['id'],
+            'result' => $result,
+        ]);
+
+
+    }
+
+    public function actionRunBackgroundTaskAjax()
+    {
+        $arguments = [
+            'id' => 7778,
+        ];
+        $model = TestTaskWorker::class;
+
+        $result = [
+            'status' => true,
+            'data' => 'no error'
+        ];
+
+        return $this->render('backgroundTask', [
+            'mode' => 'Run background task processing with waiting with AJAX',
+            'id' => $arguments['id'],
+            'result' => $result,
+            'model' => $model,
+            'arguments' => $arguments,
+        ]);
+    }
+
 
 }

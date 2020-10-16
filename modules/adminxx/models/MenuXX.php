@@ -140,7 +140,7 @@ class MenuXX extends MainModel
                     'data' => [
                         'newNode' => $node->nodeInfo,
                         'parentNode' => $node->parent->nodeInfo,
-                        ]
+                    ]
                 ];
                 $transaction->commit();
                 return true;
@@ -174,12 +174,13 @@ class MenuXX extends MainModel
             $node->setAttributes($data);
             $node->parent_id = $this->parent_id;
             $node->sort = $this->sort + 1;
+            $parentInfo = (isset($node->parent)) ? $node->parent->nodeInfo : [];
             if ($node->save()){
                 $this->result = [
                     'status' => true,
                     'data' => [
                         'newNode' => $node->nodeInfo,
-                        'parentNode' => $node->parent->nodeInfo,
+                        'parentNode' => $parentInfo,
                     ]
                 ];
                 $transaction->commit();
@@ -199,7 +200,7 @@ class MenuXX extends MainModel
     }
 
     /**
-     * Поменять местами в одном уровне (изменение сортировки)
+     * Поменять подразделения или должности местами в одном уровне (изменение сортировки)
      * @return boolean
      */
     public function exchangeSort($node2_id)
@@ -245,14 +246,19 @@ class MenuXX extends MainModel
     {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
-            //-- уменьшить сортировку у своих младших братьев
-            $nodesLower = self::updateAllCounters(['sort' => -1],
-                'parent_id = ' . $this->parent_id . ' AND id <> ' . $this->id );
             //-- найти старого родителя
             $node2 = self::findOne($node2_id);
+            //-- уменьшить сортировку у своих младших братьев
+            $nodesLower = self::updateAllCounters(['sort' => -1],
+                'parent_id = ' . $this->parent_id . ' AND sort > ' . $this->sort );
+
+            //-- увеличить сортировку у младших братьев своего бывшего родителя- будующего младшего брата
+            $nodesLower = self::updateAllCounters(['sort' => 1],
+                'parent_id = ' . $node2->parent_id . ' AND sort > ' . $node2->sort );
+
             $this->parent_id = $node2->parent_id;
             $this->sort = $node2->sort;
-            $node2->sort = $this->getOldAttribute('sort');
+            $node2->sort++;
             if (!$this->save()) {
                 $transaction->rollBack();
                 $this->result['data']=$this->getErrors();
@@ -289,16 +295,17 @@ class MenuXX extends MainModel
     {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
-            //-- увеличить сортировку у своих бывших младших братьев
-            $nodesLower = self::updateAllCounters(['sort' => -1],
-                'parent_id = ' . $this->parent_id  );
-
-            //-- уменьшить сортировку у своих будующих младших братьев
-            $nodesLower = self::updateAllCounters(['sort' => -1],
-                'parent_id = ' . $node2_id  );
-
-            //-- найти старого брата - нового родителя
+            //-- найти младшего брата - нового родителя
             $node2 = self::findOne($node2_id);
+
+            //-- уменьшить  сортировку у своих бывших младших братьев
+            $nodesLower = self::updateAllCounters(['sort' => -1],
+                'parent_id = ' . $this->parent_id . ' AND sort > ' . $this->sort  );
+
+            //--  увеличить сортировку у своих будующих младших братьев
+            $nodesLower = self::updateAllCounters(['sort' => 1],
+                'parent_id = ' . $node2_id );
+
 
             $this->parent_id = $node2_id;
             $this->sort = 1;
@@ -338,15 +345,35 @@ class MenuXX extends MainModel
             $nodeDel = self::findOne($node1_id);
             //-- увеличить сортировку у своих бывших младших братьев
             $nodesLower = self::updateAllCounters(['sort' => -1],
-                'parent_id = ' . $nodeDel->parent_id);
+                'parent_id = ' . $nodeDel->parent_id . ' AND sort > ' . $nodeDel->sort);
 
-            //-- найти родителя
-            $node2 = self::findOne($nodeDel->parent_id);
+            //-- запомнить иди родителя для обновления данных о нем в дереве
+            $parent_id = $nodeDel->parent_id;
+
+            //-- определить потомков
+            $childrenIds = [];
+            self::getChildrenIds($nodeDel->id, $childrenIds);
+            if (count($childrenIds) > 0){
+                //-- удаляем потомков
+                $childrenDelCount = self::deleteAll(['IN', 'id', $childrenIds]);
+                if ($childrenDelCount <> count($childrenIds)){
+                    $transaction->rollBack();
+                    $result['data'] = 'Не удалось удалить потомков';
+                    return $result;
+
+                }
+            }
+
+            //-- удаляем узел
             if ($nodeDel->delete() === 0) {
                 $transaction->rollBack();
+                $result['data'] = 'Не удалось удалить';
                 return $result;
             }
             $transaction->commit();
+
+            //-- если был предок - возвращаем информацию о нем
+            $node2 = self::findOne($parent_id);
             if (isset($node2)){
                 $result = [
                     'status' => true,
