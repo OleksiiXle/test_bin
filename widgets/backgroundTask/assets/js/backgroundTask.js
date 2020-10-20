@@ -241,10 +241,10 @@ function BackgroundTask(params) {
     this.processLoadingResponse = function (response, target) {
       //  console.log(response);
         if (target.showTaskStatusArea) {
-            target.taskStatusArea.html(response.status);
+            $(target.taskStatusArea).html(response.status);
         }
         if (target.showCustomStatusArea) {
-            target.customStatusArea.html(response.custom_status);
+            $(target.customStatusArea).html(response.custom_status);
         }
         switch (response.status) {
             case 'new':

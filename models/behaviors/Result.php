@@ -199,11 +199,10 @@ trait Result
         $this->done++;
         if (!empty($resStr)) {
             $this->reportPortion[] = $resStr;
-        }
-        //  $this->reportPortion[] = $reportStr;
-        if (($this->done % self::PORTION_TO_LOG_SIZE === 0)) {
-            $this->setResultSuccess($this->reportPortion);
-            $this->reportPortion = [];
+            if (($this->done % self::PORTION_TO_LOG_SIZE === 0)) {
+                $this->setResultSuccess($this->reportPortion);
+                $this->reportPortion = [];
+            }
         }
 
         if ($this->portionToProgress > 0 && ($this->done % $this->portionToProgress === 0)) {

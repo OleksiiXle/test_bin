@@ -332,6 +332,9 @@ class Xlegrid extends GridView
             $ret .= BackgroundTaskWidget::widget([
                 'mode' => 'prod',
                 'title' => 'Подготовка файла',
+                'checkProgressInterval' => 500,
+                'pixWidht' => 500,
+                'pixHeight' => 200,
 
                 /*
                 'model' => GridUploadWorker::class,
@@ -342,7 +345,7 @@ class Xlegrid extends GridView
                 ],
                 */
                 'startBtnId' => 'uploadStartBtn',
-                'showResultArea' => true,
+                'showResultArea' => false,
             ]);
         }
 

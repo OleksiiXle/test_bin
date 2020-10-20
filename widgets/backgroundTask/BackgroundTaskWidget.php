@@ -11,6 +11,9 @@ class BackgroundTaskWidget extends Widget
     public $title = '';
     public $startBtnId = "backgroundTaskStartBtn";
     public $startBtnClickFunction = "";
+    public $pixWidht = 1000;
+    public $pixHeight = 500;
+
     public $checkForAlreadyRunning = false; //-если уже запущена задача с такими $model и $arguments - новая не запускается
     public $checkProgressInterval ;// - пауза в запросах о состоянии задачи (миллисекунды), дефолтно 2000
     public $urlStartBackgroundTask ;// - URL контроллера, который запускает фоновую задачу, дефолтно '/background-tasks/start-task'
@@ -19,16 +22,16 @@ class BackgroundTaskWidget extends Widget
     public $arguments ;// - строка JSON с аргументами, которые будут переданы в модель
     public $_csrf ;// - дефолтно $('meta[name="csrf-token"]').attr("content")
 
-    public $taskStatusArea ;// - селектор области экрана, где отображается статус задачи
-    public $customStatusArea ;// - селектор области экрана, где отображается пользовательский статус задачи
+    public $taskStatusArea = 'taskStatusArea';// - селектор области экрана, где отображается статус задачи
+    public $customStatusArea = 'customStatusArea';// - селектор области экрана, где отображается пользовательский статус задачи
     public $progressArea = "progressArea" ;// - селектор области экрана, где отображается прогресс выполнения задачи
     public $resultArea  = "resultArea";// - селектор области экрана, где отображается промежуточный результат (куда дописываются куски текста)
     public $errorsArea = "errorArea";// - селектор области экрана, где отображается сообщение об ошибке (может совпадать с resultArea)
     public $progressValueArea ;// - селектор области экрана, где отображается цифровое значение прогресса выполнения задачи в процентах (для отладки)
     public $ajaxCounterArea ;// - селектор области экрана, где отображается цифровое значение счетчика запросов к серверу (для отладки)
 
-    public $showTaskStatusArea ;// - показывать taskStatusArea, дефолтно false
-    public $showCustomStatusArea ;// - показывать customStatusArea, дефолтно false
+    public $showTaskStatusArea = false;// - показывать taskStatusArea, дефолтно false
+    public $showCustomStatusArea = false;// - показывать customStatusArea, дефолтно false
     public $showProgressArea = true;// - показывать progressArea
     public $showResultArea = false ;// - показывать resultArea, дефолтно false
     public $showErrorsArea = true;// - показывать errorsArea
@@ -95,7 +98,8 @@ class BackgroundTaskWidget extends Widget
         }
         $js .= PHP_EOL . '};';
         $view->registerJs($js,\yii\web\View::POS_READY);
-        $js = "
+
+        $js1 = "
             var backgroundTask_$id = new BackgroundTask(params);
             backgroundTask_$id.init();
 
@@ -112,9 +116,34 @@ class BackgroundTaskWidget extends Widget
                   backgroundTask_$id.start();
                 });
         ";
+
+        $js = "
+            var backgroundTask_$id = new BackgroundTask(params);
+            backgroundTask_$id.init();
+
+            $(document).on('click', '#$this->startBtnId', function () {
+                  var winH = $(window).height();
+                  var winW = $(window).width(); 
+                  $('#backgroundTask_$id').css('width', $this->pixWidht).css('height', $this->pixHeight)
+                                          .css('top', winH/2-$this->pixHeight/1.5)
+                                          .css('left', winW/2-$this->pixWidht/2); 
+                   $('#modal-background_$id, #backgroundTask_$id').fadeIn();  
+
+                  
+                  backgroundTask_$id.model = WORKER_CLASS;
+                  backgroundTask_$id.arguments = {
+                        'filterModel' : FILTER_MODEL,
+                        'query' : filterQuery,
+                        'checkedIds' : checkedIds
+                  };
+                  
+                  backgroundTask_$id.start();
+                });
+        ";
+
         $view->registerJs($js,\yii\web\View::POS_READY);
 
-        return $this->render('backgroundTask',
+        return $this->render('backgroundTaskModal',
             [
                 'id' => $id,
                 'title' => $this->title,

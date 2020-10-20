@@ -79,10 +79,11 @@ class GridUploadWorker extends TaskWorker
 
             $this->task->setCustomStatus('Выгрузка в файл ...');
             foreach ($dataToUpload as $data) {
-                if ($this->done == 11) {
-                   // throw new \Exception('test exeption');
+                if ($this->done == 35) {
+                  //  throw new \Exception('test exeption');
                 }
-                $this->doLogs($this->done . '-' . $data->username);
+             //   $this->doLogs($this->done . '-' . $data->username);
+                $this->doLogs();
                 $arrayRow = [];
                 foreach ($filterModel->getDataForUpload() as $attribute => $description) {
                     if ($description['content'] == 'value') {
