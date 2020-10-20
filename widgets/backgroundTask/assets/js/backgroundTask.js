@@ -216,7 +216,7 @@ function BackgroundTask(params) {
                 data: {'taskId' : taskId} ,
                 dataType: 'json',
                 success: function (response) {
-                    console.log(response);
+                 //   console.log(response);
                     if (that.showAjaxCounterArea) {
                         that.ajaxCounter++;
                         that.ajaxCounterArea.html(that.ajaxCounter);
@@ -299,8 +299,6 @@ function BackgroundTask(params) {
 
     this.setProgress = function (progress) {
         $(this.progressArea).val(progress);
-    //    $('#progressArea_1').val(progress);
-
     };
 
     this.showSuccessResult = function (temporaryResult) {

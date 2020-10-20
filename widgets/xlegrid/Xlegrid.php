@@ -37,7 +37,7 @@ class Xlegrid extends GridView
             'style' => 'color:red;'
         ],
     ];
-    private $checkedIds = [];
+   private $checkedIds = [];
 
     //   public $gridId;
  //   public $urlGetGridFilterData;
@@ -331,6 +331,8 @@ class Xlegrid extends GridView
         if (!empty($this->dataProvider->filterModel)) {
             $ret .= BackgroundTaskWidget::widget([
                 'mode' => 'prod',
+                'title' => 'Подготовка файла',
+
                 /*
                 'model' => GridUploadWorker::class,
                 'arguments' => [
@@ -350,7 +352,7 @@ class Xlegrid extends GridView
     public function renderRowCheckBox($key)
     {
         $checked = (is_array($this->checkedIds) && in_array($key, $this->checkedIds)) ? 'checked' : '';
-        $checkBox = '<input type="checkbox" id="row-check-"' .  $key . '" class="row-check" data-id = "' . $key . '" onChange="checkRow(this);" ' . $checked . '>';
+        $checkBox = '<input type="checkbox" id="row-check-' .  $key . '" class="row-check" data-id = "' . $key . '" onChange="checkRow(this);" ' . $checked . '>';
         return Html::tag('td', $checkBox);
     }
 }

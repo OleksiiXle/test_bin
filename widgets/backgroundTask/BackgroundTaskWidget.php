@@ -101,13 +101,14 @@ class BackgroundTaskWidget extends Widget
 
             $(document).on('click', '#$this->startBtnId', function () {
                   $('#backgroundTask_$id').css('display', 'block');
+                  
                   backgroundTask_$id.model = WORKER_CLASS;
                   backgroundTask_$id.arguments = {
                         'filterModel' : FILTER_MODEL,
                         'query' : filterQuery,
                         'checkedIds' : checkedIds
                   };
-                  console.log(backgroundTask_$id.arguments);
+                  
                   backgroundTask_$id.start();
                 });
         ";

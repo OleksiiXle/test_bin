@@ -4,7 +4,6 @@ namespace app\widgets\xlegrid\models;
 
 use Yii;
 use app\commands\backgroundTasks\models\TaskWorker;
-use app\commands\backgroundTasks\models\BackgroundTask;
 use app\models\behaviors\Result;
 
 class GridUploadWorker extends TaskWorker
@@ -12,9 +11,9 @@ class GridUploadWorker extends TaskWorker
     use Result;
 
     const PORTION_TO_LOG_SIZE = 2; // какими кусками писать в файл результата
-    const PROGERSS_STEP = 1; // %
+    const PROGERSS_STEP = 5; // %
     const TOTAL_COUNT = 200; // %
-    const SLEEP_SECONDS = 1;
+    const SLEEP_SECONDS = 0;
 
     public function run()
     {
@@ -27,9 +26,11 @@ class GridUploadWorker extends TaskWorker
             foreach ($this->arguments['query'] as $item) {
                 $filterModel->{$item['name']} =  $item['value'];
             }
+            /*
             if (!empty($this->arguments['checkedIds'])) {
                 $filterModel->checkedIds = $this->arguments['checkedIds'];
             }
+            */
 
             $pathToFile = Yii::$app->basePath . '/runtime/uploads/';
             if (!is_dir($pathToFile)) {

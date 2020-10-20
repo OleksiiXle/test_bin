@@ -57,9 +57,9 @@ class ActiveDataProviderConserve extends ActiveDataProvider
             $params = [];
             if(\Yii::$app->request->isPost) {
                 $_post = \Yii::$app->request->post();
-                if (isset($_post['checkedIds']) && $this->filterModel->hasProperty('checkedIds')) {
-                    $this->filterModel->checkedIds =  $_post['checkedIds'];
-                }
+              //  if (isset($_post['checkedIds']) && $this->filterModel->hasProperty('checkedIds')) {
+             //       $this->filterModel->checkedIds =  $_post['checkedIds'];
+              //  }
 
                 $_get = \Yii::$app->request->get();
                 if (isset($_get['filter'])) {

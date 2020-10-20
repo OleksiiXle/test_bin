@@ -13,7 +13,7 @@ JuiAsset::register($this);
                     <button class="btn-control glyphicon glyphicon-chevron-up" onclick = "changeView(this);"></button>
                 </div>
                 <div class="col-lg-10">
-                    <span id="info-header" class="info-header-text">lokoko</span>
+                    <span id="info-header" class="info-header-text"><?=$title?></span>
                 </div>
                 <div class="col-lg-1" align="right">
                     <button class="btn-control glyphicon glyphicon-remove" onclick = "closeInfo();"></button>

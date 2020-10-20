@@ -29,9 +29,9 @@ $(document).ready(function(){
             event.stopPropagation();
             doPjax(this.href);
         });
-        $('#' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-showonlychecked').prop('checked', false);
-        checkedIds = JSON.parse($('#' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-checkedidsjson').val());
-       // console.log(checkedIds);
+       // $('#' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-showonlychecked').prop('checked', false);
+       // checkedIds = JSON.parse($('#' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-checkedidsjson').val());
+     //   console.log(checkedIds);
 
         getFilterQuery();
         useFilter();
@@ -136,8 +136,10 @@ function getFilterQuery() {
 }
 
 function checkRow(checkbox){
+   // console.log(checkedIds);
     var id = parseInt($(checkbox)[0].dataset['id']);
     if (checkbox.checked) {
+       // console.log(id);
         checkedIds.push(id);
     } else {
         var ind = checkedIds.indexOf(id);
