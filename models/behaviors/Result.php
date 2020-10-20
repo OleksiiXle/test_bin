@@ -25,7 +25,7 @@ trait Result
      * Класс фоновой задачи, если задан, в файл лога будет писаться промежуточный результат
      * @var null
      */
-    public $resultTask = null;
+   // public $resultTask = null;
     /**
      * Массив результатов операции - простой ( 0 -> Какой-то текст1, 1 -> Какой-то текст2)
      * @var array
@@ -58,12 +58,17 @@ trait Result
      */
     private $_resultAsStringHtml = '';
 
-
+    // -- данные для логирования процесса
+    private $totalCount = 0;
+    private $portionToProgress = 0;
+    private $progressPercentCount = 0;
+    private $done = 0;
+    private $reportPortion = [];
 
     /**
      * @return array
      */
-    public function getResultAsArray(): array
+    public function getResultAsArray()
     {
         $this->_resultAsArray = $this->resultData;
         return $this->_resultAsArray;
@@ -72,7 +77,7 @@ trait Result
     /**
      * @return string
      */
-    public function getResultAsStringSimple(): string
+    public function getResultAsStringSimple()
     {
         $this->_resultAsStringSimple = (empty($this->resultData)) ? '' : $this->resultData[0];
 
@@ -82,7 +87,7 @@ trait Result
     /**
      * @return string
      */
-    public function getResultAsStringTxt(): string
+    public function getResultAsStringTxt()
     {
         $this->_resultAsStringTxt = '';
         foreach ($this->resultData as $row) {
@@ -94,7 +99,7 @@ trait Result
     /**
      * @return string
      */
-    public function getResultAsStringHtml(): string
+    public function getResultAsStringHtml()
     {
         $this->_resultAsStringHtml = '';
         foreach ($this->resultData as $row) {
@@ -164,8 +169,65 @@ trait Result
      */
     private function backgroundTaskLog($logTxt)
     {
-        if (!empty($this->resultTask) && $this->resultTask instanceof BackgroundTask) {
-            $this->resultTask->writeTemporaryResultToFile($logTxt . PHP_EOL);
+        if (!empty($this->task) && $this->task instanceof BackgroundTask) {
+            $this->task->writeTemporaryResultToFile($logTxt . PHP_EOL);
+        }
+    }
+
+    private function prepareErrorStringToHtml($str)
+    {
+        $ret = explode(PHP_EOL, $str);
+        return $ret;
+    }
+
+
+    //****************************************************************************************** логирование процесса
+
+    private function logsInit($totalCount)
+    {
+        if (!empty($totalCount)) {
+            $this->totalCount = $totalCount;
+            $this->portionToProgress = intval(self::PROGERSS_STEP * $totalCount / 100);
+            $this->progressPercentCount = 0;
+            $this->done = 0;
+            $this->reportPortion = [];
+        }
+    }
+
+    private function doLogs($resStr = '')
+    {
+        $this->done++;
+        if (!empty($resStr)) {
+            $this->reportPortion[] = $resStr;
+        }
+        //  $this->reportPortion[] = $reportStr;
+        if (($this->done % self::PORTION_TO_LOG_SIZE === 0)) {
+            $this->setResultSuccess($this->reportPortion);
+            $this->reportPortion = [];
+        }
+
+        if ($this->portionToProgress > 0 && ($this->done % $this->portionToProgress === 0)) {
+            $this->progressPercentCount += self::PROGERSS_STEP;
+            $this->task->setProgress($this->progressPercentCount);
+        }
+        self::doSleep();
+    }
+
+    private function addTologsPortion($data)
+    {
+        if (is_array($data)) {
+            foreach ($data as $row) {
+                $this->reportPortion[] = $row;
+            }
+        } else {
+            $this->reportPortion[] = $data;
+        }
+    }
+
+    private function doSleep()
+    {
+        if (self::SLEEP_SECONDS > 0) {
+            sleep(self::SLEEP_SECONDS);
         }
     }
 }

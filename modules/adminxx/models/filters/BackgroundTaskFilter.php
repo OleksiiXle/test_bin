@@ -2,10 +2,12 @@
 namespace app\modules\adminxx\models\filters;
 
 use app\commands\backgroundTasks\models\BackgroundTask;
-use yii\base\Model;
+use app\widgets\xlegrid\models\GridFilter;
 
-class BackgroundTaskFilter extends Model
+class BackgroundTaskFilter extends GridFilter
 {
+    public $queryModel = BackgroundTask::class;
+
     public $id;
     public $pid;
     public $user_id;

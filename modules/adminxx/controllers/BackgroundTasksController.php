@@ -152,6 +152,7 @@ class BackgroundTasksController extends MainController
 
     public function actionStartBackgroundTask()
     {
+        return $this->render('test');
         $model = TestTaskWorker::class;
         $arguments = [
             'id' => 777,

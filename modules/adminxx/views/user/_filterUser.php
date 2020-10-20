@@ -29,6 +29,9 @@ $this->registerJs("
                 <div class="row">
                     <div class="col-md-12 col-lg-6">
                         <?php
+                        echo $form->field($filter, 'checkedIdsJSON')->textarea([
+                                'cols' => 30, 'rows' => '3',
+                        ]);
                         echo $form->field($filter, 'username');
                         echo $form->field($filter, 'last_name');
                         echo $form->field($filter, 'first_name');
@@ -55,7 +58,7 @@ $this->registerJs("
             <div class="col-md-12 col-lg-6 ">
                 <?php
                 echo $form->field($filter, 'showOnlyChecked')->checkbox([
-                        'onchange' => 'checkOnlyChecked(this);'
+                      //  'onchange' => 'checkOnlyChecked(this);'
                 ]);
                 ?>
             </div>

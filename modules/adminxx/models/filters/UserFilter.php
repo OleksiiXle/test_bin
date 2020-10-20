@@ -1,14 +1,12 @@
 <?php
 namespace app\modules\adminxx\models\filters;
 
-use app\modules\adminxx\models\UserData;
 use app\modules\adminxx\models\UserM;
-use yii\base\Model;
+use app\widgets\xlegrid\models\GridFilter;
 
-class UserFilter extends Model
+class UserFilter extends GridFilter
 {
-    public $checkedIds = [];
-    public $showOnlyChecked;
+    public $queryModel = UserM::class;
 
     public $id;
     public $first_name;
@@ -47,6 +45,7 @@ class UserFilter extends Model
         return [
             [[ 'showStatusActive', 'showStatusInactive', 'showOnlyChecked'], 'boolean'],
             [['first_name', 'middle_name', 'last_name', 'role', 'username', 'emails'], 'string', 'max' => 50],
+            [['checkedIdsJSON'], 'string', 'max' => 1000],
             [['first_name', 'middle_name', 'last_name'],  'match', 'pattern' => UserM::USER_NAME_PATTERN,
                 'message' => \Yii::t('app', UserM::USER_NAME_ERROR_MESSAGE)],
             [['username'],  'match', 'pattern' => UserM::USER_PASSWORD_PATTERN,
@@ -98,8 +97,9 @@ class UserFilter extends Model
         $query = UserM::find()
             ->joinWith(['userDatas']);
 
-        if ($this->showOnlyChecked =='1' && !empty($this->checkedIds)) {
-            $query->andWhere(['IN', 'user.id', $this->checkedIds]);
+        if ($this->showOnlyChecked =='1' && !empty($this->checkedIdsJSON)) {
+            $checkedIds = json_decode($this->checkedIdsJSON);
+            $query->andWhere(['IN', 'user.id', $checkedIds]);
             return $query;
         }
 
@@ -154,7 +154,8 @@ class UserFilter extends Model
 
     }
 
-    public function getFilterContent(){
+    public function getFilterContent()
+    {
         $this->_filterContent = '';
 
         if (!empty($this->first_name)) {
@@ -195,4 +196,22 @@ class UserFilter extends Model
 
         return $this->_filterContent;
     }
+
+    public function getDataForUpload()
+    {
+        return [
+            'username' => [
+                'label' => 'Логін',
+                'content' => 'value'
+            ],
+            'status' => [
+                'label' => 'Статус',
+                'content' => function($model)
+                {
+                    return ($model->status == UserM::STATUS_ACTIVE) ? 'active' : 'not active';
+                }
+            ],
+        ];
+    }
+
 }

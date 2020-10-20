@@ -22,7 +22,7 @@ class BackgroundTasksController extends Controller
                 [
                     'allow'      => true,
                     'actions'    => [
-                        'start-task', 'check-task'
+                        'start-task', 'check-task', 'test-background-task',
                     ],
                     'roles'      => [
                         '@',
@@ -36,11 +36,12 @@ class BackgroundTasksController extends Controller
 
     /**
      * Создание и запуск новой фоновой задачи
+     * @param boolean $checkForAlreadyRunning (get)
      * @param string $model (post)
      * @param string $arguments (post json)
      * @return \yii\web\Response
      */
-    public function actionStartTask()
+    public function actionStartTask($checkForAlreadyRunning = false)
     {
        $result = [
             'taskId' => 0,
@@ -51,32 +52,39 @@ class BackgroundTasksController extends Controller
         ];
         $_post = \Yii::$app->request->post();
         if (isset($_post['model']) && isset($_post['arguments'])) {
-            $arguments = json_decode($_post['arguments'], true);
-            $model = $_post['model'];
-         //   $arguments['id'] = (int)$arguments['id']; //постом приходит стринг а нам надо интеджер
-            $taskIsAlreadyRunning = BackgroundTask::taskIsRunning($model, $arguments);
-            if ($taskIsAlreadyRunning) {
-                $result = [
-                    'taskId' => 0,
-                    'status' => BackgroundTask::TASK_STATUS_ERROR,
-                    'progress' => 0,
-                    'temporaryResult' => [],
-                    'result' => "Task for " . $model . ' and arguments=' . json_encode($arguments) . ' now is already running',
-                ];
+            if (!is_array($_post['arguments'])) {
+                $arguments = json_decode($_post['arguments'], true);
             } else {
-                $task = BackgroundTask::newTask($model, $arguments);
-                if ($task->hasErrors()) {
+                $arguments = $_post['arguments'];
+            }
+            $model = $_post['model'];
+            if ($checkForAlreadyRunning != 'false') {
+                $taskIsAlreadyRunning = BackgroundTask::taskIsRunning($model, $arguments);
+                if ($taskIsAlreadyRunning) {
                     $result = [
                         'taskId' => 0,
                         'status' => BackgroundTask::TASK_STATUS_ERROR,
                         'progress' => 0,
                         'temporaryResult' => [],
-                        'result' => "Task for " . $model . ' and arguments=' . json_encode($arguments) . ' save error',
+                        'result' => "Task for " . $model . ' and arguments=' . json_encode($arguments) . ' now is already running',
                     ];
-                } else {
-                    $task->startRun();
-                    $result = BackgroundTask::checkTask($task->id);
+
+                    return $this->asJson($result);
                 }
+            }
+
+            $task = BackgroundTask::newTask($model, $arguments);
+            if ($task->hasErrors()) {
+                $result = [
+                    'taskId' => 0,
+                    'status' => BackgroundTask::TASK_STATUS_ERROR,
+                    'progress' => 0,
+                    'temporaryResult' => [],
+                    'result' => "Task for " . $model . ' and arguments=' . json_encode($arguments) . ' save error',
+                ];
+            } else {
+                $task->startRun();
+                $result = BackgroundTask::checkTask($task->id);
             }
         }
 
@@ -114,6 +122,42 @@ class BackgroundTasksController extends Controller
                 '_post' => $_post
             ];
        }
+
+        return $this->asJson($result);
+    }
+
+    public function actionTestBackgroundTask()
+    {
+        $tmp = 1;
+        $result = [
+            'taskId' => 0,
+            'status' => BackgroundTask::TASK_STATUS_NOT_FOUND,
+            'progress' => 0,
+            'temporaryResult' => [],
+            'result' => '',
+        ];
+        $_post = \Yii::$app->request->post();
+        if (isset($_post['model']) && isset($_post['arguments'])) {
+            if (!is_array($_post['arguments'])) {
+                $arguments = json_decode($_post['arguments'], true);
+            } else {
+                $arguments = $_post['arguments'];
+            }
+            $model = $_post['model'];
+
+            $task = BackgroundTask::newTask($model, $arguments);
+            if ($task->hasErrors()) {
+                $result = [
+                    'taskId' => 0,
+                    'status' => BackgroundTask::TASK_STATUS_ERROR,
+                    'progress' => 0,
+                    'temporaryResult' => [],
+                    'result' => "Task for " . $model . ' and arguments=' . json_encode($arguments) . ' save error',
+                ];
+            } else {
+                $result = BackgroundTask::runTask($task->id);
+            }
+        }
 
         return $this->asJson($result);
     }

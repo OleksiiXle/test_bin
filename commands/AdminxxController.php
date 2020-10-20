@@ -364,6 +364,51 @@ class AdminxxController extends Controller
         die();
     }
 
+    public function actionAddTestUsers()
+    {
+        $user = require(__DIR__ . '/data/testUsersInit.php');
+        $auth = \Yii::$app->authManager;
+        for ($i = 1; $i < 100; $i++){
+            echo $user['username'] . ' - ' . $i . PHP_EOL;
+            $model = new UserM();
+            //   $model->scenario = User::SCENARIO_REGISTRATION;
+            $model->setAttributes($user);
+            $model->username = $model->username . $i;
+            $model->last_name = $model->last_name . $i;
+            $model->email = 'user_' . $i . '@email.com';
+            $model->setPassword($user['password']);
+            $model->generateAuthKey();
+            if (!$model->save()){
+                echo var_dump($model->getErrors()) . PHP_EOL;
+                return false;
+            }
+            $userData = new UserData();
+            // $userData->setAttributes($user);
+
+
+            $userData->user_id = $model->id;
+            $userData->emails = $model->email;
+            $userData->first_name = $user['first_name'];
+            $userData->middle_name = $user['middle_name'];
+            $userData->last_name = $user['last_name'];
+            if (!$userData->save()){
+                echo var_dump($userData->getErrors()) . PHP_EOL;
+                return false;
+            }
+            foreach ($user['userRoles'] as $role){
+                $userRole = $auth->getRole($role);
+                if (isset($userRole)){
+                    $auth->assign($userRole, $model->id);
+                    echo '   ' . $role . PHP_EOL;
+                } else {
+                    echo '   не найдена роль - ' . $role . PHP_EOL;
+                }
+            }
+            echo 'Додано ...' . PHP_EOL;
+
+        }
+        return true;
+    }
 
 
 }

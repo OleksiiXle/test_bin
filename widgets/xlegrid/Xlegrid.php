@@ -1,6 +1,8 @@
 <?php
 namespace app\widgets\xlegrid;
 
+use app\widgets\backgroundTask\BackgroundTaskWidget;
+use app\widgets\xlegrid\models\GridUploadWorker;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -35,6 +37,7 @@ class Xlegrid extends GridView
             'style' => 'color:red;'
         ],
     ];
+    private $checkedIds = [];
 
     //   public $gridId;
  //   public $urlGetGridFilterData;
@@ -42,11 +45,20 @@ class Xlegrid extends GridView
     public function run()
     {
         $r=1;
-        $this->getView()->registerJs("
+        $js = "
             const FILTER_CLASS_SHORT_NAME = '" . $this->dataProvider->filterClassShortName . "';
             const USE_PJAX = " . $this->usePjax . ";
             const PJAX_CONTAINER_ID = '#" . $this->pjaxContainerId . "';
-            ",\yii\web\View::POS_HEAD);
+        ";
+        if (!empty($this->dataProvider->filterModel)){
+            if ($this->dataProvider->filterModel->hasProperty('checkedIdsJSON')) {
+                $this->checkedIds = json_decode($this->dataProvider->filterModel->checkedIdsJSON);
+            }
+
+            $js .= PHP_EOL . "const FILTER_MODEL = '" . addcslashes($this->dataProvider->filterModelClass, '\\') . "';";
+            $js .= PHP_EOL . "const WORKER_CLASS = '" . addcslashes(GridUploadWorker::class, '\\') . "';";
+        }
+        $this->getView()->registerJs($js,\yii\web\View::POS_HEAD);
         if ($this->usePjax) {
             $this->registerPjaxScript();
         }
@@ -93,6 +105,11 @@ class Xlegrid extends GridView
                 'onclick' => 'buttonFilterShow(this);',
                 'class' => 'show-filter-btn',
             ]);
+            $filterButtonTest = Html::button('<span class="glyphicon glyphicon-upload"></span>', [
+                'title' => 'В файл',
+               // 'onclick' => 'testRunBackgroundTask();',
+                'id' => 'uploadStartBtn',
+            ]);
 
             $filterContent = '';
             if (!empty($this->dataProvider->filterModel->filterContent)){
@@ -113,7 +130,7 @@ class Xlegrid extends GridView
                         <div class="col-md-8" align="left" style="font-style: italic;">
                              <b>' . $this->gridTitle .  '</b>'
                     . ' '
-                    . $filterContent .
+                    . $filterContent . $filterButtonTest . ' ' .
                     '</div>
                         <div class="col-md-1" align="right">
                           ' . $filterButton . '
@@ -141,7 +158,7 @@ class Xlegrid extends GridView
                     . $filterContent .
                     '</div>
                         <div class="col-md-1" align="right">
-                          ' . $filterButton . '
+                          ' . $filterButton .  ' 
                         </div>
                    </div>
                    <div class="row">
@@ -311,13 +328,29 @@ class Xlegrid extends GridView
 
         $ret = Html::tag('table', $filter, $filterRenderOptions)
             . Html::tag('table', implode("\n", $content), $this->tableOptions);
+        if (!empty($this->dataProvider->filterModel)) {
+            $ret .= BackgroundTaskWidget::widget([
+                'mode' => 'prod',
+                /*
+                'model' => GridUploadWorker::class,
+                'arguments' => [
+                    'filterModel' => addcslashes($this->dataProvider->filterModelClass, '\\'),
+                    'attributes' => $this->dataProvider->filterModel->getAttributes(),
+                    'checkedIds' => $this->dataProvider->filterModel->checkedIds,
+                ],
+                */
+                'startBtnId' => 'uploadStartBtn',
+                'showResultArea' => true,
+            ]);
+        }
 
         return $ret;
     }
 
     public function renderRowCheckBox($key)
     {
-        $checkBox = '<input type="checkbox" id="row-check-"' .  $key . '" class="row-check" data-id = "' . $key . '" onChange="checkRow(this);" >';
+        $checked = (is_array($this->checkedIds) && in_array($key, $this->checkedIds)) ? 'checked' : '';
+        $checkBox = '<input type="checkbox" id="row-check-"' .  $key . '" class="row-check" data-id = "' . $key . '" onChange="checkRow(this);" ' . $checked . '>';
         return Html::tag('td', $checkBox);
     }
 }

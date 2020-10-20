@@ -10,12 +10,13 @@ var _pjaxClientOptions = {
     }
 const USE_PJAX = 1 / 0
 const PJAX_CONTAINER_ID = '#users-grid-container'
+const FILTER_MODEL = '.....'
+const WORKER_CLASS = '.....'
  */
 
 var filterQuery = [];
 var filterQueryJSON = '{}';
 var checkedIds = [];
-
 
 $(document).ready(function(){
    // console.log(PJAX_CONTAINER_ID);
@@ -29,6 +30,8 @@ $(document).ready(function(){
             doPjax(this.href);
         });
         $('#' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-showonlychecked').prop('checked', false);
+        checkedIds = JSON.parse($('#' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-checkedidsjson').val());
+       // console.log(checkedIds);
 
         getFilterQuery();
         useFilter();
@@ -37,7 +40,7 @@ $(document).ready(function(){
 
 function doPjax(href) {
     var hr = getHrefWithFilter(href);
-   // console.log(checkedIds);
+  //  console.log(filterQuery);
    // console.log('+++++ doPjax for ++' + hr);
  //  return;
 
@@ -53,7 +56,7 @@ function doPjax(href) {
 
 function useFilter() {
   //  checkedIds = [];
-    console.log(checkedIds);
+ //   console.log(checkedIds);
     doPjax(window.location.href);
 }
 
@@ -61,6 +64,7 @@ function getHrefWithFilter(href) {
    // console.log('**************************');
     getFilterQuery();
     var url = parseUrl(href);
+  //  console.log(url.path);
   //  console.log(url.params);
     var newHref = url.path;
     if (filterQuery.length > 0) {
@@ -81,12 +85,18 @@ function getHrefWithFilter(href) {
  //   console.log(newHref);
  //   console.log('**************************');
 
-    return newHref;
+    return encodeURI(newHref);
 }
 
 function getFilterQuery() {
     filterQuery = [];
     filterQueryJSON = '{}';
+    if (checkedIds.length > 0) {
+      //  filterQuery.push({'name' : 'checkedIdsJSON', 'value' : JSON.stringify(checkedIds) });
+        //#userfilter-checkedidsjson
+        $('#' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-checkedidsjson').val(JSON.stringify(checkedIds));
+    }
+
     var bufName;
     $('[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').each(function(index, value) {
         if (value.value.length > 0) {
@@ -109,6 +119,17 @@ function getFilterQuery() {
             filterQuery.push({'name' : bufName, 'value' : value.value });
         }
     });
+    $('textarea[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').each(function(index, value) {
+        if (value.value != 0) {
+            bufName = value.name.replace(FILTER_CLASS_SHORT_NAME, '').replace('[', '').replace(']', '');
+            filterQuery.push({'name' : bufName, 'value' : value.value });
+        }
+    });
+    /*
+    if (checkedIds.length > 0) {
+        filterQuery.push({'name' : 'checkedIdsJSON', 'value' : JSON.stringify(checkedIds) });
+    }
+    */
     filterQueryJSON = JSON.stringify(filterQuery);
    // console.log(filterQuery);
    // console.log(filterQueryJSON);
@@ -178,12 +199,17 @@ function cleanFilter(reload){
   //  console.log(window.location);
  //   console.log(window.location.origin +  window.location.pathname);
     $('input[type="text"][ id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val('');
+  //  $('textarea').val('');
+    $('textarea[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val('');
+ //   $('textarea[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').innerHTML('');
     $('input[type="checkbox"][id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').prop('checked', false);
     $('select[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val(0);
+    checkedIds = [];
     history.pushState({}, '', window.location.origin +  window.location.pathname);
     if (reload) {
         useFilter();
     }
+    console.log($('textarea[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]'));
 }
 
 function parseUrl(href) {
@@ -206,7 +232,7 @@ function parseUrl(href) {
             paramsStr = href.substr(startParams);
         }
     }
-  //  console.log('paramsStr = ' + paramsStr);
+ //   console.log('paramsStr = ' + paramsStr);
     if (paramsStr !== '') {
         res.params = paramsStr.replace('?','').split('&').reduce(
             function(p,e){
@@ -223,6 +249,10 @@ function parseUrl(href) {
     return res;
 }
 
+
+
+
+//--@deprecated
 function checkOnlyChecked(item) {
     if ($(item).prop('checked')) {
         $('input[type="text"][ id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val('');
@@ -233,9 +263,6 @@ function checkOnlyChecked(item) {
     }
 
 }
-
-
-
 
 function getHrefWithFilter__COPY(href) {
     var hr = href;

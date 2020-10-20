@@ -47,7 +47,7 @@ class ActiveDataProviderConserve extends ActiveDataProvider
         ];
         //-- фильтр
         if (isset($this->filterModelClass)){
-            $this->exportQuery['filterModelClass'] = $this->filterModelClass;
+            $this->exportQuery['filterModelClass'] = $this->filterModelClass; //todo ??? delete
             if (!$this->filterModel){
                 $this->filterModel = new $this->filterModelClass;
                 $this->filterClassShortName = $this->filterModel->formName();
