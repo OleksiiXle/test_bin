@@ -1,6 +1,8 @@
 <?php
 namespace app\controllers;
 
+use app\helpers\Functions;
+use yii\helpers\FileHelper;
 use yii\web\Controller;
 use \app\components\AccessControl;
 use app\commands\backgroundTasks\models\BackgroundTask;
@@ -11,6 +13,14 @@ use app\commands\backgroundTasks\models\BackgroundTask;
  */
 class BackgroundTasksController extends Controller
 {
+    public $result = [
+        'taskId' => 0,
+        'status' => BackgroundTask::TASK_STATUS_NOT_FOUND,
+        'progress' => 0,
+        'temporaryResult' => [],
+        'result' => '',
+    ];
+
     /**
      * @return array
      */
@@ -22,7 +32,7 @@ class BackgroundTasksController extends Controller
                 [
                     'allow'      => true,
                     'actions'    => [
-                        'start-task', 'check-task', 'test-background-task',
+                        'start-task', 'check-task', 'test-background-task', 'upload-result', 'kill-task'
                     ],
                     'roles'      => [
                         '@',
@@ -43,13 +53,6 @@ class BackgroundTasksController extends Controller
      */
     public function actionStartTask($checkForAlreadyRunning = false)
     {
-       $result = [
-            'taskId' => 0,
-            'status' => BackgroundTask::TASK_STATUS_NOT_FOUND,
-            'progress' => 0,
-            'temporaryResult' => [],
-            'result' => '',
-        ];
         $_post = \Yii::$app->request->post();
         if (isset($_post['model']) && isset($_post['arguments'])) {
             if (!is_array($_post['arguments'])) {
@@ -61,7 +64,7 @@ class BackgroundTasksController extends Controller
             if ($checkForAlreadyRunning != 'false') {
                 $taskIsAlreadyRunning = BackgroundTask::taskIsRunning($model, $arguments);
                 if ($taskIsAlreadyRunning) {
-                    $result = [
+                    $this->result = [
                         'taskId' => 0,
                         'status' => BackgroundTask::TASK_STATUS_ERROR,
                         'progress' => 0,
@@ -69,13 +72,13 @@ class BackgroundTasksController extends Controller
                         'result' => "Task for " . $model . ' and arguments=' . json_encode($arguments) . ' now is already running',
                     ];
 
-                    return $this->asJson($result);
+                    return $this->asJson($this->result);
                 }
             }
 
             $task = BackgroundTask::newTask($model, $arguments);
             if ($task->hasErrors()) {
-                $result = [
+                $this->result = [
                     'taskId' => 0,
                     'status' => BackgroundTask::TASK_STATUS_ERROR,
                     'progress' => 0,
@@ -84,11 +87,11 @@ class BackgroundTasksController extends Controller
                 ];
             } else {
                 $task->startRun();
-                $result = BackgroundTask::checkTask($task->id);
+                $this->result = BackgroundTask::checkTask($task->id);
             }
         }
 
-        return $this->asJson($result);
+        return $this->asJson($this->result);
     }
 
     /**
@@ -114,16 +117,52 @@ class BackgroundTasksController extends Controller
         $_post = \Yii::$app->request->post();
         if (isset($_post['taskId'])) {
             $taskId = $_post['taskId'];
-            $result = BackgroundTask::checkTask($taskId);
-        } else {
-            $result = [
-                'status' => BackgroundTask::TASK_STATUS_ERROR,
-                'result' => "Wrong taskId",
-                '_post' => $_post
-            ];
-       }
+            $this->result = BackgroundTask::checkTask($taskId);
+        }
 
-        return $this->asJson($result);
+        return $this->asJson($this->result );
+    }
+
+    public function actionKillTask()
+    {
+        $_post = \Yii::$app->request->post();
+        if (isset($_post['taskId'])) {
+            $taskId = $_post['taskId'];
+            $task = BackgroundTask::findOne($taskId);
+            if (!empty($task)) {
+                $this->result = [
+                    'taskId' => $task->id,
+                    'status' => $task->status,
+                    'progress' => 0,
+                    'temporaryResult' => [],
+                ];
+                if ($task->remove(true)) {
+                    $this->result['result'] = 'removed';
+                } else {
+                    $this->result['result'] = $task->showErrors();
+                }
+            }
+        }
+
+        return $this->asJson($this->result );
+    }
+
+    public function actionUploadResult($taskId, $killTask, $killFile, $fileNameColumn)
+    {
+        $task = BackgroundTask::findOne($taskId);
+        if (empty($task)) {
+            return 'task not found!!!';
+        }
+        $fileToUpload = $task->{$fileNameColumn};
+        if ($killTask && !$task->remove(false)) {
+            return 'task not removed!!!';
+        }
+        $options['mimeType'] = FileHelper::getMimeTypeByExtension($fileToUpload);
+        $attachmentName = basename($fileToUpload);
+        \Yii::$app->response->sendFile($fileToUpload, $attachmentName, $options);
+        if ($killFile){
+            unlink($fileToUpload);
+        }
     }
 
     public function actionTestBackgroundTask()

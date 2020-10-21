@@ -1,6 +1,8 @@
 <?php
 namespace app\modules\adminxx\models\filters;
 
+use app\commands\backgroundTasks\models\BackgroundTask;
+use app\helpers\Functions;
 use app\modules\adminxx\models\UserM;
 use app\widgets\xlegrid\models\GridFilter;
 

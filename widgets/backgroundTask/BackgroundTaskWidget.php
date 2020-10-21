@@ -10,7 +10,6 @@ class BackgroundTaskWidget extends Widget
     public $mode = 'prod'; //-- or 'dev'
     public $title = '';
     public $startBtnId = "backgroundTaskStartBtn";
-    public $startBtnClickFunction = "";
     public $pixWidht = 1000;
     public $pixHeight = 500;
 
@@ -85,6 +84,16 @@ class BackgroundTaskWidget extends Widget
                     case 'hidePreloader':
                         $js .= PHP_EOL . "    $name : function () {{$value}},";
                         break;
+                    case 'doOnSuccesss':
+                        $js .= PHP_EOL . "    $name : function (response) {
+                        this.cleanAreas();
+                        $('#modal-background_$id, #backgroundTask_$id').fadeOut(); 
+                        {$value}
+                        },";
+                        break;
+                    case 'doOnError':
+                        $js .= PHP_EOL . "    $name : function (response) {{$value}},";
+                        break;
                     default:
                         if (is_string($value)) {
                             $js .= PHP_EOL . "    $name : '$value',";
@@ -98,29 +107,14 @@ class BackgroundTaskWidget extends Widget
         }
         $js .= PHP_EOL . '};';
         $view->registerJs($js,\yii\web\View::POS_READY);
-
-        $js1 = "
-            var backgroundTask_$id = new BackgroundTask(params);
-            backgroundTask_$id.init();
-
-            $(document).on('click', '#$this->startBtnId', function () {
-                  $('#backgroundTask_$id').css('display', 'block');
-                  
-                  backgroundTask_$id.model = WORKER_CLASS;
-                  backgroundTask_$id.arguments = {
-                        'filterModel' : FILTER_MODEL,
-                        'query' : filterQuery,
-                        'checkedIds' : checkedIds
-                  };
-                  
-                  backgroundTask_$id.start();
-                });
-        ";
-
         $js = "
             var backgroundTask_$id = new BackgroundTask(params);
             backgroundTask_$id.init();
 
+            $(document).on('click', '#close-btn', function () {
+                  $('#modal-background_$id, #backgroundTask_$id').fadeOut();  
+                  backgroundTask_$id.removeTask();
+                });
             $(document).on('click', '#$this->startBtnId', function () {
                   var winH = $(window).height();
                   var winW = $(window).width(); 
@@ -130,12 +124,8 @@ class BackgroundTaskWidget extends Widget
                    $('#modal-background_$id, #backgroundTask_$id').fadeIn();  
 
                   
-                  backgroundTask_$id.model = WORKER_CLASS;
-                  backgroundTask_$id.arguments = {
-                        'filterModel' : FILTER_MODEL,
-                        'query' : filterQuery,
-                        'checkedIds' : checkedIds
-                  };
+                  backgroundTask_$id.model = $this->model;
+                  backgroundTask_$id.arguments = $this->arguments;
                   
                   backgroundTask_$id.start();
                 });

@@ -2,6 +2,7 @@
 
 namespace app\helpers;
 
+use app\modules\adminxx\models\filters\UserFilter;
 use yii\base\Exception;
 use yii\helpers\FileHelper;
 
@@ -128,7 +129,6 @@ class Functions
         } catch (Exception $e){
             return $e->getMessage();
         }
-
     }
 
     /**

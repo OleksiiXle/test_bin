@@ -335,6 +335,7 @@ class Xlegrid extends GridView
                 'checkProgressInterval' => 500,
                 'pixWidht' => 500,
                 'pixHeight' => 200,
+                'showResultArea' => false,
 
                 /*
                 'model' => GridUploadWorker::class,
@@ -345,7 +346,15 @@ class Xlegrid extends GridView
                 ],
                 */
                 'startBtnId' => 'uploadStartBtn',
-                'showResultArea' => false,
+                'model' => "WORKER_CLASS",
+                'arguments' => "{
+                        'filterModel' : FILTER_MODEL,
+                        'query' : filterQuery,
+                        'checkedIds' : checkedIds
+                  }",
+                'doOnSuccesss' => "
+                    this.uploadResult(true, true, 'result');
+                ",
             ]);
         }
 

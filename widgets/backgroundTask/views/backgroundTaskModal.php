@@ -11,7 +11,7 @@
                         <span id="info-header" class="info-header-text"><?=$title?></span>
                     </div>
                     <div class="col-lg-1" align="right">
-                        <button class="btn-control glyphicon glyphicon-remove" onclick = "closeInfo();"></button>
+                        <button id="close-btn" class="btn-control glyphicon glyphicon-remove" ></button>
                     </div>
                 </div>
             </div>

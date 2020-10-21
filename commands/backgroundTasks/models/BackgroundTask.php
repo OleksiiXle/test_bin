@@ -979,7 +979,7 @@ class BackgroundTask extends ActiveRecord
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function remove()
+    public function remove($killFile = false)
     {
         $pid = $this->pid;
         $resultFileName = $this->taskResultFileFullName;
@@ -995,15 +995,17 @@ class BackgroundTask extends ActiveRecord
             $this->addError('id', "The process PID=$pid was stopped, but the record about it was not deleted. Call your administrator.");
             return false;
         }
-        if (file_exists($resultFileName)) {
-            try {
-                unlink($resultFileName);
-            } catch (\Exception $e) {
-                $errorMessage = "The process PID=$pid was stopped, the record about it was deleted, but temporary file was not deleted. Call your administrator."
-                    . PHP_EOL
-                    . $e->getMessage();
-                $this->addError('id', $errorMessage);
-               return false;
+        if ($killFile) {
+            if (file_exists($resultFileName)) {
+                try {
+                    unlink($resultFileName);
+                } catch (\Exception $e) {
+                    $errorMessage = "The process PID=$pid was stopped, the record about it was deleted, but temporary file was not deleted. Call your administrator."
+                        . PHP_EOL
+                        . $e->getMessage();
+                    $this->addError('id', $errorMessage);
+                    return false;
+                }
             }
         }
 

@@ -91,12 +91,17 @@ const ERROR_PREFIX = '*error*';
 function BackgroundTask(params) {
     this.params = params;
 
+    this.task_id = 0;
+    this.taskStatus = '';
+    this.taskNeedsToRemove = false;
     this.mode = 'dev';
     this.checkForAlreadyRunning = false;
     this.checkProgressInterval = 2000;
     this.urlStartBackgroundTask = '/background-tasks/start-task';
     this.urlTestBackgroundTask = '/background-tasks/test-background-task';
     this.urlGetTaskProgress = '/background-tasks/check-task';
+    this.urlUploadResult = '/background-tasks/upload-result';
+    this.urlKillTask = '/background-tasks/kill-task';
     this.model = null;
     this.arguments = null;
     this._csrf = $('meta[name="csrf-token"]').attr("content");
@@ -119,6 +124,7 @@ function BackgroundTask(params) {
 
     this.ajaxCounter = 0;
     this.scrollCounter = 0;
+
 
     this.init = function (start=false) {
         for (key in this) {
@@ -166,12 +172,16 @@ function BackgroundTask(params) {
                         that.showPreloader();
                     },
                     success: function(response){
-                        if (response.status != 'error' && response.status != 'not_found'){
+                       // console.log('start response:');
+                      //  console.log(response);
+                        that.taskStatus = response.status;
+                        if (!that.taskNeedsToRemove && response.status != 'error' && response.status != 'not_found'){
+                            that.task_id = response.taskId;
                             setTimeout(that.trackProgress(response.taskId, that.processLoadingResponse), that.checkProgressInterval);
                         } else {
                             //    console.log(response);
                             that.processLoadingResponse(response, that);
-                            alert('errors');
+                          //  alert('errors');
                         }
                     },
                     error: function (jqXHR, error, errorThrown) {
@@ -219,10 +229,11 @@ function BackgroundTask(params) {
                  //   console.log(response);
                     if (that.showAjaxCounterArea) {
                         that.ajaxCounter++;
-                        that.ajaxCounterArea.html(that.ajaxCounter);
+                        $(that.ajaxCounterArea).html(that.ajaxCounter);
                     }
+                    that.taskStatus = response.status;
                     response.wait = function() {
-                        if (response.status != 'error' && response.status != 'not_found' && response.status != 'ready' ) {
+                        if (!that.taskNeedsToRemove && response.status != 'error' && response.status != 'not_found' && response.status != 'ready' ) {
                             setTimeout(that.trackProgress(taskId, processResponse), that.checkProgressInterval);
                         }
                     };
@@ -292,7 +303,9 @@ function BackgroundTask(params) {
             case 'not_found':
                 target.showErrorResult(response);
                 target.hidePreloader();
-                target.doOnNotFound();
+                if (!target.taskNeedsToRemove) {
+                    target.doOnNotFound();
+                }
                 break;
         }
     };
@@ -342,5 +355,58 @@ function BackgroundTask(params) {
 
     this.doOnNotFound = function (response) {
         alert('Task not found')
-    }
+    };
+
+    this.uploadResult = function (killTask, killFile, fileNameColumn) {
+        var uploadUrl = this.urlUploadResult + '?taskId=' + this.task_id + '&killTask=' + killTask + '&killFile=' + killFile + '&fileNameColumn=' + fileNameColumn;
+        document.location.href = uploadUrl;
+    };
+
+    this.cleanAreas = function () {
+        if (this.progressArea !== null) {
+            $(this.progressArea).val(0);
+        }
+        if (this.taskStatusArea !== null) {
+            $(this.taskStatusArea).html('');
+        }
+        if (this.customStatusArea !== null) {
+            $(this.customStatusArea).html('');
+        }
+        if (this.resultArea !== null) {
+            $(this.resultArea).html('');
+        }
+        if (this.errorsArea !== null) {
+            $(this.errorsArea).html('');
+        }
+        if (this.progressValueArea !== null) {
+            $(this.progressValueArea).html('');
+        }
+        if (this.ajaxCounterArea !== null) {
+            $(this.ajaxCounterArea).html('');
+        }
+    };
+
+    this.removeTask = function () {
+        var that = this;
+        that.taskNeedsToRemove = true;
+        $.ajax({
+            url: that.urlKillTask,
+            type: "POST",
+            data: {'taskId' : that.task_id} ,
+            dataType: 'json',
+            complete: function(response){
+                that.cleanAreas();
+            },
+            success: function (response) {
+                 //  console.log(response);
+            },
+            error: function (jqXHR, error, errorThrown) {
+                errorHandler(jqXHR, error, errorThrown);
+                that.cleanAreas();
+                alert('Error: taskId=' + taskId + ' murder failed');
+            }
+        });
+
+    };
+
 }
