@@ -110,16 +110,12 @@ class Xlegrid extends GridView
                 'onclick' => 'buttonFilterShow(this);',
                 'class' => 'show-filter-btn',
             ]);
-            $filterButtonTest = Html::button('<span class="glyphicon glyphicon-upload"></span>', [
-                'title' => 'В файл',
-               // 'onclick' => 'testRunBackgroundTask();',
-                'id' => 'uploadStartBtn',
-            ]);
-            $filterButtonTest1 = Html::button('<span class="glyphicon glyphicon-upload"></span>', [
+            $uploadButton = Html::button('<span class="glyphicon glyphicon-floppy-save"></span>', [
                 'title' => 'В файл',
                 'onclick' => 'startBackgroundUploadTask();',
-                'id' => 'uploadStartBtn1',
-                'style' => 'color: red;',
+                'class' => 'show-filter-btn',
+
+                //  'id' => 'uploadStartBtn',
             ]);
 
             $filterContent = '';
@@ -127,22 +123,22 @@ class Xlegrid extends GridView
                 $filterContent = 'Фільтр: ' . $this->dataProvider->filterModel->filterContent;
             }
             if ($this->useCheckForRows) {
-                $actionsWithChecked = 'No actions declared';
+                $actionsWithChecked = '';
                 if (isset($this->checkActionList['actions']) && isset($this->checkActionList['options'])) {
-                    $actionsWithChecked = Html::dropDownList(null, null,$this->checkActionList['actions'], $this->checkActionList['options']);
+                    $actionsWithChecked = Html::dropDownList(null,
+                        null,$this->checkActionList['actions'], $this->checkActionList['options']);
                 }
                 $filterBody = '
             <tr>
                 <td>
                    <div class="row">
-                        <div class="col-lg-3">
-                            ' . $actionsWithChecked . '
+                        <div class="col-lg-3" align="left">
+                            <span>' . $actionsWithChecked . ' ' . $uploadButton . '</span>
                         </div>
-                        <div class="col-md-8" align="left" style="font-style: italic;">
+                        <div class="col-md-7" align="left" style="font-style: italic;">
                              <b>' . $this->gridTitle .  '</b>'
                     . ' '
-                    . $filterContent . $filterButtonTest . ' ' .
-                     $filterButtonTest1 . ' ' .
+                    . $filterContent . ' ' .
                     '</div>
                         <div class="col-md-1" align="right">
                           ' . $filterButton . '

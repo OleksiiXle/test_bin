@@ -78,21 +78,10 @@ $this->registerJs("
                     'id' => 'cleanBtn',
                     'onclick' => 'cleanFilter(true);',
                 ]) ?>
-                <!--
-                              Html::a('У файл', ['/adminxx/user/export-to-exel', 'exportQuery' => $exportQuery],
-                    [
-                        'class' => 'btn btn-success',
-                        'data-method' => 'post',
-                        'onclick' => 'preloader("show", "mainContainer", 0);'
-                    ]);
-
-                -->
-
-                <?= Html::a('У файл', null,
-                    [
-                        'class' => 'btn btn-success',
-                        'onclick' => "uploadDataPartitional();"
-                    ]);?>
+                <?= Html::button('В файл', [
+                    'class' => 'btn btn-success',
+                    'onclick' => 'startBackgroundUploadTask();',
+                ]) ?>
             </div>
         </div>
 
