@@ -1,10 +1,6 @@
-<?php
-
-?>
 <div id="modal-background_<?=$id?>" class="modal-background">
     <div id="backgroundTask_<?=$id?>" class="info-block-modal" style="display: none">
         <div class="container-fluid">
-
             <div class="row">
                 <div class="info-header">
                     <div class="col-lg-11">
@@ -15,7 +11,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="row to-hide_<?=$id?>">
                 <div class="col-lg-6">
                     <div class="infoArea" id="taskStatusArea_<?=$id?>"></div>

@@ -1,6 +1,7 @@
 <?php
 namespace app\widgets\xlegrid;
 
+use app\assets\BackgroundTaskAsset;
 use app\widgets\backgroundTask\BackgroundTaskWidget;
 use app\widgets\xlegrid\models\GridUploadWorker;
 use yii\grid\GridView;
@@ -45,24 +46,28 @@ class Xlegrid extends GridView
     public function run()
     {
         $r=1;
+        $view = $this->getView();
         $js = "
-            const FILTER_CLASS_SHORT_NAME = '" . $this->dataProvider->filterClassShortName . "';
             const USE_PJAX = " . $this->usePjax . ";
             const PJAX_CONTAINER_ID = '#" . $this->pjaxContainerId . "';
+            
+            var _filterClassShortName = '" . $this->dataProvider->filterClassShortName . "';
+            
         ";
         if (!empty($this->dataProvider->filterModel)){
             if ($this->dataProvider->filterModel->hasProperty('checkedIdsJSON')) {
                 $this->checkedIds = json_decode($this->dataProvider->filterModel->checkedIdsJSON);
             }
 
-            $js .= PHP_EOL . "const FILTER_MODEL = '" . addcslashes($this->dataProvider->filterModelClass, '\\') . "';";
-            $js .= PHP_EOL . "const WORKER_CLASS = '" . addcslashes(GridUploadWorker::class, '\\') . "';";
+            $js .= PHP_EOL . "var _filterModel = '" . addcslashes($this->dataProvider->filterModelClass, '\\') . "';";
+            $js .= PHP_EOL . "var _workerClass = '" . addcslashes(GridUploadWorker::class, '\\') . "';";
         }
-        $this->getView()->registerJs($js,\yii\web\View::POS_HEAD);
+        $view->registerJs($js,\yii\web\View::POS_HEAD);
         if ($this->usePjax) {
             $this->registerPjaxScript();
         }
-        XlegridAsset::register($this->getView());
+        XlegridAsset::register($view);
+        BackgroundTaskAsset::register($view);
         parent::run();
     }
 
@@ -110,6 +115,12 @@ class Xlegrid extends GridView
                // 'onclick' => 'testRunBackgroundTask();',
                 'id' => 'uploadStartBtn',
             ]);
+            $filterButtonTest1 = Html::button('<span class="glyphicon glyphicon-upload"></span>', [
+                'title' => 'В файл',
+                'onclick' => 'startBackgroundUploadTask();',
+                'id' => 'uploadStartBtn1',
+                'style' => 'color: red;',
+            ]);
 
             $filterContent = '';
             if (!empty($this->dataProvider->filterModel->filterContent)){
@@ -131,6 +142,7 @@ class Xlegrid extends GridView
                              <b>' . $this->gridTitle .  '</b>'
                     . ' '
                     . $filterContent . $filterButtonTest . ' ' .
+                     $filterButtonTest1 . ' ' .
                     '</div>
                         <div class="col-md-1" align="right">
                           ' . $filterButton . '
@@ -328,35 +340,6 @@ class Xlegrid extends GridView
 
         $ret = Html::tag('table', $filter, $filterRenderOptions)
             . Html::tag('table', implode("\n", $content), $this->tableOptions);
-        if (!empty($this->dataProvider->filterModel)) {
-            $ret .= BackgroundTaskWidget::widget([
-                'mode' => 'prod',
-                'title' => 'Подготовка файла',
-                'checkProgressInterval' => 500,
-                'pixWidht' => 500,
-                'pixHeight' => 200,
-                'showResultArea' => false,
-
-                /*
-                'model' => GridUploadWorker::class,
-                'arguments' => [
-                    'filterModel' => addcslashes($this->dataProvider->filterModelClass, '\\'),
-                    'attributes' => $this->dataProvider->filterModel->getAttributes(),
-                    'checkedIds' => $this->dataProvider->filterModel->checkedIds,
-                ],
-                */
-                'startBtnId' => 'uploadStartBtn',
-                'model' => "WORKER_CLASS",
-                'arguments' => "{
-                        'filterModel' : FILTER_MODEL,
-                        'query' : filterQuery,
-                        'checkedIds' : checkedIds
-                  }",
-                'doOnSuccesss' => "
-                    this.uploadResult(true, true, 'result');
-                ",
-            ]);
-        }
 
         return $ret;
     }

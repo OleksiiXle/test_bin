@@ -10,8 +10,9 @@ var _pjaxClientOptions = {
     }
 const USE_PJAX = 1 / 0
 const PJAX_CONTAINER_ID = '#users-grid-container'
-const FILTER_MODEL = '.....'
-const WORKER_CLASS = '.....'
+ var _filterClassShortName = '......'
+ var _filterModel = '......'
+ var _workerClass = '......'
  */
 
 var filterQuery = [];
@@ -29,21 +30,25 @@ $(document).ready(function(){
             event.stopPropagation();
             doPjax(this.href);
         });
-       // $('#' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-showonlychecked').prop('checked', false);
-       // checkedIds = JSON.parse($('#' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-checkedidsjson').val());
+       // $('#' + _filterClassShortName.toLowerCase() + '-showonlychecked').prop('checked', false);
+       // checkedIds = JSON.parse($('#' + _filterClassShortName.toLowerCase() + '-checkedidsjson').val());
      //   console.log(checkedIds);
+        /*
+        $(PJAX_CONTAINER_ID).on("pjax:beforeSend", function (e, xhr, settings) {
+              console.log(e);
+              console.log(xhr);
+              console.log(settings);
+        });
+        */
 
         getFilterQuery();
         useFilter();
     }
 });
 
+//-- обработать href с учетом фильтра, пагинации и сортировки и сделать pjax с обработанным href
 function doPjax(href) {
     var hr = getHrefWithFilter(href);
-  //  console.log(filterQuery);
-   // console.log('+++++ doPjax for ++' + hr);
- //  return;
-
     $.pjax({
         type: 'POST',
         url: hr,
@@ -52,14 +57,22 @@ function doPjax(href) {
       //  data: {'query' : filterQuery},
         data: {'checkedIds' : checkedIds},
     })
+        /*
+        .done(function (response) {
+        console.log('done');
+        console.log(response);
+    })
+    */
 }
 
+//-- запрос на doPjax по кнопке "Применить фильтр"
 function useFilter() {
   //  checkedIds = [];
  //   console.log(checkedIds);
     doPjax(window.location.href);
 }
 
+//-- обновить фильтр, взять пагинацию и сортировку из href, и на их основании сформировать новый href
 function getHrefWithFilter(href) {
    // console.log('**************************');
     getFilterQuery();
@@ -88,19 +101,20 @@ function getHrefWithFilter(href) {
     return encodeURI(newHref);
 }
 
+//-- обновить filterQuery, filterQueryJSON на основании данных формы фильтра
 function getFilterQuery() {
     filterQuery = [];
     filterQueryJSON = '{}';
     if (checkedIds.length > 0) {
       //  filterQuery.push({'name' : 'checkedIdsJSON', 'value' : JSON.stringify(checkedIds) });
         //#userfilter-checkedidsjson
-        $('#' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-checkedidsjson').val(JSON.stringify(checkedIds));
+        $('#' + _filterClassShortName.toLowerCase() + '-checkedidsjson').val(JSON.stringify(checkedIds));
     }
 
     var bufName;
-    $('[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').each(function(index, value) {
+    $('[id^=' + _filterClassShortName.toLowerCase() + '-]').each(function(index, value) {
         if (value.value.length > 0) {
-            bufName = value.name.replace(FILTER_CLASS_SHORT_NAME, '').replace('[', '').replace(']', '');
+            bufName = value.name.replace(_filterClassShortName, '').replace('[', '').replace(']', '');
             switch (value.type) {
                 case 'text':
                     filterQuery.push({'name' : bufName, 'value' : value.value });
@@ -113,15 +127,15 @@ function getFilterQuery() {
             }
         }
     });
-    $('select[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').each(function(index, value) {
+    $('select[id^=' + _filterClassShortName.toLowerCase() + '-]').each(function(index, value) {
         if (value.value != 0) {
-            bufName = value.name.replace(FILTER_CLASS_SHORT_NAME, '').replace('[', '').replace(']', '');
+            bufName = value.name.replace(_filterClassShortName, '').replace('[', '').replace(']', '');
             filterQuery.push({'name' : bufName, 'value' : value.value });
         }
     });
-    $('textarea[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').each(function(index, value) {
+    $('textarea[id^=' + _filterClassShortName.toLowerCase() + '-]').each(function(index, value) {
         if (value.value != 0) {
-            bufName = value.name.replace(FILTER_CLASS_SHORT_NAME, '').replace('[', '').replace(']', '');
+            bufName = value.name.replace(_filterClassShortName, '').replace('[', '').replace(']', '');
             filterQuery.push({'name' : bufName, 'value' : value.value });
         }
     });
@@ -135,6 +149,7 @@ function getFilterQuery() {
    // console.log(filterQueryJSON);
 }
 
+//-- модификация checkedIds по нажатию на чекбокс (+ или -)
 function checkRow(checkbox){
    // console.log(checkedIds);
     var id = parseInt($(checkbox)[0].dataset['id']);
@@ -150,11 +165,7 @@ function checkRow(checkbox){
    // console.log(checkedIds);
 }
 
-function actionWithChecked(action) {
-    console.log(action.value);
-    console.log(checkedIds);
-}
-
+//-- показать/скрыть форму фильтра на гриде
 function buttonFilterShow(button) {
     if ($("#filterZone").is(":hidden")) {
         $("#filterZone").show("slow");
@@ -174,46 +185,26 @@ function buttonFilterShow(button) {
     }
 }
 
-function getGridFilterData(modelName, formId, urlName, container_id) {
-    //   alert(modelName + ' ' + formId + ' ' + urlName + ' ' + container_id);
-    var filterData = $("#" + formId).serialize();
-    //  objDump(data);
-    $.ajax({
-        url: urlName ,
-        type: "POST",
-        data:  filterData,
-        timeout: 3000,
-        success: function(response){
-            objDump(response);
-        },
-        error: function (jqXHR, error, errorThrown) {
-            alert( "Ошибка фильтра : " + modelName + " " + error + " " +  errorThrown);
-        }
-
-    });
-
-
-
-}
-
+//-- очистить форму фильтра и перелоадить грид через pjax
 function cleanFilter(reload){
   //  console.log(parseUrl());
   //  console.log(window.location);
  //   console.log(window.location.origin +  window.location.pathname);
-    $('input[type="text"][ id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val('');
+    $('input[type="text"][ id^=' + _filterClassShortName.toLowerCase() + '-]').val('');
   //  $('textarea').val('');
-    $('textarea[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val('');
- //   $('textarea[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').innerHTML('');
-    $('input[type="checkbox"][id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').prop('checked', false);
-    $('select[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val(0);
+    $('textarea[id^=' + _filterClassShortName.toLowerCase() + '-]').val('');
+ //   $('textarea[id^=' + _filterClassShortName.toLowerCase() + '-]').innerHTML('');
+    $('input[type="checkbox"][id^=' + _filterClassShortName.toLowerCase() + '-]').prop('checked', false);
+    $('select[id^=' + _filterClassShortName.toLowerCase() + '-]').val(0);
     checkedIds = [];
     history.pushState({}, '', window.location.origin +  window.location.pathname);
     if (reload) {
         useFilter();
     }
-    console.log($('textarea[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]'));
+    console.log($('textarea[id^=' + _filterClassShortName.toLowerCase() + '-]'));
 }
 
+//-- распарсить href на path и params
 function parseUrl(href) {
 //    console.log(window.location);
    // console.log('**** parseUrl ');
@@ -251,16 +242,68 @@ function parseUrl(href) {
     return res;
 }
 
+function startBackgroundUploadTask() {
+    var params = {
+        'mode' : 'prod',
+       // 'mode' : 'dev',
+        'checkProgressInterval' : 500,
+        'showProgressArea' : true,
+        'showErrorsArea' : true,
+        'model' : _workerClass,
+        'arguments' : {
+            'filterModel' : _filterModel,
+            'query' : filterQuery,
+            'checkedIds' : checkedIds
+        },
+        'doOnSuccesss' : function () {
+            this.cleanAreas();
+            this.uploadResult(true, true, 'result');
+            },
+    };
+
+    startNewBackgroundTask('modal', params, 500, 100, 'Подготовка файла')
+}
 
 
+
+
+
+function actionWithChecked(action) {
+    console.log(action.value);
+    console.log(checkedIds);
+}
+
+
+//--@deprecated
+function getGridFilterData(modelName, formId, urlName, container_id) {
+    //   alert(modelName + ' ' + formId + ' ' + urlName + ' ' + container_id);
+    var filterData = $("#" + formId).serialize();
+    //  objDump(data);
+    $.ajax({
+        url: urlName ,
+        type: "POST",
+        data:  filterData,
+        timeout: 3000,
+        success: function(response){
+            objDump(response);
+        },
+        error: function (jqXHR, error, errorThrown) {
+            alert( "Ошибка фильтра : " + modelName + " " + error + " " +  errorThrown);
+        }
+
+    });
+
+
+
+}
 
 //--@deprecated
 function checkOnlyChecked(item) {
     if ($(item).prop('checked')) {
-        $('input[type="text"][ id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val('');
-        $('input[type="checkbox"][id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-][id!=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-showonlychecked]')
+        $('input[type="text"][ id^=' + _filterClassShortName.toLowerCase() + '-]').val('');
+        $('input[type="checkbox"][id^=' + _filterClassShortName.toLowerCase() + '-][id!=' + _filterClassShortName.toLowerCase() + '-showonlychecked]')
             .prop('checked', false);
-        $('select[id^=' + FILTER_CLASS_SHORT_NAME.toLowerCase() + '-]').val(0);
+        $('select[id^=' + _filterClassShortName.toLowerCase() + '-]').val(0);
         history.pushState({}, '', window.location.origin +  window.location.pathname);
     }
 

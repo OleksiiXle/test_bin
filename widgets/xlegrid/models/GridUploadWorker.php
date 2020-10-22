@@ -11,7 +11,7 @@ class GridUploadWorker extends TaskWorker
     use Result;
 
     const PORTION_TO_LOG_SIZE = 2; // какими кусками писать в файл результата
-    const PROGERSS_STEP = 5; // %
+    const PROGERSS_STEP = 2; // %
     const TOTAL_COUNT = 200; // %
     const SLEEP_SECONDS = 1;
 
@@ -62,7 +62,7 @@ class GridUploadWorker extends TaskWorker
     private function prepareFile($filterModel, $fullFileName)
     {
         try {
-            throw new \Exception('test exeption');
+           // throw new \Exception('test exeption');
             $this->resetResult();
             $this->task->setProgress(0);
             $this->task->setCustomStatus('Подготовка данных для выгрузки в файл ...');
@@ -80,8 +80,8 @@ class GridUploadWorker extends TaskWorker
 
             $this->task->setCustomStatus('Выгрузка в файл ...');
             foreach ($dataToUpload as $data) {
-                if ($this->done == 35) {
-                  //  throw new \Exception('test exeption');
+                if ($this->done == 5) {
+                    throw new \Exception('test exeption');
                 }
              //   $this->doLogs($this->done . '-' . $data->username);
                 $this->doLogs();

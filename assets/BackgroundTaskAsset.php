@@ -10,10 +10,12 @@ class BackgroundTaskAsset extends AssetBundle
     public $sourcePath = '@app/assets';
     public $publishOptions = ['forceCopy' => true];
     public $css = [
+        'css/backgroundTask.css',
     ];
 
     public $js = [
-        'js/backgroundTask.js'
+        'js/backgroundTask.js',
+        'js/backgroundTaskDispatcher.js',
     ];
 
     public $jsOptions = array(

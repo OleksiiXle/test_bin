@@ -86,7 +86,6 @@
  * @return {object}
  */
 
-const ERROR_PREFIX = '*error*';
 
 function BackgroundTask(params) {
     this.params = params;
