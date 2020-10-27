@@ -13,7 +13,7 @@ class GridUploadWorker extends TaskWorker
     const PORTION_TO_LOG_SIZE = 2; // какими кусками писать в файл результата
     const PROGERSS_STEP = 2; // %
     const TOTAL_COUNT = 200; // %
-    const SLEEP_SECONDS = 1;
+    const SLEEP_SECONDS = 2;
 
     public function run()
     {
@@ -81,7 +81,7 @@ class GridUploadWorker extends TaskWorker
             $this->task->setCustomStatus('Выгрузка в файл ...');
             foreach ($dataToUpload as $data) {
                 if ($this->done == 5) {
-                    throw new \Exception('test exeption');
+                //    throw new \Exception('test exeption');
                 }
              //   $this->doLogs($this->done . '-' . $data->username);
                 $this->doLogs();

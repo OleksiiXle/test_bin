@@ -21,6 +21,43 @@ class BackgroundTasksController extends Controller
         'result' => '',
     ];
 
+    private $_tasksPool = null;
+
+
+    /**
+     * @return mixed
+     */
+    public function getTasksPool()
+    {
+        if($this->_tasksPool === null) {
+            $user_id = \Yii::$app->user->getId();
+            $session = \Yii::$app->session;
+            $tasksPool = $session->get('tasksPool', []);
+            if (!empty($tasksPool[$user_id])) {
+                $this->_tasksPool = $tasksPool[$user_id];
+            } else {
+                $this->_tasksPool = [];
+            }
+
+        }
+
+        return $this->_tasksPool;
+    }
+
+    /**
+     * @param mixed $taskPool
+     */
+    public function setTasksPool($data)
+    {
+        $user_id = \Yii::$app->user->getId();
+        $session = \Yii::$app->session;
+        $tasksPool = $session->get('tasksPool', []);
+        $tasksPool[$user_id] = $data;
+        $session->set('tasksPool', $tasksPool);
+
+        $this->_tasksPool = $tasksPool[$user_id];
+    }
+
     /**
      * @return array
      */
@@ -32,7 +69,8 @@ class BackgroundTasksController extends Controller
                 [
                     'allow'      => true,
                     'actions'    => [
-                        'start-task', 'check-task', 'test-background-task', 'upload-result', 'kill-task'
+                        'start-task', 'check-task', 'test-background-task', 'upload-result', 'kill-task',
+                        'get-background-tasks-pool'
                     ],
                     'roles'      => [
                         '@',
@@ -51,7 +89,21 @@ class BackgroundTasksController extends Controller
      * @param string $arguments (post json)
      * @return \yii\web\Response
      */
-    public function actionStartTask($checkForAlreadyRunning = false)
+    public function actionGetBackgroundTasksPool()
+    {
+        $this->result['result'] = $this->tasksPool;
+
+        return $this->asJson($this->result);
+    }
+
+    /**
+     * Создание и запуск новой фоновой задачи
+     * @param boolean $checkForAlreadyRunning (get)
+     * @param string $model (post)
+     * @param string $arguments (post json)
+     * @return \yii\web\Response
+     */
+    public function actionStartTask($checkForAlreadyRunning = false, $useSession = false)
     {
         $_post = \Yii::$app->request->post();
         if (isset($_post['model']) && isset($_post['arguments'])) {
@@ -88,11 +140,18 @@ class BackgroundTasksController extends Controller
             } else {
                 $task->startRun();
                 $this->result = BackgroundTask::checkTask($task->id);
+                if ($useSession == 'true' && $_post['serializedParams']) {
+                   // $serializedParams = json_decode($_post['serializedParams'],true);
+                    $tasksPool = $this->tasksPool;
+                    $tasksPool[] = [$task->id => $_post['serializedParams']];
+                    $this->tasksPool = $tasksPool;
+                }
             }
         }
 
         return $this->asJson($this->result);
     }
+
 
     /**
      * Проверка состояния выполнения тестовой задачи и получение очередной порции временного результата
@@ -118,6 +177,9 @@ class BackgroundTasksController extends Controller
         if (isset($_post['taskId'])) {
             $taskId = $_post['taskId'];
             $this->result = BackgroundTask::checkTask($taskId);
+            if ($this->result['status'] !== BackgroundTask::TASK_STATUS_NEW && $this->result['status'] !== BackgroundTask::TASK_STATUS_PROCESS ) {
+                $this->removeTaskFromPoll($_post['taskId']);
+            }
         }
 
         return $this->asJson($this->result );
@@ -138,6 +200,7 @@ class BackgroundTasksController extends Controller
                 ];
                 if ($task->remove(true)) {
                     $this->result['result'] = 'removed';
+                    $this->removeTaskFromPoll($_post['taskId']);
                 } else {
                     $this->result['result'] = $task->showErrors();
                 }
@@ -157,7 +220,8 @@ class BackgroundTasksController extends Controller
         if ($killTask && !$task->remove(false)) {
             return 'task not removed!!!';
         }
-        $options['mimeType'] = FileHelper::getMimeTypeByExtension($fileToUpload);
+     //   $options['mimeType'] = FileHelper::getMimeTypeByExtension($fileToUpload);
+        $options['mimeType'] = 'application/csv';
         $attachmentName = basename($fileToUpload);
         \Yii::$app->response->sendFile($fileToUpload, $attachmentName, $options);
         if ($killFile){
@@ -199,5 +263,17 @@ class BackgroundTasksController extends Controller
         }
 
         return $this->asJson($result);
+    }
+
+    private function removeTaskFromPoll($taskId)
+    {
+        $taskPool = $this->tasksPool;
+        foreach ($taskPool as $i => $item) {
+            if (isset($item[(int)$taskId])) {
+                unset($taskPool[$i]);
+            }
+        }
+        $this->tasksPool = $taskPool;
+
     }
 }

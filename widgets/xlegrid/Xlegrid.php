@@ -2,7 +2,6 @@
 namespace app\widgets\xlegrid;
 
 use app\assets\BackgroundTaskAsset;
-use app\widgets\backgroundTask\BackgroundTaskWidget;
 use app\widgets\xlegrid\models\GridUploadWorker;
 use yii\grid\GridView;
 use yii\helpers\Html;

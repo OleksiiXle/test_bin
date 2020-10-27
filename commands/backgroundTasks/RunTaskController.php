@@ -4,9 +4,6 @@ namespace app\commands\backgroundTasks;
 
 use app\commands\backgroundTasks\models\BackgroundTask;
 use yii\console\Controller;
-use yii\console\Exception;
-use yii\console\ExitCode;
-
 
 class RunTaskController extends Controller
 {
@@ -42,5 +39,4 @@ class RunTaskController extends Controller
         }
         return;
     }
-
 }

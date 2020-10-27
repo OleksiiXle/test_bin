@@ -37,14 +37,14 @@
  * @property {function} showPreloader() - вызывается при старте, показывает прелоадер, можно переписывать в params
  * @property {function} hidePreloader() - вызывается при окончании (успешном или по ошибке), скрывает прелоадер, можно переписывать в params
  * @property {function} setProgress(progress) - как изменять progressArea при изменении прогресса, можно переписывать в params, progress - прогресс в процентах
- * @property {function} doOnSuccesss(progress) - что делать при успешном завершении фоновой задачи
+ * @property {function} doOnSuccess(progress) - что делать при успешном завершении фоновой задачи
  * @property {function} doOnError(progress) - что делать при ошибке во время исполнения фоновой задачи
  *
  * не рекомендуется переписывать в property:
  * @property {function} init() - берет params и на его основе модифицирует свойства созданного объекта BackgroundTask
  * @property {function} start() - запуск исполнения фоновой задачи
  * @property {function} trackProgress() - рекурсивная проверка состояния выполнения задачи
- * @property {function} processLoadingResponse() - обработка пришедшего состояния задачи
+ * @property {function} responseProcessing() - обработка пришедшего состояния задачи
  * @property {function} showSuccessResult() - дописывает в resultArea пришедшую новую порцию промежуточного результата
  * @property {function} showErrorResult() - дописывает в errorsArea пришедшее сообщение об ошибке
  * @property {function} scrollTo() - скролит resultArea на новую пришедшую строчку промежуточного результата
@@ -87,14 +87,22 @@
  */
 
 const ERROR_PREFIX = '*error*';
+var fbody1 = "console.log('lokoko');";
+
 
 function BackgroundTask(params) {
     this.params = params;
 
-    this.task_id = 0;
+    this.taskId = 0;
     this.taskStatus = '';
+    this.useSession = 'false' ;
     this.taskNeedsToRemove = false;
-    this.mode = 'dev';
+    this.mode = 'prod';
+    this.title = 'Background Task';
+    this.windowMode = 'popup';
+    this.widht = 500;
+    this.doneScript = 'downloadFile(this);'; //-- скрипт js, который вызывается по нажатию кнопки после завершения задачи
+
     this.checkForAlreadyRunning = false;
     this.checkProgressInterval = 2000;
     this.urlStartBackgroundTask = '/background-tasks/start-task';
@@ -122,51 +130,130 @@ function BackgroundTask(params) {
     this.showErrorsArea = false;
     this.showProgressArea = false;
 
+    this.doOnSuccessTxt = null;
+    this.doOnErrorTxt = null;
+    this.doOnNotFoundTxt = null;
+    this.showPreloaderTxt = null;
+    this.hidePreloaderTxt = null;
+
+    this.progress = 0;
     this.ajaxCounter = 0;
     this.scrollCounter = 0;
     this.backgroundWrapper = null;
     this.backgroundTaskArea = null;
+    this.doneButon = null;
 
-
+    /*
+    * Инициализация параметров задачи, если start, то после - запуск задачи
+     */
     this.init = function (start=false) {
         for (key in this) {
             if (this.params[key] !== undefined) {
-                this[key] = this.params[key];
+                if (typeof this[key] != 'function'){
+                    this[key] = this.params[key];
+                    switch (key) {
+                        case 'doOnSuccessTxt':
+                            this.doOnSuccess = function (response) {
+                                eval(this.doOnSuccessTxt);
+                            };
+                            break;
+                        case 'doOnErrorTxt':
+                            this.doOnError = function (response) {
+                                eval(this.doOnErrorTxt);
+                            };
+                            break;
+                        case 'doOnNotFoundTxt':
+                            this.doOnNotFound = function (response) {
+                                eval(this.doOnNotFoundTxt);
+                            };
+                            break;
+                        case 'showPreloaderTxt':
+                            this.showPreloader = function () {
+                                eval(this.showPreloaderTxt);
+                            };
+                            break;
+                        case 'hidePreloaderTxt':
+                            this.hidePreloader = function () {
+                                eval(this.hidePreloaderTxt);
+                            };
+                            break;
+                    }
+                } else {
+                    switch (key) {
+                        case 'doOnSuccess':
+                        case 'doOnError':
+                        case 'doOnNotFound':
+                        case 'showPreloader':
+                        case 'hidePreloader':
+                            this[key] = this.params[key];
+                            break;
+                    }
+                }
             }
-            /*
-            if (typeof this[key] != 'function'){
-                console.log(key + '=' + this[key]);
+            if (1 == 0) {
+                console.log('Attributes:');
+                for (key in this) {
+                    if (typeof this[key] != 'function') {
+                        console.log(key + '=' + this[key]);
+                    }
+                }
+                console.log('Functions:');
+                for (key in this) {
+                    if (typeof this[key] == 'function') {
+                        console.log(key + '=' + this[key]);
+                    }
+                }
             }
-            */
         }
         if (start) {
             this.start();
         }
     };
 
+    /*
+    *Включить лоадер при старте задачи
+     */
     this.showPreloader = function () {
         preloader('show', 'mainContainer', 0);
         $('html,body').css('cursor','wait');
 
     };
 
+    /*
+    *Выключить лоадер после завершения задачи
+     */
     this.hidePreloader = function () {
         preloader('hide', 'mainContainer', 0);
         $('html,body').css('cursor','default');
     };
 
+    /*
+    * Возобновление надлюдения за задачей, посстановленной из пула сессии
+     */
+    this.resumeObservation = function (taskId) {
+        setTimeout(this.trackProgress(taskId, this.responseProcessing), this.checkProgressInterval);
+    };
+
+    /*
+    *Запуск на старт задачи - аякс запрос на старт и в случае успеха - вызов trackProgress с задержкой checkProgressInterval
+     */
     this.start = function () {
         var that = this;
+        var startData = {
+            'model' : that.model,
+            'arguments' : that.arguments,
+            '_csrf' : that._csrf
+        };
+        if (that.useSession) {
+            startData['serializedParams'] = that.getSerializedParams();
+        }
+
         switch (that.mode) {
             case 'prod':
                 $.ajax({
-                    url: that.urlStartBackgroundTask + '?checkForAlreadyRunning=' + that.checkForAlreadyRunning,
+                    url: that.urlStartBackgroundTask + '?checkForAlreadyRunning=' + that.checkForAlreadyRunning + '&useSession=' + that.useSession,
                     type: "POST",
-                    data: {
-                        'model' : that.model,
-                        'arguments' : that.arguments,
-                        '_csrf' : that._csrf
-                    } ,
+                    data: startData,
                     dataType: 'json',
                     beforeSend: function() {
                         that.showPreloader();
@@ -176,11 +263,12 @@ function BackgroundTask(params) {
                       //  console.log(response);
                         that.taskStatus = response.status;
                         if (!that.taskNeedsToRemove && response.status != 'error' && response.status != 'not_found'){
-                            that.task_id = response.taskId;
-                            setTimeout(that.trackProgress(response.taskId, that.processLoadingResponse), that.checkProgressInterval);
+                            that.taskId = response.taskId;
+                            that.progress = response.progress;
+                            setTimeout(that.trackProgress(response.taskId, that.responseProcessing), that.checkProgressInterval);
                         } else {
                             //    console.log(response);
-                            that.processLoadingResponse(response, that);
+                            that.responseProcessing(response, that);
                           //  alert('errors');
                         }
                     },
@@ -217,6 +305,9 @@ function BackgroundTask(params) {
         }
     };
 
+    /*
+    *Рекурсивная проверка состояния задачи, аякс - запрос, выход из векурсии - если задача завершена (успешно или с ошибкой), не найдена или подлежит удалению
+     */
     this.trackProgress = function (taskId,  processResponse) {
         var that = this;
         return function () {
@@ -232,11 +323,10 @@ function BackgroundTask(params) {
                         $(that.ajaxCounterArea).html(that.ajaxCounter);
                     }
                     that.taskStatus = response.status;
-                    response.wait = function() {
-                        if (!that.taskNeedsToRemove && response.status != 'error' && response.status != 'not_found' && response.status != 'ready' ) {
-                            setTimeout(that.trackProgress(taskId, processResponse), that.checkProgressInterval);
-                        }
-                    };
+                    if (!that.taskNeedsToRemove && response.status != 'error' && response.status != 'not_found' && response.status != 'ready' ) {
+                        that.progress = response.progress;
+                        setTimeout(that.trackProgress(taskId, processResponse), that.checkProgressInterval);
+                    }
                     processResponse(response, that);
                 },
                 error: function (jqXHR, error, errorThrown) {
@@ -249,8 +339,11 @@ function BackgroundTask(params) {
         };
     };
 
-    this.processLoadingResponse = function (response, target) {
-        console.log(response);
+    /*
+    *Обработка ответа о состоянии задачи
+     */
+    this.responseProcessing = function (response, target) {
+       // console.log(response);
         if (target.showTaskStatusArea) {
             $(target.taskStatusArea).html(response.status);
         }
@@ -260,16 +353,15 @@ function BackgroundTask(params) {
         switch (response.status) {
             case 'new':
                 if (target.showProgressArea) {
-                    target.setProgress(0);
+                    target.setProgress();
                 }
                 if (target.showProgressValueArea) {
                     target.progressValueArea.html(0);
                 }
-                response.wait();
                 break;
             case 'process':
                 if (target.showProgressArea) {
-                    target.setProgress(response.progress);
+                    target.setProgress();
                 }
                 if (target.showResultArea && response.temporaryResult.length > 0) {
                   //  console.log(response);
@@ -278,17 +370,18 @@ function BackgroundTask(params) {
                 if (target.showProgressValueArea) {
                     target.progressValueArea.html(response.progress);
                 }
-                response.wait();
                 break;
             case 'ready':
-                if (target.showProgressArea) {
-                    target.setProgress(response.progress);
-                }
                 if (target.showResultArea) {
                     target.showSuccessResult(response.temporaryResult);
                 }
                 target.hidePreloader();
-                target.doOnSuccesss(response);
+                if (target.showProgressArea) {
+                    target.setProgress(response.progress);
+                }
+
+                target.doOnSuccess(response);
+
                 break;
             case 'error':
                 if (target.showResultArea) {
@@ -310,10 +403,16 @@ function BackgroundTask(params) {
         }
     };
 
-    this.setProgress = function (progress) {
-        $(this.progressArea).val(progress);
+    /*
+    *Обновление указателя прогресса выполнения задачи
+     */
+    this.setProgress = function () {
+        $(this.progressArea).val(this.progress);
     };
 
+    /*
+    *Обработка успешного состояния задачи
+     */
     this.showSuccessResult = function (temporaryResult) {
         var infoText;
         var that = this;
@@ -331,11 +430,17 @@ function BackgroundTask(params) {
         this.scrollTo(this.resultArea, (this.scrollCounter-1));
     };
 
+    /*
+    *Обработка ошибки в состоянии задачи
+     */
     this.showErrorResult = function (response) {
         var infoText = '<div style="color: red;">' +  response.result.replaceAll(ERROR_PREFIX, '') + '</div>';
         $(this.errorsArea).css('display', 'block').append(infoText + '<br>');
    };
 
+    /*
+    *Прокрутка области показа промежуточного результата
+     */
     this.scrollTo = function (area, counter) {
      //   console.log("#i_" + counter);
         var destination = $("#i_" + counter);
@@ -346,22 +451,37 @@ function BackgroundTask(params) {
         }
     };
 
-    this.doOnSuccesss = function (response) {
+    /*
+    *Действи/я, если задача успешно завершена
+     */
+    this.doOnSuccess = function (response) {
       //  alert('Success')
     };
 
+    /*
+    *Действия, если задача завершена с ошибкой
+     */
     this.doOnError = function (response) {
     };
 
+    /*
+    *Действия, если проверяемая задача не найдена
+     */
     this.doOnNotFound = function (response) {
         alert('Task not found')
     };
 
+    /*
+    *Выгрузка файла результата задачи пользователю
+     */
     this.uploadResult = function (killTask, killFile, fileNameColumn) {
-        var uploadUrl = this.urlUploadResult + '?taskId=' + this.task_id + '&killTask=' + killTask + '&killFile=' + killFile + '&fileNameColumn=' + fileNameColumn;
+        var uploadUrl = this.urlUploadResult + '?taskId=' + this.taskId + '&killTask=' + killTask + '&killFile=' + killFile + '&fileNameColumn=' + fileNameColumn;
         document.location.href = uploadUrl;
     };
 
+    /*
+    *Очистка всех информационных блоков и закрытие окна задачи
+     */
     this.cleanAreas = function () {
         if (this.progressArea !== null) {
             $(this.progressArea).val(0);
@@ -384,25 +504,38 @@ function BackgroundTask(params) {
         if (this.ajaxCounterArea !== null) {
             $(this.ajaxCounterArea).html('');
         }
-        if (this.backgroundWrapper !== null && this.backgroundTaskArea !== null) {
-            $(this.backgroundWrapper).fadeOut();
-            $(this.backgroundTaskArea).fadeOut();
+        switch (this.windowMode) {
+            case 'modal':
+                if (this.backgroundWrapper !== null && this.backgroundTaskArea !== null) {
+                    $(this.backgroundWrapper).fadeOut();
+                    $(this.backgroundTaskArea).fadeOut();
+                }
+                break;
+            case 'popup':
+                $(this.backgroundTaskArea).remove();
+                if ($('.background-area-popup').length == 0) {
+                    $(this.backgroundWrapper).remove();
+                }
+                break;
         }
     };
 
+    /*
+    *Принудительное завершение задачи (вызывается из внешнего скрипта)
+     */
     this.removeTask = function () {
         var that = this;
         that.taskNeedsToRemove = true;
         $.ajax({
             url: that.urlKillTask,
             type: "POST",
-            data: {'taskId' : that.task_id} ,
+            data: {'taskId' : that.taskId} ,
             dataType: 'json',
             complete: function(response){
                 that.cleanAreas();
             },
             success: function (response) {
-                 //  console.log(response);
+                   console.log(response);
             },
             error: function (jqXHR, error, errorThrown) {
                 errorHandler(jqXHR, error, errorThrown);
@@ -413,4 +546,32 @@ function BackgroundTask(params) {
 
     };
 
+    /*
+    *Возвращает JSON с сериализованными параметрами себя
+     */
+    this.getSerializedParams = function () {
+        var serializedParamsArray = [];
+        for (key in this) {
+            if (typeof this[key] != 'function' && key != 'params' && key != 'arguments'){
+                serializedParamsArray.push({'name':key, 'value' : this[key] });
+            }
+        }
+
+        return  JSON.stringify(serializedParamsArray);
+    };
+
+    /*
+    *
+     */
+    this.setSerializedParams = function (taskId, serializedParams) {
+     //   console.log(serializedParams);
+        var serializedParamsArray = JSON.parse(serializedParams);
+        this.params = {};
+        var that = this;
+        $(serializedParamsArray).each(function (index, value) {
+            that.params[value['name']] = value['value'];
+        });
+        that.params['taskId'] = taskId;
+     //   console.log(that.params);
+    };
 }

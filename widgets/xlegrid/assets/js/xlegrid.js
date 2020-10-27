@@ -242,31 +242,34 @@ function parseUrl(href) {
     return res;
 }
 
+//-- запуск выгрузки файла со списком в режиме фоновой задачи
 function startBackgroundUploadTask() {
     var params = {
         'mode' : 'prod',
+        'useSession' : true,
        // 'mode' : 'dev',
         'checkProgressInterval' : 500,
         'showProgressArea' : true,
-        'showErrorsArea' : true,
+        'windowMode' : 'popup',
+        'title' : 'Подготовка файла',
+        'widht' : 500,
+        'doneScript' : 'downloadFile(this);',
         'model' : _workerClass,
         'arguments' : {
             'filterModel' : _filterModel,
             'query' : filterQuery,
             'checkedIds' : checkedIds
         },
-        'doOnSuccesss' : function () {
-            this.cleanAreas();
-            this.uploadResult(true, true, 'result');
-            },
+        'showErrorsArea' : true,
+        'doOnSuccessTxt' : "$(this.doneButon).show();",
+        /*
+            'doOnSuccessTxt' : "this.cleanAreas();" +
+                                "this.uploadResult(true, true, 'result');",
+                                */
     };
 
-    startNewBackgroundTask('modal', params, 500, 100, 'Подготовка файла')
+    startNewBackgroundTask(params);
 }
-
-
-
-
 
 function actionWithChecked(action) {
     console.log(action.value);

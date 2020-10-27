@@ -453,7 +453,7 @@ class BackgroundTask extends ActiveRecord
     public static function getTaskStatus($id)
     {
         $strSQL = "
-                SELECT * FROM  `background_tasks`
+                SELECT * FROM  `" . self::tableName() ."`
                 WHERE id = $id;
                 ";
         $task = \Yii::$app->db->createCommand($strSQL)->queryOne();
@@ -527,7 +527,8 @@ class BackgroundTask extends ActiveRecord
 
     //    $logErrorFile = FileHelper::getWritableLogFile(\Yii::$app->basePath . self::LOG_ERROR_FILE_NAME);
 
-        $commandStr .= " 2>>{$this->taskLogErrorFileFullName} 1>>/dev/null  & echo $!;";
+     //   $commandStr .= " 2>>{$this->taskLogErrorFileFullName} 1>>/dev/null  & echo $!;";
+        $commandStr .= " 2>>{$this->taskLogErrorFileFullName} 1>>/dev/null  & echo $! &";
      // /usr/bin/php /var/www/xle/staff/yii backgroundTasks/run-task --task_id=52 2>>/var/www/xle/staff/runtime/logs/backgroundTasks/tasksError.log 1>>/dev/null  & echo $!;
         exec($commandStr, $output,$exitCode);
 
@@ -835,8 +836,8 @@ class BackgroundTask extends ActiveRecord
     public static function setTaskError($id, $errorMessage)
     {
         $strSQL = "
-                UPDATE `background_tasks`
-                      SET `status` = '" . self::TASK_STATUS_ERROR . "', `result` = '$errorMessage'
+                UPDATE `" . self::tableName() . "`
+                      SET `status` = '" . self::TASK_STATUS_ERROR . "', `result` = '" . addslashes($errorMessage) . "'
                 WHERE id = $id;
                 ";
         $ret = \Yii::$app->db->createCommand($strSQL)->execute();
@@ -898,15 +899,14 @@ class BackgroundTask extends ActiveRecord
     public static function checkPidIsRunning($pid, $task_id = 0)
     {
         if (!empty($pid)) {
-        //    exec("ps -p $pid", $output);
-            // $result = (count($output) > 1);
+            exec("ps -p $pid", $output);
+            $result = (count($output) > 1);
 
           //  exec("ps -p $pid -o comm=", $output,$exitCode);
           //  $result = (count($output) == 1 && $output[0] === 'php');
 
-            exec("cat /proc/$pid/cmdline", $output,$exitCode);
-            ///usr/bin/php/var/www/xle/staff/yiibackgroundTasks/run-task--task_id=191
-            $result = (count($output) == 1 && strpos($output[0], "task_id=$task_id"));
+          //  exec("cat /proc/$pid/cmdline", $output,$exitCode);
+         //   $result = (count($output) == 1 && strpos($output[0], "task_id=$task_id"));
 
             return $result;
         }
@@ -984,9 +984,11 @@ class BackgroundTask extends ActiveRecord
         $pid = $this->pid;
         $resultFileName = $this->taskResultFileFullName;
 
-        if (static::checkPidIsRunning($this->pid, $this->pid)) {
-            exec("kill $this->pid");
-            if (!static::checkPidIsRunning($this->pid, $this->pid)){
+        if (static::checkPidIsRunning($this->pid, $this->id)) {
+         //   $command = 'pkill -9 -f "/usr/bin/php /var/www/xle/test/yii backgroundTasks/run-task --task_id=' . $this->id . '"';
+           // exec($command,$output,$exitCode);
+            $this->killProcess();
+            if (static::checkPidIsRunning($this->pid, $this->id)){
                 $this->addError('id', "The process PID=$pid could not be stopped. Call your administrator.");
                 return false;
             }
@@ -1012,6 +1014,16 @@ class BackgroundTask extends ActiveRecord
 
         return true;
     }
+
+    public function killProcess()
+    {
+        $processCMD = '/usr/bin/php ' . \Yii::$app->basePath . DIRECTORY_SEPARATOR . 'yii ' .
+            'backgroundTasks' . DIRECTORY_SEPARATOR . 'run-task --task_id=' . $this->id;
+        exec("pkill -9 -f '$processCMD'");
+
+        return true;
+    }
+
 
     //************************************************************** КАЛЛБЕКИ ДЛЯ ПЕРЕОПРЕДЕЛЕНИЯ ДЕЙСТВИЙ ПРИ ИЗМЕНЕНИИ СТАТУСА ТАСКА
 

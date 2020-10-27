@@ -1,10 +1,15 @@
 <?php
 
 use yii\helpers\Html;
-use \app\widgets\menuX\MenuXWidget;
-use \app\modules\adminxx\assets\AdminxxLayoutAsset;
+use app\widgets\menuX\MenuXWidget;
+use app\modules\adminxx\assets\AdminxxLayoutAsset;
+use app\assets\BackgroundTaskAsset;
+use yii\jui\JuiAsset;
 
 AdminxxLayoutAsset::register($this);
+BackgroundTaskAsset::register($this);
+JuiAsset::register($this);
+
 if (Yii::$app->session->getAllFlashes()){
          $fms = Yii::$app->session->getAllFlashes();
          $_fms = \yii\helpers\Json::htmlEncode($fms);
