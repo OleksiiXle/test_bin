@@ -18,6 +18,9 @@ migrate
 
 5 Создание суперадмина
    php yii adminxx/make-super-admin
+   
+6. Инициализация словаря
+   php yii translate/init
 
 
 

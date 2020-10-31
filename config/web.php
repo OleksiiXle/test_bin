@@ -30,6 +30,7 @@ $config = [
             'loginUrl' => ['site/login'],
             'enableAutoLogin' => false,
         ],
+
         'configs' => [
             'class' => 'app\components\ConfigsComponent',
         ],
@@ -39,6 +40,24 @@ $config = [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        'i18n' => [
+            'translations' => [
+                'app' => [
+                    //  'class' => 'yii\i18n\DbMessageSource',
+                    'class' => 'app\components\DbMessageSource',
+                    //   'class' => 'app\i18n\PhpMessageSource',
+                    //'basePath' => '@app/messages',
+                    'sourceLanguage' => 'ru-RU',
+                    /*
+                    'fileMap' => [
+                        'app'       => 'app.php',
+                        'app/error' => 'error.php',
+                    ],
+                    */
+                ],
+            ],
+        ],
+
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             // send all mails to a file by default. You have to set
