@@ -5,6 +5,7 @@ use app\widgets\menuX\MenuXWidget;
 use app\modules\adminxx\assets\AdminxxLayoutAsset;
 use app\assets\BackgroundTaskAsset;
 use yii\jui\JuiAsset;
+use app\helpers\DateHelper;
 
 AdminxxLayoutAsset::register($this);
 BackgroundTaskAsset::register($this);
@@ -157,6 +158,118 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => \yii\h
 </html>
 <?php $this->endPage() ?>
 <script>
+    moment.locale('ru');
+
+    date_format = '<?= DateHelper::SYSTEM_DATE_FORMAT_JS;?>';
+  //  date_format = 'MM/DD/YYYY';
+    datetime_format = '<?= DateHelper::SYSTEM_DATETIME_FORMAT_JS;?>';
+
+    daterangepicker_default_ranges = {
+        'Сегодня': [moment(), moment()],
+        'Вчера': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'За последние 7 дней': [moment().subtract(6, 'days'), moment()],
+        'За последние  30 дней': [moment().subtract(29, 'days'), moment()],
+        'В этом месяце': [moment().startOf('month'), moment().endOf('month')],
+        'В прошлом месяце': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+        /*
+        'Today': [moment(), moment()],
+        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        */
+    };
+
+    daterangepicker_locale_config = {
+        direction: 'ltr',
+        format: datetime_format,
+        separator: ' - ',
+        applyLabel: 'Применить',
+        cancelLabel: 'Отмена',
+        weekLabel: 'Нед.',
+        customRangeLabel: 'Произвольный диапазон',
+        daysOfWeek: moment.weekdaysMin(),
+        monthNames: moment.monthsShort(),
+        firstDay: moment.localeData().firstDayOfWeek()
+    };
+
+    daterangepicker_default_config = {
+        startDate : moment().startOf('day'),
+        endDate : moment().endOf('day'),
+        minDate : false,
+        maxDate : false,
+        maxSpan : false,
+        autoApply : false,
+        singleDatePicker : false,
+        showDropdowns : false,
+        minYear : moment().subtract(100, 'year').format('YYYY'),
+        maxYear : moment().add(100, 'year').format('YYYY'),
+        showWeekNumbers : false,
+        showISOWeekNumbers : false,
+        showCustomRangeLabel : true,
+        timePicker : false,
+        timePicker24Hour : false,
+        timePickerIncrement : 1,
+        timePickerSeconds : false,
+        linkedCalendars : true,
+        autoUpdateInput : true,
+        alwaysShowCalendars : true,
+        ranges : daterangepicker_default_ranges,
+        opens: 'center',
+        locale: daterangepicker_locale_config
+    };
+
+    daterangepicker_single_default_config = {
+        startDate : moment().startOf('day'),
+        endDate : moment().endOf('day'),
+        minDate : false,
+        maxDate : false,
+        maxSpan : false,
+        autoApply : false,
+        singleDatePicker : true,
+        showDropdowns : false,
+        minYear : moment().subtract(100, 'year').format('YYYY'),
+        maxYear : moment().add(100, 'year').format('YYYY'),
+        showWeekNumbers : false,
+        showISOWeekNumbers : false,
+        showCustomRangeLabel : false,
+        timePicker : false,
+        timePicker24Hour : false,
+        timePickerIncrement : 1,
+        timePickerSeconds : false,
+        linkedCalendars : true,
+        autoUpdateInput : true,
+        alwaysShowCalendars : true,
+        ranges : {},
+        opens: 'center',
+        locale: daterangepicker_locale_config
+    };
+
+    daterangepicker_datetime_locale_config = {
+        direction: 'ltr',
+        format: datetime_format,
+        separator: ' - ',
+        applyLabel: 'Применить',
+        cancelLabel: 'Отмена',
+        weekLabel: 'W',
+        customRangeLabel: 'Произвольный диапазон',
+        daysOfWeek: moment.weekdaysMin(),
+        monthNames: moment.monthsShort(),
+        firstDay: moment.localeData().firstDayOfWeek(),
+    };
+
+    daterangepicker_single_datetime_default_config = {
+        singleDatePicker: true,
+        showDropdowns: true,
+        timePicker: true,
+        autoUpdateInput: false,
+       // timePicker24Hour: $.parseJSON(''),
+      //  timePickerSeconds: $.parseJSON(''),
+        locale: daterangepicker_datetime_locale_config,
+        maxDate: '<?= DateHelper::getFormattedDateFromString(DateHelper::SYSTEM_DATETIME_FORMAT, '+40 year');?>',
+    };
+
 </script>
 
 

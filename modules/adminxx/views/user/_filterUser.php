@@ -2,9 +2,10 @@
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-use \app\modules\adminx\models\UserData;
+use app\modules\adminxx\assets\AdminxxUserFilterAsset;
 
-\app\modules\adminxx\assets\AdminxxUserFilterAsset::register($this);
+AdminxxUserFilterAsset::register($this);
+
 
 $_exportQuery = \yii\helpers\Json::htmlEncode($exportQuery);
 $this->registerJs("
@@ -31,7 +32,7 @@ $this->registerJs("
                         <?php
                         echo $form->field($filter, 'checkedIdsJSON')->textarea([
                                 'cols' => 30, 'rows' => '3',
-                        ]);
+                        ])->hiddenInput()->label(false);
                         echo $form->field($filter, 'username');
                         echo $form->field($filter, 'last_name');
                         echo $form->field($filter, 'first_name');
@@ -45,6 +46,10 @@ $this->registerJs("
                             ['class' => 'form-control', 'tabindex' => '4']])
                             ->dropDownList($filter->roleDict,
                                 ['options' => [ $filter->role => ['Selected' => true]],]);
+                        echo $form->field($filter, 'datetime_range');
+                        echo $form->field($filter, 'datetime_min')->hiddenInput()->label(false);
+                        echo $form->field($filter, 'datetime_max')->hiddenInput()->label(false);
+
                         ?>
                         <div>
                             <?php
@@ -103,6 +108,29 @@ $this->registerJs("
         }
     });
     */
+$(document).ready(function(){
+   // $('input[name="UserFilter[datetime_range]"]').daterangepicker();
+
+});
+moment.locale('ru');
+//console.log('moment', moment);
+//console.log(moment.localeData().firstDayOfWeek());
+//console.log(moment.monthsShort());
+//console.log(daterangepicker_default_config);
+$(function() {
+    console.log(filterQueryObject);
+    var daterangepicker_config = daterangepicker_default_config;
+    if (filterQueryObject.hasOwnProperty('datetime_max') && filterQueryObject.hasOwnProperty('datetime_min')) {
+        daterangepicker_config.startDate = filterQueryObject.datetime_min;
+        daterangepicker_config.endDate = filterQueryObject.datetime_max;
+    }
+    $('input[name="UserFilter[datetime_range]"]').daterangepicker(daterangepicker_config, function (start, end,) {
+        $('input[name="UserFilter[datetime_min]"]').val(start.format(datetime_format));
+        $('input[name="UserFilter[datetime_max]"]').val(end.format(datetime_format));
+    });
+  //  $('input[name="UserFilter[datetime_range]"]').daterangepicker(daterangepicker_single_default_config);
+});
+
 
 </script>
 

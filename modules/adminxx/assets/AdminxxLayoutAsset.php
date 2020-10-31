@@ -10,13 +10,15 @@ class AdminxxLayoutAsset extends  AssetBundle {
     public $publishOptions = ['forceCopy' => true];
     public $css = [
         'css/adminx.css',
-        'css/site.css'
-       // 'mdl/material.css'
-
+        'css/site.css',
+        'datepicker/css/daterangepicker.css',
     ];
     public $js = [
+        'js/functions.js',
         'js/layout.js',
-      //  'mdl/material.js',
+       // 'datepicker/js/moment.min.js',
+        'datepicker/js/moment-with-locales.min.js',
+        'datepicker/js/daterangepicker.js',
     ];
     public $jsOptions = array(
         'position' => \yii\web\View::POS_HEAD

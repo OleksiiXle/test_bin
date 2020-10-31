@@ -16,9 +16,12 @@ use Exception;
  */
 class DateHelper
 {
-    const SYSTEM_DATE_FORMAT = 'Y-m-d';
+   // const SYSTEM_DATE_FORMAT = 'Y m d';
+    const SYSTEM_DATE_FORMAT = 'm d Y';
+    const SYSTEM_DATE_FORMAT_JS = 'DD.MM.YYYY';
     const SYSTEM_TIME_FORMAT = 'H:i:s';
     const SYSTEM_DATETIME_FORMAT = 'Y-m-d H:i:s';
+    const SYSTEM_DATETIME_FORMAT_JS = 'DD.MM.YYYY HH:mm';
 
     const DATE_NULL = '0000-00-00';
     const DATETIME_NULL = '0000-00-00 00:00:00';
@@ -124,6 +127,12 @@ class DateHelper
         'Yemen' => 'd/m/Y',
         'South Africa' => 'Y/m/d',
     ];
+
+    public static function getFormattedDateFromString($format, $string)
+    {
+        return self::formatDate(date($format, strtotime($string)));
+    }
+
 
     public static function isNull($date)
     {

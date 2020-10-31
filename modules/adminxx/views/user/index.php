@@ -118,7 +118,7 @@ $this->title =  'Користувачі';
                             'contentOptions' => ['style' => 'width: 8%; white-space: nowrap; overflow: hidden;'],
                         ],
                         [
-                            'attribute' => 'phone',
+                            'attribute' => 'created_at_str',
                             'headerOptions' => ['style' => 'width: 7%; overflow: hidden;'],
                             'contentOptions' => ['style' => 'width: 7%; overflow: hidden'],
                         ],

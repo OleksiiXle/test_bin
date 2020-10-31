@@ -10,6 +10,10 @@ class UserFilter extends GridFilter
 {
     public $queryModel = UserM::class;
 
+    public $datetime_range = '';
+    public $datetime_min = '';
+    public $datetime_max = '';
+
     public $id;
     public $first_name;
     public $middle_name;
@@ -54,7 +58,9 @@ class UserFilter extends GridFilter
                 'message' => \Yii::t('app', UserM::USER_PASSWORD_ERROR_MESSAGE)],
             [['id', ], 'integer'],
             [['first_name', 'middle_name', 'last_name', 'role'], 'string', 'max' => 50],
+            [['datetime_range', 'datetime_min', 'datetime_max'], 'string', 'max' => 100],
             ['emails', 'email'],
+           // [['datetime_range'], 'match', 'pattern' => '/^.+\s\-\s.+$/'],
 
 
 
@@ -72,6 +78,7 @@ class UserFilter extends GridFilter
             'middle_name' => 'По батькові',
             'last_name' => 'Прізвище',
             'showOnlyChecked' => 'Только выбранные',
+            'datetime_range' => 'Создан',
 
             'phone' => 'Телефон',
             'auth_key' => 'Ключ авторізації',
@@ -113,9 +120,9 @@ class UserFilter extends GridFilter
             $query ->innerJoin('auth_assignment aa', 'user.id=aa.user_id')
                 ->innerJoin('auth_item ai', 'aa.item_name=ai.name')
                 ->where(['ai.type' => 1])
+                ->andWhere(['aa.item_name' => $this->role])
             ;
         }
-
 
         if (!empty($this->emails)) {
             $query->andWhere(['LIKE', 'user.emails', $this->emails]);
@@ -123,10 +130,6 @@ class UserFilter extends GridFilter
 
         if (!empty($this->username)) {
             $query->andWhere(['user.username' => $this->username]);
-        }
-
-        if (!empty($this->role)) {
-            $query->andWhere(['aa.item_name' => $this->role]);
         }
 
 
@@ -149,7 +152,15 @@ class UserFilter extends GridFilter
         if ($this->showStatusInactive =='1'){
             $query->andWhere(['user.status' => UserM::STATUS_INACTIVE]);
         }
-           $e = $query->createCommand()->getSql();
+
+        if (!empty($this->datetime_min) && !empty($this->datetime_max)) {
+            $tmp = strtotime($this->datetime_min);
+            $query->andWhere(['>=','user.created_at', strtotime($this->datetime_min)])
+                  ->andWhere(['<=','user.created_at', strtotime($this->datetime_max)]);
+        }
+
+
+        $e = $query->createCommand()->getSql();
 
         return $query;
 

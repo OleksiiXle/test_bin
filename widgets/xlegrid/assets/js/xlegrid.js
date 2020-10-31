@@ -17,6 +17,7 @@ const PJAX_CONTAINER_ID = '#users-grid-container'
 
 var filterQuery = [];
 var filterQueryJSON = '{}';
+var filterQueryObject = {};
 var checkedIds = [];
 
 $(document).ready(function(){
@@ -116,12 +117,15 @@ function getFilterQuery() {
         if (value.value.length > 0) {
             bufName = value.name.replace(_filterClassShortName, '').replace('[', '').replace(']', '');
             switch (value.type) {
+                case 'hidden':
                 case 'text':
                     filterQuery.push({'name' : bufName, 'value' : value.value });
+                    filterQueryObject[bufName] = value.value;
                     break;
                 case 'checkbox':
                     if (value.checked) {
                         filterQuery.push({'name' : bufName, 'value' : 1 });
+                        filterQueryObject[bufName] = 1;
                     }
                     break;
             }
@@ -131,12 +135,14 @@ function getFilterQuery() {
         if (value.value != 0) {
             bufName = value.name.replace(_filterClassShortName, '').replace('[', '').replace(']', '');
             filterQuery.push({'name' : bufName, 'value' : value.value });
+            filterQueryObject[bufName] = value.value;
         }
     });
     $('textarea[id^=' + _filterClassShortName.toLowerCase() + '-]').each(function(index, value) {
         if (value.value != 0) {
             bufName = value.name.replace(_filterClassShortName, '').replace('[', '').replace(']', '');
             filterQuery.push({'name' : bufName, 'value' : value.value });
+            filterQueryObject[bufName] = value.value;
         }
     });
     /*
@@ -145,6 +151,7 @@ function getFilterQuery() {
     }
     */
     filterQueryJSON = JSON.stringify(filterQuery);
+  //  console.log(filterQueryObject);
    // console.log(filterQuery);
    // console.log(filterQueryJSON);
 }
