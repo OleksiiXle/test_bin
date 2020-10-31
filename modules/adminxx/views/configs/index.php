@@ -1,7 +1,8 @@
 <?php
 
 use yii\helpers\Html;
-use \yii\widgets\Pjax;
+use yii\widgets\Pjax;
+use yii\grid\GridView;
 
 
 $this->title = \Yii::t('app', 'Настройки');
@@ -22,7 +23,7 @@ $this->title = \Yii::t('app', 'Настройки');
     </div>
     <div class="row">
         <?php Pjax::begin(['id' => 'gridConfigs']);
-        echo \yii\grid\GridView::widget([
+        echo GridView::widget([
             'dataProvider' => $dataProvider,
             //-------------------------------------------
             'tableOptions' => [

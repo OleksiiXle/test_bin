@@ -1,8 +1,7 @@
 <?php
-use \app\modules\adminxx\models\Configs;
+use \app\components\models\Configs;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-//use \macgyer\yii2materializecss\widgets\form\ActiveForm;
 
 $this->title = 'Налаштування';
 ?>
@@ -11,15 +10,7 @@ $this->title = 'Налаштування';
     <?php $form = ActiveForm::begin([
         'id' => 'form-update',
         'options' => [
-          //  'layout'=>'horizontal',
-          //  'class' => 'form-horizontal',
         ],
-        /*
-        'fieldConfig' => [
-            'template'     => "<div class=\"col-lg-6 col-md-12 col-sm-12\"><div class=\"md-form\">{input}{label}</div>{error}</div>",
-            'labelOptions' => ['class' => ''],
-        ],
-        */
 
 
     ]); ?>
@@ -35,16 +26,14 @@ $this->title = 'Налаштування';
                     ['options' => [ $model->permCacheKeyDuration => ['Selected' => true]]]);
                 echo $form->field($model, 'guestControlDuration')->dropDownList(Configs::dictionaryDuration(),
                     ['options' => [ $model->guestControlDuration => ['Selected' => true]]]);
-                /*
-                          echo $form->field($model, 'adminEmail');
-                          echo $form->field($model, 'permCacheKey');
-                          echo $form->field($model, 'menuType')->dropDownList(Configs::dictionaryMenu(),
-                              ['options' => [ $model->menuType => ['Selected' => true]]]);
-                          echo $form->field($model, 'passwordResetTokenExpire')->dropDownList(Configs::dictionaryDuration(),
-                              ['options' => [ $model->passwordResetTokenExpire => ['Selected' => true]]]);
-                          echo $form->field($model, 'userDefaultRole')->dropDownList(Configs::dictionaryRoles(),
-                              ['options' => [ $model->userDefaultRole => ['Selected' => true]]]);
-                          */
+                echo $form->field($model, 'adminEmail');
+                echo $form->field($model, 'permCacheKey');
+                echo $form->field($model, 'menuType')->dropDownList(Configs::dictionaryMenu(),
+                    ['options' => [ $model->menuType => ['Selected' => true]]]);
+                echo $form->field($model, 'passwordResetTokenExpire')->dropDownList(Configs::dictionaryDuration(),
+                    ['options' => [ $model->passwordResetTokenExpire => ['Selected' => true]]]);
+                echo $form->field($model, 'userDefaultRole')->dropDownList(Configs::dictionaryRoles(),
+                    ['options' => [ $model->userDefaultRole => ['Selected' => true]]]);
                 ?>
             </div>
         </div>
