@@ -11,9 +11,8 @@ class GridFilter extends Model
     public $showOnlyChecked;
     public $queryModel;
 
-    private $_filterContent;
 
-    public function getQuery($params = null)
+    public function getQuery()
     {
         $query = ($this->queryModel)::find();
        //    $e = $query->createCommand()->getSql();
@@ -21,16 +20,6 @@ class GridFilter extends Model
         return $query;
     }
 
-    public function getFilterContent(){
-        $this->_filterContent = '';
-/*
-        if (!empty($this->first_name)) {
-            $this->_filterContent .= ' Ім"я *' . $this->first_name . '*;' ;
-        }
-*/
-
-        return $this->_filterContent;
-    }
 
     public function getDataForUpload()
     {

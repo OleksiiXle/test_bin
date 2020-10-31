@@ -44,7 +44,16 @@ class UserFilter extends GridFilter
     public $showStatusActive;
     public $showStatusInactive;
 
-    private $_filterContent;
+    private $_filterContent = null;
+
+    public function getFilterContent()
+    {
+        if ($this->_filterContent === null) {
+            $this->getQuery();
+        }
+
+        return $this->_filterContent;
+    }
 
     public function rules()
     {
@@ -100,15 +109,16 @@ class UserFilter extends GridFilter
         ];
     }
 
-    public function getQuery($params = null)
+    public function getQuery()
     {
         $tmp = 1;
         $query = UserM::find()
             ->joinWith(['userDatas']);
-
+        $this->_filterContent = '';
         if ($this->showOnlyChecked =='1' && !empty($this->checkedIdsJSON)) {
             $checkedIds = json_decode($this->checkedIdsJSON);
             $query->andWhere(['IN', 'user.id', $checkedIds]);
+            $this->_filterContent .= ' * Только отмеченные*;' ;
             return $query;
         }
 
@@ -122,41 +132,50 @@ class UserFilter extends GridFilter
                 ->where(['ai.type' => 1])
                 ->andWhere(['aa.item_name' => $this->role])
             ;
+            $this->_filterContent .= ' Роль *' . $this->roleDict[$this->role] . '*;' ;
         }
 
         if (!empty($this->emails)) {
             $query->andWhere(['LIKE', 'user.emails', $this->emails]);
+            $this->_filterContent .= ' Email *' . $this->emails . '*;' ;
         }
 
         if (!empty($this->username)) {
             $query->andWhere(['user.username' => $this->username]);
+            $this->_filterContent .= ' Логін *' . $this->username . '*;' ;
         }
 
 
         if (!empty($this->first_name)) {
             $query->andWhere(['like', 'user_data.first_name', $this->first_name]);
+            $this->_filterContent .= ' Ім"я *' . $this->first_name . '*;' ;
         }
 
         if (!empty($this->middle_name)) {
             $query->andWhere(['like', 'user_data.middle_name', $this->middle_name]);
+            $this->_filterContent .= ' По-батькові *' . $this->middle_name . '*;' ;
         }
 
         if (!empty($this->last_name)) {
             $query->andWhere(['like', 'user_data.last_name', $this->last_name]);
+            $this->_filterContent .= ' Прізвище *' . $this->last_name . '*;' ;
         }
 
         if ($this->showStatusActive =='1'){
             $query->andWhere(['user.status' => UserM::STATUS_ACTIVE]);
+            $this->_filterContent .= ' * Тількі активні*;' ;
         }
 
         if ($this->showStatusInactive =='1'){
             $query->andWhere(['user.status' => UserM::STATUS_INACTIVE]);
+            $this->_filterContent .= ' * Тількі неактивні*;' ;
         }
 
         if (!empty($this->datetime_min) && !empty($this->datetime_max)) {
             $tmp = strtotime($this->datetime_min);
             $query->andWhere(['>=','user.created_at', strtotime($this->datetime_min)])
                   ->andWhere(['<=','user.created_at', strtotime($this->datetime_max)]);
+            $this->_filterContent .= ' * Создан ' . $this->datetime_range . ' *;' ;
         }
 
 
@@ -165,49 +184,6 @@ class UserFilter extends GridFilter
         return $query;
 
 
-    }
-
-    public function getFilterContent()
-    {
-        $this->_filterContent = '';
-
-        if (!empty($this->first_name)) {
-            $this->_filterContent .= ' Ім"я *' . $this->first_name . '*;' ;
-        }
-
-        if (!empty($this->middle_name)) {
-            $this->_filterContent .= ' По-батькові *' . $this->middle_name . '*;' ;
-        }
-
-        if (!empty($this->last_name)) {
-            $this->_filterContent .= ' Прізвище *' . $this->last_name . '*;' ;
-        }
-
-        if (!empty($this->username)) {
-            $this->_filterContent .= ' Логін *' . $this->username . '*;' ;
-        }
-
-        if (!empty($this->emails)) {
-            $this->_filterContent .= ' Email *' . $this->emails . '*;' ;
-        }
-
-        if (!empty($this->role)) {
-            $this->_filterContent .= ' Роль *' . $this->roleDict[$this->role] . '*;' ;
-        }
-
-        if ($this->showStatusActive =='1'){
-            $this->_filterContent .= ' * Тількі активні*;' ;
-        }
-
-        if ($this->showStatusInactive =='1'){
-            $this->_filterContent .= ' * Тількі неактивні*;' ;
-        }
-
-        if ($this->showOnlyChecked =='1'){
-            $this->_filterContent .= ' * Только отмеченные*;' ;
-        }
-
-        return $this->_filterContent;
     }
 
     public function getDataForUpload()

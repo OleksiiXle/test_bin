@@ -117,10 +117,7 @@ class Xlegrid extends GridView
                 //  'id' => 'uploadStartBtn',
             ]);
 
-            $filterContent = '';
-            if (!empty($this->dataProvider->filterModel->filterContent)){
-                $filterContent = 'Фільтр: ' . $this->dataProvider->filterModel->filterContent;
-            }
+            $filterContent = $this->dataProvider->filterModel->filterContent;
             if ($this->useCheckForRows) {
                 $actionsWithChecked = '';
                 if (isset($this->checkActionList['actions']) && isset($this->checkActionList['options'])) {

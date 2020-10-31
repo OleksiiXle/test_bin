@@ -109,16 +109,11 @@ $this->registerJs("
     });
     */
 $(document).ready(function(){
-   // $('input[name="UserFilter[datetime_range]"]').daterangepicker();
 
 });
 moment.locale('ru');
-//console.log('moment', moment);
-//console.log(moment.localeData().firstDayOfWeek());
-//console.log(moment.monthsShort());
-//console.log(daterangepicker_default_config);
 $(function() {
-    console.log(filterQueryObject);
+  //  console.log(filterQueryObject);
     var daterangepicker_config = daterangepicker_default_config;
     if (filterQueryObject.hasOwnProperty('datetime_max') && filterQueryObject.hasOwnProperty('datetime_min')) {
         daterangepicker_config.startDate = filterQueryObject.datetime_min;
