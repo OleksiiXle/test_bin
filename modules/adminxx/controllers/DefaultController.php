@@ -86,6 +86,16 @@ class DefaultController extends MainController
                 : [
                     'show' => false,
                 ],
+            'Translations' => (isset($userPermissions['menuAdminxMain']))
+                ? [
+                    'show' => true,
+                    'name' => 'Переводы',
+                    'route' => 'adminxx/translation/index'
+                ]
+                : [
+                    'show' => false,
+                ],
+
             'PHPinfo' => (isset($userPermissions['menuAdminxMain']))
                 ? [
                     'show' => true,

@@ -37,6 +37,9 @@ $config = [
         'conservation' => [
             'class' => 'app\components\conservation\ConservationComponent',
         ],
+        'userProfile' => [
+            'class' => 'app\components\UserProfileComponent',
+        ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],

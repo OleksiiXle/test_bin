@@ -24,12 +24,23 @@ $(document).ready(function(){
    // console.log(PJAX_CONTAINER_ID);
   //  console.log(USE_PJAX);
    // console.log(_pjaxClientOptions);
+    //console.log(PJAX_CONTAINER_ID + ' a');
+  //  console.log($(PJAX_CONTAINER_ID + ' a'));
+   // console.log($("#users-grid-container a [class = 'no-pjax']"));
+   // console.log($("#users-grid-container a"));
+   // console.log($('a[class!="route no-pjax"]'));
+  //  console.log($("a[class!='no-pjax']"));
+   // console.log($(PJAX_CONTAINER_ID + ' a [class = "no-pjax"]'));
+
+
 
     if (USE_PJAX) {
         $(document).on('click', PJAX_CONTAINER_ID + ' a', function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            doPjax(this.href);
+            if (!$(this).hasClass('no-pjax')){
+                event.preventDefault();
+                event.stopPropagation();
+                doPjax(this.href);
+            }
         });
        // $('#' + _filterClassShortName.toLowerCase() + '-showonlychecked').prop('checked', false);
        // checkedIds = JSON.parse($('#' + _filterClassShortName.toLowerCase() + '-checkedidsjson').val());

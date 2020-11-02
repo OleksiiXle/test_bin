@@ -2,6 +2,7 @@
 
 namespace app\modules\adminxx\controllers;
 
+use Yii;
 use app\modules\adminxx\models\UControl;
 use yii\web\Controller;
 
@@ -21,11 +22,14 @@ class MainController extends Controller
 
     public function beforeAction($action)
     {
+        Yii::$app->language = Yii::$app->userProfile->language;
+        $t1 = Yii::$app->language;
+
         if (defined('YII_DEBUG') && YII_DEBUG) {
-            \Yii::$app->getAssetManager()->forceCopy = true;
+            Yii::$app->getAssetManager()->forceCopy = true;
         }
-        if (!\Yii::$app->request->isAjax){
-            if (\Yii::$app->configs->userControl || \Yii::$app->configs->guestControl){
+        if (!Yii::$app->request->isAjax){
+            if (Yii::$app->configs->userControl || \Yii::$app->configs->guestControl){
                 $ret = UControl::guestsAndUsersControl();
             }
         }

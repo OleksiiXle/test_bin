@@ -18,6 +18,7 @@ return [
     'permCacheKeyDuration' => '180',
     'passwordResetTokenExpire' => '3600',
     'userDefaultRole' => 'user',
+    'rbacCacheSource' => 'session', //cache
 
     'pathToFiles' => '/files',
     'max_execution_time' => '60',

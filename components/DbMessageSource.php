@@ -2,16 +2,13 @@
 
 namespace app\components;
 
-use app\models\Translation;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\caching\CacheInterface;
 use yii\db\Connection;
-use yii\db\Expression;
-use yii\db\Query;
 use yii\di\Instance;
-use yii\helpers\ArrayHelper;
 use yii\i18n\MessageSource;
+use app\components\models\Translation;
 
 /**
  * DbMessageSource extends [[MessageSource]] and represents a message source that stores translated

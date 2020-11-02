@@ -1,11 +1,13 @@
 <?php
-
 use yii\helpers\Html;
 use app\widgets\menuX\MenuXWidget;
+use app\widgets\changeLanguage\ChangeLanguageWidget;
 use app\modules\adminxx\assets\AdminxxLayoutAsset;
 use app\assets\BackgroundTaskAsset;
 use yii\jui\JuiAsset;
 use app\helpers\DateHelper;
+use app\components\models\Translation;
+use yii\helpers\Url;
 
 AdminxxLayoutAsset::register($this);
 BackgroundTaskAsset::register($this);
@@ -53,8 +55,13 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => \yii\h
           </div>
           <!--************************************************************************************************************* CENTER-->
 
-        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 " >
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 " >
             <h3 style="margin-top: 15px;margin-bottom: 15px; white-space: nowrap; overflow: hidden;"><?= Html::encode($this->title) ?></h3>
+        </div>
+        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 " >
+            <?php
+            echo ChangeLanguageWidget::widget();
+            ?>
         </div>
         <!--************************************************************************************************************* LOGIN/LOGOUT-->
         <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2" align="center" style="padding-left: 1px">

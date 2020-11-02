@@ -31,6 +31,9 @@ return [
         'menuAdminConfigUpdate'       => '*** Изменение системных настроек (меню)',
         'adminConfigUpdate'           => 'Изменение системных настроек',
 
+        'menuAdminTranslateUpdate'    => '*** Изменение словарей (меню)',
+        'adminTranslateUpdate'        => 'Изменение словарей',
+
 
     ],
     'roles' => [
@@ -48,6 +51,7 @@ return [
         'adminSystem' => [
             'menuAdminxMain',
 
+            'menuAdminTranslateUpdate',
             'menuAdminUsersView',
             'menuAdminAuthItemList',
             'menuAdminMenuEdit',
@@ -62,6 +66,7 @@ return [
             'adminAuthItemCRUD',
             'adminMenuEdit',
             'adminConfigUpdate',
+            'adminTranslateUpdate',
         ],
         'adminUsers' => [
             'menuAdminxMain',

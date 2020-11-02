@@ -49,6 +49,13 @@ $t = [
                 'children' => []
             ],
             [
+                'name'       => 'Переводы',
+                'route'      => '/adminxx/translation/index',
+                'role' => 'menuAdminTranslateUpdate',
+                'access_level' => 2,
+                'children' => []
+            ],
+            [
                 'name'       => 'PHP-info',
                 'route'      => 'adminxx/user/php-info',
                 'role' => 'menuAdminxMain',
