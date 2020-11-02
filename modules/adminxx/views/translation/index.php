@@ -13,7 +13,7 @@ $this->title = Yii::t('app', 'Переводы');
         </div>
         <div class="col-md-6" align="right" style="padding-top: 20px">
             <?php
-            echo Html::a('Добавить новый', '/adminx/translation/create', [
+            echo Html::a('Добавить новый', '/adminxx/translation/create', [
                 'class' =>'btn btn-primary',
             ]);
             ?>

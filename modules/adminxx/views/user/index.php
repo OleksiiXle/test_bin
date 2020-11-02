@@ -1,5 +1,5 @@
 <?php
-
+use Yii;
 use yii\helpers\Html;
 use \yii\widgets\Pjax;
 use \app\modules\adminxx\models\UserM;
@@ -10,8 +10,8 @@ use \app\modules\adminxx\assets\AdminxxUserAsset;
 
 AdminxxUserAsset::register($this);
 
+$this->title = Yii::t('app', 'Пользователи');
 
-$this->title =  'Користувачі';
 ?>
 <style>
     .usersGrid{

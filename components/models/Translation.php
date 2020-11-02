@@ -5,6 +5,7 @@ namespace app\components\models;
 use app\components\DbMessageSource;
 use app\models\MainModel;
 use Yii;
+use yii\db\Query;
 
 /**
  * This is the model class for table "translation".
@@ -237,5 +238,20 @@ class Translation extends MainModel
         }
 
         return $ret;
+    }
+
+    public static function getDataForAutocomplete($language, $category = 'app')
+    {
+        $data = (new Query())
+            ->select('message')
+            ->from(self::tableName())
+            ->where(['category' => $category, 'language' => $language])
+            ->orderBy('message')
+            ->indexBy('message')
+            ->all();
+     //   $result = "['" . implode ( "', '", array_keys($data) ) . "']";
+        $result = json_encode(array_keys($data));
+
+        return $result;
     }
 }

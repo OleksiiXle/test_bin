@@ -76,7 +76,12 @@ class TranslationController extends MainController
      */
     public function actionCreate()
     {
+        $dataForAutocompleteRu = Translation::getDataForAutocomplete('ru-RU', 'app');
+        $dataForAutocompleteEn = Translation::getDataForAutocomplete('en-US', 'app');
+        $dataForAutocompleteUk = Translation::getDataForAutocomplete('uk-UK', 'app');
+
         $model = new Translation();
+        $model->category = 'app';
         if (\Yii::$app->getRequest()->isPost) {
             $data = \Yii::$app->getRequest()->post('Translation');
             if (isset($data['reset-button'])){
@@ -88,8 +93,11 @@ class TranslationController extends MainController
             }
         }
 
-        return $this->render('update', [
+        return $this->render('create', [
             'model' => $model,
+            'dataForAutocompleteRu' => $dataForAutocompleteRu,
+            'dataForAutocompleteEn' => $dataForAutocompleteEn,
+            'dataForAutocompleteUk' => $dataForAutocompleteUk,
         ]);
     }
 
