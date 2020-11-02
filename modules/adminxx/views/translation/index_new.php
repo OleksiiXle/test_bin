@@ -3,14 +3,13 @@ use yii\helpers\Html;
 use app\widgets\xlegrid\Xlegrid;
 use app\widgets\menuAction\MenuActionWidget;
 use yii\helpers\Url;
-use app\modules\adminxx\assets\AdminxxTranslationsAsset;
 
-AdminxxTranslationsAsset::register($this);
 $this->title = Yii::t('app', 'Переводы');
 ?>
 <div class="row ">
     <div class="xHeader">
         <div class="col-md-6" align="left">
+            <h3><?= Html::encode($this->title) ?></h3>
         </div>
         <div class="col-md-6" align="right" >
             <?php
@@ -31,13 +30,13 @@ $this->title = Yii::t('app', 'Переводы');
                 'useCheckForRows' => true,
                 'checkActionList' => [
                     'actions' => [
-                        'deleteChecked' => 'Удалить отмеченные',
+                        'action1' => 'action1***',
                         'action2' => 'action2***',
                         'action3' => 'action3***',
                     ],
                     'options' => [
                         'class' => 'checkActionsSelect',
-                        'onchange' => 'actionWithCheckedTranslations(this);',
+                        'onchange' => 'actionWithChecked(this);',
                     ],
                 ],
                 'pager' => [
@@ -105,7 +104,7 @@ $this->title = Yii::t('app', 'Переводы');
                                             'confirm' => 'Подтвердите удаление',
                                         ],
                                    ],
-                                    'offset' => -100,
+                                    'offset' => -200,
                                 ]
                             );
                         },

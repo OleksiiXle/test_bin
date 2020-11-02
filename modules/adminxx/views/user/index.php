@@ -1,12 +1,10 @@
 <?php
-use Yii;
 use yii\helpers\Html;
-use \yii\widgets\Pjax;
-use \app\modules\adminxx\models\UserM;
-use \app\widgets\xlegrid\Xlegrid;
-use \app\widgets\menuAction\MenuActionWidget;
+use app\modules\adminxx\models\UserM;
+use app\widgets\xlegrid\Xlegrid;
+use app\widgets\menuAction\MenuActionWidget;
 use yii\helpers\Url;
-use \app\modules\adminxx\assets\AdminxxUserAsset;
+use app\modules\adminxx\assets\AdminxxUserAsset;
 
 AdminxxUserAsset::register($this);
 

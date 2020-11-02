@@ -3,14 +3,25 @@ namespace app\modules\adminxx\models\filters;
 
 use app\modules\adminxx\models\AuthItemX;
 use yii\base\Model;
+use app\widgets\xlegrid\models\GridFilter;
 
-class AuthItemFilter extends Model
+class AuthItemFilter extends GridFilter
 {
     public $name;
     public $type;
     public $description;
     public $rule_name;
 
+    private $_filterContent = null;
+
+    public function getFilterContent()
+    {
+        if ($this->_filterContent === null) {
+            $this->getQuery();
+        }
+
+        return $this->_filterContent;
+    }
 
 
     public function rules()

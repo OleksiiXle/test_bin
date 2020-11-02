@@ -11,6 +11,13 @@ class GridFilter extends Model
     public $showOnlyChecked;
     public $queryModel;
 
+    public function rules()
+    {
+        return [
+            [['checkedIdsJSON'], 'string', 'max' => 1000],
+            [[ 'showOnlyChecked'], 'boolean'],
+        ];
+    }
 
     public function getQuery()
     {

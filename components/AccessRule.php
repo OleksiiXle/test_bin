@@ -156,6 +156,16 @@ class AccessRule extends Component
     public function allows($action, $user, $request)
     {
         $q=1;
+        if (1 == 0) {
+            $a_matchAction = $this->matchAction($action);
+            $a_matchRole = $this->matchRole($user);
+            $a_matchIP = $this->matchIP($request->getUserIP());
+            $a_matchVerb = $this->matchVerb($request->getMethod());
+            $a_matchController = $this->matchController($action->controller);
+            $a_matchCustom = $this->matchCustom($action);
+            $tmp = 1;
+
+        }
         if ($this->matchAction($action)
             && $this->matchRole($user)
             && $this->matchIP($request->getUserIP())

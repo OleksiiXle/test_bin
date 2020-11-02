@@ -107,6 +107,7 @@ class Translation extends MainModel
 
     public function saveTranslation()
     {
+        $currentLanguage = Yii::$app->language;
         $ret = $this->validate();
         if ($ret){
             if ($this->isNewRecord){
@@ -123,7 +124,13 @@ class Translation extends MainModel
                     $t->language = 'ru-RU';
                     $t->message = $this->messageRU;
                     if (!$t->save()){
+                        if ($currentLanguage == $t->language) {
+                            $this->id = $t->id;
+                        }
                         return false;
+                    }
+                    if ($currentLanguage == $t->language) {
+                        $this->id = $t->id;
                     }
                 }
 
@@ -136,6 +143,9 @@ class Translation extends MainModel
                     if (!$t->save()){
                         return false;
                     }
+                    if ($currentLanguage == $t->language) {
+                        $this->id = $t->id;
+                    }
                 }
 
                 if (!empty($this->messageEN)){
@@ -146,6 +156,9 @@ class Translation extends MainModel
                     $t->message = $this->messageEN;
                     if (!$t->save()){
                         return false;
+                    }
+                    if ($currentLanguage == $t->language) {
+                        $this->id = $t->id;
                     }
                 }
             } else {

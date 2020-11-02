@@ -53,8 +53,8 @@ $(document).ready(function(){
         });
         */
 
-        getFilterQuery();
-        useFilter();
+      //  getFilterQuery();
+      //  useFilter();
     }
 });
 

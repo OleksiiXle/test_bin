@@ -2,14 +2,16 @@
 
 namespace app\modules\adminxx\controllers;
 
+use app\components\conservation\ActiveDataProviderConserve;
 use app\components\models\Translation;
 use app\components\AccessControl;
+use app\modules\adminxx\models\filters\TranslationFilter;
 use yii\data\ActiveDataProvider;
+use yii\db\Query;
 use yii\filters\VerbFilter;
 
 class TranslationController extends MainController
 {
-
     public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -19,7 +21,7 @@ class TranslationController extends MainController
                 [
                     'allow'      => true,
                     'actions'    => [
-                         'index', 'create', 'update', 'delete'
+                         'index', 'create', 'update', 'delete', 'delete-translations'
                     ],
                     'roles'      => ['adminTranslateUpdate' ],
                 ],
@@ -44,6 +46,7 @@ class TranslationController extends MainController
             'class' => VerbFilter::class,
             'actions' => [
                 'delete' => ['post'],
+                'delete-translations' => ['post'],
             ],
 
         ];
@@ -56,7 +59,8 @@ class TranslationController extends MainController
      */
     public function actionIndex() {
      //   $r = Translation::getDictionary('app', 'ru-RU');
-        $r = \Yii::t('app', 'Перевод');
+      //  $r = \Yii::t('app', 'Перевод');
+        /*
         $dataProvider = new ActiveDataProvider([
             'query' => Translation::find()
             ->where(['language' => \Yii::$app->language])
@@ -65,6 +69,53 @@ class TranslationController extends MainController
                 'pageSize' => 50,
             ],
         ]);
+        */
+        $dataProvider = new ActiveDataProviderConserve([
+            // 'searchId' => $id,
+            'filterModelClass' => TranslationFilter::class,
+            'conserveName' => 'translationGrid',
+            'pageSize' => 10,
+            /*
+            'sort' => ['attributes' => [
+                'id',
+                'username',
+                'nameFam' => [
+                    'asc' => [
+                        'user_data.last_name' => SORT_ASC,
+                    ],
+                    'desc' => [
+                        'user_data.last_name' => SORT_DESC,
+                    ],
+                ],
+                'lastRoutTime' => [
+                    'asc' => [
+                        'user_data.last_rout_time' => SORT_ASC,
+                    ],
+                    'desc' => [
+                        'user_data.last_rout_time' => SORT_DESC,
+                    ],
+                ],
+                'lastRout' => [
+                    'asc' => [
+                        'user_data.last_rout' => SORT_ASC,
+                    ],
+                    'desc' => [
+                        'user_data.last_rout' => SORT_DESC,
+                    ],
+                ],
+                'status' => [
+                    'asc' => [
+                        'user.status' => SORT_ASC,
+                    ],
+                    'desc' => [
+                        'user.status' => SORT_DESC,
+                    ],
+                ],
+            ]],
+            */
+
+        ]);
+
         return $this->render('index',[
             'dataProvider' => $dataProvider,
         ]);
@@ -89,6 +140,12 @@ class TranslationController extends MainController
             }
             $model->setAttributes($data);
             if ($model->saveTranslation()) {
+                $session = \Yii::$app->session;
+                if ($session->get('searchIid')){
+                    $session->remove('searchIid');
+                }
+                $session->set('searchIid', $model->id );
+
                 return $this->redirect(['index']);
             }
         }
@@ -102,7 +159,7 @@ class TranslationController extends MainController
     }
 
     /**
-     * +++ Регистрация нового
+     * +++ Изменение старого
      * @return string
      */
     public function actionUpdate($id)
@@ -131,6 +188,7 @@ class TranslationController extends MainController
      */
     public function actionDelete($tkey)
     {
+        $tmp = 1;
         if (\Yii::$app->request->isPost){
             $userDel = Translation::deleteAll(['tkey' => $tkey]);
             if ($userDel === 0){
@@ -152,7 +210,27 @@ class TranslationController extends MainController
             $this->result['data'] = $e->getMessage();
         }
         return $this->redirect(\Yii::$app->request->referrer);
-   //     return $this->goBack();
+    }
+
+    public function actionDeleteTranslations()
+    {
+        $_post = \Yii::$app->request->post();
+        if (isset($_post['checkedIds'])) {
+            $checkedIds = $_post['checkedIds'];
+            $tkeys = (new Query())
+                ->select('tkey')
+                ->from(Translation::tableName())
+                ->where(['IN', 'id', $checkedIds])
+                ->indexBy('tkey')
+                ->all();
+            $translationsToDelete = Translation::deleteAll(['IN', 'tkey', array_keys($tkeys)]);
+            $this->result = [
+                'status' => true,
+                'data' => $translationsToDelete
+            ];
+        }
+
+        return $this->asJson($this->result);
     }
 
 }

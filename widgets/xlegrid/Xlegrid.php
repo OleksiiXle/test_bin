@@ -27,6 +27,7 @@ class Xlegrid extends GridView
     public $pjaxClientOptions;
     public $useCheckForRows = false;
     public $checkActionList = [
+        /*
         'actions' => [
             'action1' => 'action1***',
             'action2' => 'action2***',
@@ -34,13 +35,10 @@ class Xlegrid extends GridView
         ],
         'options' => [
             'onchange' => 'actionWithChecked(this);',
-            'style' => 'color:red;'
         ],
+        */
     ];
    private $checkedIds = [];
-
-    //   public $gridId;
- //   public $urlGetGridFilterData;
 
     public function run()
     {
@@ -121,8 +119,17 @@ class Xlegrid extends GridView
             if ($this->useCheckForRows) {
                 $actionsWithChecked = '';
                 if (isset($this->checkActionList['actions']) && isset($this->checkActionList['options'])) {
-                    $actionsWithChecked = Html::dropDownList(null,
+                    $actionsWithChecked = "
+                           <select class='checkActionsSelect' onchange='" . $this->checkActionList['options']['onchange'] . "'>
+                                <option disabled selected value='label'>Операции с выбранными строками</option>" . PHP_EOL;
+                    foreach ($this->checkActionList['actions'] as $action => $text) {
+                        $actionsWithChecked .= "<option value='$action'>$text</option>" . PHP_EOL ;
+                    }
+                    $actionsWithChecked .= "</select>" . PHP_EOL;
+/*
+                    $actionsWithChecked_ = Html::dropDownList(null,
                         null,$this->checkActionList['actions'], $this->checkActionList['options']);
+*/
                 }
                 $filterBody = '
             <tr>
