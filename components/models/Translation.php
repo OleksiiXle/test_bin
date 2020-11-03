@@ -39,7 +39,6 @@ class Translation extends MainModel
     public $messageUK = '';
     public $messageEN = '';
 
-
     /**
      * @return mixed
      */
@@ -104,7 +103,10 @@ class Translation extends MainModel
             ;
     }
 
-
+    /**
+     * @return bool
+     * @throws \yii\base\InvalidConfigException
+     */
     public function saveTranslation()
     {
         $currentLanguage = Yii::$app->language;
@@ -205,13 +207,17 @@ class Translation extends MainModel
                 }
             }
 
-            $item = new DbMessageSource();
-            $t=$item->refreshCache($this->category);
+            $messageSource = Yii::$app->i18n->getMessageSource('app');
+            $messageSource->refreshCache($this->category);
+            $messageSource->cache->delete('jst');
 
         }
         return $ret;
     }
 
+    /**
+     * @return bool
+     */
     public function setLanguages()
     {
         $l = self::find()
@@ -234,6 +240,11 @@ class Translation extends MainModel
         return true;
     }
 
+    /**
+     * @param $category
+     * @param $language
+     * @return array
+     */
     public static function getDictionary($category, $language)
     {
         $ret = [];
@@ -253,6 +264,11 @@ class Translation extends MainModel
         return $ret;
     }
 
+    /**
+     * @param $language
+     * @param string $category
+     * @return false|string
+     */
     public static function getDataForAutocomplete($language, $category = 'app')
     {
         $data = (new Query())
@@ -266,5 +282,83 @@ class Translation extends MainModel
         $result = json_encode(array_keys($data));
 
         return $result;
+    }
+
+    /**
+     * Определение переводов для передачи в JS
+     * todo *** важно - передавать переводы в JS только в главном выиде, который рендерится из контроллера
+     * Переводы хранятся в кеше jst, например:
+     * array (
+     *  'translation-index' => , (translation - контроллер, index - действие,из которого рендерится вид)
+     *      array (
+     *          'uk-UK' =>
+     *                array (
+     *                  'Владелец' => 'Власник',
+     *                  'Owner' => 'Власник',
+     *                  'Переводы' => 'Переклади',
+     *                  'Translations' => 'Переклади',
+     *                      ),
+     *          ),
+     *          'ru-RU' =>
+     *                array (
+     *                  'Власник' => 'Владелец',
+     *                  'Owner' => 'Владелец',
+     *                  'Переклади' => 'Переводы',
+     *                  'Translations' => 'Переводы',
+     *                      ),
+     *          ),
+     *  'user-index' =>
+     *      array (
+     *          'uk-UK' =>
+     *              array (
+     *                  'Видео' => 'Відео',
+     *                  'Video' => 'Відео',
+     *                  ),
+     *          ),
+     *  )
+     * @param $key
+     * @param $messages
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function getJsDictionary($key, $messages)
+    {
+        $cache = Yii::$app->i18n->getMessageSource('app')->cache;
+       // $cache = Yii::$app->cache;
+        $currentLanguage = Yii::$app->userProfile->language;
+        if (!($data = $cache->get('jst')) || empty($data[$key]) || empty($data[$key][$currentLanguage])) {
+            $translationsToCache = [];
+            $items = self::find()
+                ->where(['language' => $currentLanguage, 'category' => 'app'])
+                ->andWhere(['IN', 'message', $messages])
+                ->all();
+            if (!empty($items)){
+                foreach ($items as $item){
+                    $tr = $item->translations;
+                    foreach ($tr as $translation){
+                        $translationsToCache[$translation->message] =  $item->message;
+                    }
+                }
+                if (!$data) {
+                    $data = [
+                        $key => [
+                            $currentLanguage => $translationsToCache,
+                        ]
+                    ];
+                } elseif (empty($data[$key])) {
+                    $data[$key] = [
+                        $currentLanguage => $translationsToCache,
+                    ];
+                } else {
+                    $data[$key][$currentLanguage] = $translationsToCache;
+                }
+                $cache->set('jst', $data);
+                return $translationsToCache;
+            } else {
+                return array_fill_keys ($messages , $messages);
+            }
+        } else {
+            return $data[$key][$currentLanguage];
+        }
     }
 }

@@ -57,19 +57,19 @@ class TranslationController extends MainController
      * +++ Список всех
      * @return mixed
      */
-    public function actionIndex() {
+    public function actionIndex()
+    {
      //   $r = Translation::getDictionary('app', 'ru-RU');
-      //  $r = \Yii::t('app', 'Перевод');
         /*
-        $dataProvider = new ActiveDataProvider([
-            'query' => Translation::find()
-            ->where(['language' => \Yii::$app->language])
-            ,
-            'pagination' => [
-                'pageSize' => 50,
-            ],
-        ]);
-        */
+            $dataProvider = new ActiveDataProvider([
+                'query' => Translation::find()
+                ->where(['language' => \Yii::$app->language])
+                ,
+                'pagination' => [
+                    'pageSize' => 50,
+                ],
+            ]);
+            */
         $dataProvider = new ActiveDataProviderConserve([
             // 'searchId' => $id,
             'filterModelClass' => TranslationFilter::class,
