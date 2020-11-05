@@ -361,4 +361,37 @@ class Translation extends MainModel
             return $data[$key][$currentLanguage];
         }
     }
+
+    public static function upload()
+    {
+        $pathToFile = \Yii::$app->basePath . '/runtime/uploads';
+        if (!is_dir($pathToFile)) {
+            mkdir($pathToFile, 0777, true);
+        }
+        $fileName = $pathToFile . '/transRusInit_'. date('Y-m-d', time()) . '.php';
+        $tkeys = (new Query())
+            ->select('tkey')
+            ->distinct()
+            ->from(self::tableName())
+            ->indexBy('tkey')
+            ->all();
+        file_put_contents($fileName, '<?php' . PHP_EOL . 'return [' . PHP_EOL);
+        foreach ($tkeys as $tkey) {
+            $items =  (new Query())
+                ->select('language, message')
+                ->from(self::tableName())
+                ->where(['tkey' => $tkey])
+                ->orderBy('language')
+                ->all();
+            $bufStr = "    [" . PHP_EOL;
+            foreach ($items as $item) {
+                $bufStr .= "      '". $item['language'] . "'=> '". addslashes($item['message']) . "'," . PHP_EOL;
+            }
+            $bufStr .= "    ]," . PHP_EOL;
+            file_put_contents($fileName, $bufStr, FILE_APPEND);
+        }
+        file_put_contents($fileName, '];' . PHP_EOL, FILE_APPEND);
+
+        return $fileName;
+    }
 }

@@ -7,7 +7,7 @@ $t = [
         'access_level' => 2,
         'children' => [
             [
-                'name'       => 'Користувачі',
+                'name'       => 'Пользователи',
                 'route'      => '/adminxx/user',
                 'role' => 'menuAdminUsersView',
                 'access_level' => 2,
@@ -21,7 +21,7 @@ $t = [
                 'children' => []
             ],
             [
-                'name'       => 'Дозвіли, ролі',
+                'name'       => 'Разрешения',
                 'route'      => '/adminxx/auth-item',
                 'role' => 'menuAdminAuthItemList',
                 'access_level' => 2,
@@ -35,14 +35,14 @@ $t = [
                 'children' => []
             ],
             [
-                'name'       => 'Системні налаштування',
+                'name'       => 'Симтемные настройки',
                 'route'      => '/adminxx/configs/update',
                 'role' => 'menuAdminConfigUpdate',
                 'access_level' => 2,
                 'children' => []
             ],
             [
-                'name'       => 'Відвідування сайту',
+                'name'       => 'Посещение сайта',
                 'route'      => '/adminxx/check/guest-control',
                 'role' => 'menuAdminGuestControl',
                 'access_level' => 2,
@@ -67,7 +67,7 @@ $t = [
 
     //********************************************************************************************************** КАБИНЕТ
     [
-        'name' => 'Кабінет',
+        'name' => 'Кабинет',
         'route' => '',
         'role' => 'menuAll',
         'access_level' => 0,
@@ -82,7 +82,7 @@ $t = [
         ]
     ],
     [
-        'name'       => 'Вхід',
+        'name'       => 'Вход',
         'route'      => '/adminxx/user/login',
         'role' => '',
         'access_level' => 0,

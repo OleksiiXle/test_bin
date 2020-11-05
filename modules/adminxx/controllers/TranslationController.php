@@ -5,6 +5,7 @@ namespace app\modules\adminxx\controllers;
 use app\components\conservation\ActiveDataProviderConserve;
 use app\components\models\Translation;
 use app\components\AccessControl;
+use yii\helpers\FileHelper;
 use app\modules\adminxx\models\filters\TranslationFilter;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
@@ -21,7 +22,7 @@ class TranslationController extends MainController
                 [
                     'allow'      => true,
                     'actions'    => [
-                         'index', 'create', 'update', 'delete', 'delete-translations'
+                         'index', 'create', 'update', 'delete', 'delete-translations', 'upload'
                     ],
                     'roles'      => ['adminTranslateUpdate' ],
                 ],
@@ -233,4 +234,11 @@ class TranslationController extends MainController
         return $this->asJson($this->result);
     }
 
+    public function actionUpload()
+    {
+        $fileName = Translation::upload();
+        $options['mimeType'] = FileHelper::getMimeTypeByExtension($fileName);
+        $attachmentName = basename($fileName);
+        \Yii::$app->response->sendFile($fileName, $attachmentName, $options);
+    }
 }

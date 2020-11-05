@@ -148,10 +148,9 @@ class UControl extends ActiveRecord
      * Фиксация визита зарегистрированных пользователей и гостей
      * @return string
      */
-    public static function guestsAndUsersControl()
+    public static function guestsAndUsersControl($guestControl, $userControl)
     {
         try{
-            $guestControl = \Yii::$app->configs->guestControl;
             $request = \Yii::$app->getRequest();
             $userId = \Yii::$app->user->getId();
             $user_id = (!empty($userId)) ? $userId : 0;
@@ -347,26 +346,5 @@ class UControl extends ActiveRecord
         $countUpdatet = $this->getChangedItems($target, 'updated', false, $interval );
         $countDeleted = $this->getChangedItems($target, 'deleted', false, $interval );
         return $countCreated . '/' . $countUpdatet . '/' . $countDeleted;
-    }
-
-    /**
-     * ---- Фиксация визита зарегистрированных пользователей
-     * @return string
-     */
-    public static function userControl($userId, $route)
-    {
-        $timeAction=time();
-        try{
-            $strSql = "
-               UPDATE user_data
-                  SET last_rout = '$route', last_rout_time = $timeAction
-                  WHERE user_id = $userId
-             ";
-            $ret = \Yii::$app->db->createCommand($strSql)->execute();
-            return '';
-        } catch (Exception $e){
-            return $e->getMessage();
-        }
-
     }
 }

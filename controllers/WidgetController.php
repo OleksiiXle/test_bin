@@ -3,10 +3,9 @@
 namespace app\controllers;
 
 use app\widgets\menuUpdate\models\MenuX;
-use yii\web\Controller;
 use app\components\AccessControl;
 
-class WidgetController extends Controller
+class WidgetController extends MainController
 {
     /**
      * Ответ, который будет возвращаться на AJAX-запросы

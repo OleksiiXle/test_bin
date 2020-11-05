@@ -41,8 +41,8 @@ class MenuxController extends MainController
      */
     public function actionMenu()
     {
-        $rout = new Route();
-        $routes = $rout->getAppRoutes();
+      //  $rout = new Route();
+       // $routes = $rout->getAppRoutes();
         return $this->render('menuEdit');
     }
 

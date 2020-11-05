@@ -44,7 +44,6 @@ class UserFilter extends GridFilter
     public $showStatusActive;
     public $showStatusInactive;
 
-    private $_filterContent = null;
 
     public function getFilterContent()
     {

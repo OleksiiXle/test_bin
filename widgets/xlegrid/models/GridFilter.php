@@ -10,6 +10,8 @@ class GridFilter extends Model
     public $checkedIdsJSON = '{}';
     public $showOnlyChecked;
     public $queryModel;
+    public $_filterContent = [];
+
 
     public function rules()
     {

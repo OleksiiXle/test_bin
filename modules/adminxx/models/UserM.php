@@ -64,7 +64,6 @@ class UserM extends MainModel
     private $_userProfileStrShort;
     private $_userCreater;
     private $_userUpdater;
-    private $_defaultRoles;
 
     private $_firstVisitTime;
     private $_lastVisitTime;
@@ -304,16 +303,6 @@ class UserM extends MainModel
            // self::STATUS_WAIT => \Yii::t('app', 'Очікує на підтвердження'),
             self::STATUS_ACTIVE => 'Активний',
         ];
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDefaultRoles()
-    {
-
-        $this->_defaultRoles = Yii::$app->params['defaultRoles'];
-        return $this->_defaultRoles;
     }
 
     public function getUserCreater()
@@ -789,5 +778,22 @@ class UserM extends MainModel
     }
 
 //********************************************************************************** Другие функции
+
+    public static function getDefaultRoles()
+    {
+        $result = [];
+        if (isset(Yii::$app->params['defaultRoles'])) {
+            $defaultRoles = Yii::$app->params['defaultRoles'];
+            $auth = Yii::$app->authManager;
+            foreach ($defaultRoles as $role) {
+                $authRole = $auth->getRole($role);
+                if (!empty($authRole)) {
+                    $result[$role] = Yii::t('app', $authRole->description);
+                }
+            }
+        }
+        return $result;
+    }
+
 
 }

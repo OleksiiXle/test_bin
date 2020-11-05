@@ -35,7 +35,7 @@ class DefaultController extends MainController
             'users' => (isset($userPermissions['adminUsersView']))
                 ? [
                     'show' => true,
-                    'name' => 'Користувачі',
+                    'name' => Yii::t('app', 'Пользователи'),
                     'route' => '/adminxx/user'
                 ]
                 : [
@@ -44,7 +44,7 @@ class DefaultController extends MainController
             'rules' => (isset($userPermissions['adminAuthItemList']))
                 ? [
                     'show' => true,
-                    'name' => 'Правила',
+                    'name' => Yii::t('app', 'Правила'),
                     'route' => '/adminxx/rule'
                 ]
                 : [
@@ -53,7 +53,7 @@ class DefaultController extends MainController
             'authItems' => (isset($userPermissions['adminAuthItemList']))
                 ? [
                     'show' => true,
-                    'name' => 'Дозвіли, ролі',
+                    'name' => Yii::t('app', 'Разрешения'),
                     'route' => '/adminxx/auth-item'
                 ]
                 : [
@@ -62,7 +62,7 @@ class DefaultController extends MainController
             'menuEdit' => (isset($userPermissions['adminMenuEdit']))
                 ? [
                     'show' => true,
-                    'name' => 'Редактор меню',
+                    'name' => Yii::t('app', 'Редактор меню'),
                     'route' => '/adminxx/menux/menu'
                 ]
                 : [
@@ -71,7 +71,7 @@ class DefaultController extends MainController
             'configs' => (isset($userPermissions['adminConfigUpdate']))
                 ? [
                     'show' => true,
-                    'name' => 'Системні налаштування',
+                    'name' => Yii::t('app', 'Системные настройки'),
                     'route' => '/adminxx/configs/update'
                 ]
                 : [
@@ -80,7 +80,7 @@ class DefaultController extends MainController
             'guestControl' => (isset($userPermissions['adminGuestControl']))
                 ? [
                     'show' => true,
-                    'name' => 'Відвідування сайту',
+                    'name' => Yii::t('app', 'Посещения сайта'),
                     'route' => '/adminxx/check/guest-control'
                 ]
                 : [
@@ -89,7 +89,7 @@ class DefaultController extends MainController
             'Translations' => (isset($userPermissions['menuAdminxMain']))
                 ? [
                     'show' => true,
-                    'name' => 'Переводы',
+                    'name' => Yii::t('app', 'Переводы'),
                     'route' => 'adminxx/translation/index'
                 ]
                 : [

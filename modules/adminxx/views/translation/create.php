@@ -1,9 +1,9 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-use app\components\models\Translation;
+use yii\jui\JuiAsset;
 
-\yii\jui\JuiAsset::register($this);
+JuiAsset::register($this);
 $this->title = 'Перевод';
 $this->registerJs("
     var _dataForAutocompleteRu = {$dataForAutocompleteRu};

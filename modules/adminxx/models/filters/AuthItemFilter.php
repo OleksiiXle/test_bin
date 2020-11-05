@@ -12,8 +12,6 @@ class AuthItemFilter extends GridFilter
     public $description;
     public $rule_name;
 
-    private $_filterContent = null;
-
     public function getFilterContent()
     {
         if ($this->_filterContent === null) {

@@ -12,7 +12,7 @@
     }
 </style>
 <?php
-$this->title =  'Адміністративна панель';
+$this->title =  Yii::t('app', 'Администрирование');
 ?>
 <div class="row xContent"  style="height: 90%">
     <?php foreach ($buttons as $button):?>

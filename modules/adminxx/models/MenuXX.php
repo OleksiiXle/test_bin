@@ -429,7 +429,7 @@ class MenuXX extends MainModel
             $res[] = [
                 'id'            => $d->id,
                 'parent_id'     => $d->parent_id,
-                'name'          => $d->name,
+                'name'          => \Yii::t('app', $d->name),
                 'hasChildren'   => (count($d->children) > 0),
             ];
         }
@@ -456,7 +456,7 @@ class MenuXX extends MainModel
                     for ($j = 0; $j < count($branch); $j++) {
                         $res[$j]['id']            = $branch[$j]->id;
                         $res[$j]['parent_id']     = $branch[$j]->parent_id;
-                        $res[$j]['name']          = $branch[$j]->name;
+                        $res[$j]['name']          = \Yii::t('app', $branch[$j]->name);
                         $res[$j]['hasChildren']   = (count($branch[$j]->children) > 0);
                         $res[$j]['hasAdditional'] = (count($branch[$j]->positions) > 0);
                         $res[$j]['amountInfo']    = $branch[$j]->summary_amount;

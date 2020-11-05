@@ -1,5 +1,5 @@
 <?php
-\Yii::t('app', '');
+//\Yii::t('app', '');
 return [
     [
       'ru-RU'=> 'Владелец',

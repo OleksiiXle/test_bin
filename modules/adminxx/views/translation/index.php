@@ -31,8 +31,8 @@ $this->title = Yii::t('app', 'Переводы');
                 'useCheckForRows' => true,
                 'checkActionList' => [
                     'actions' => [
-                        'deleteChecked' => 'Удалить отмеченные',
-                        'action2' => 'action2***',
+                        'deleteChecked' => Yii::t('app', 'Удалить отмеченные'),
+                        'action2' => 'action3***',
                         'action3' => 'action3***',
                     ],
                     'options' => [

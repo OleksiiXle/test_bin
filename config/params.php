@@ -36,10 +36,10 @@ return [
             'png',
         ]
     ],
-
-
-
-
+    'defaultRoles' => [
+        'user',
+        'adminUsers',
+    ],
 
     'pathToBackgroundTasksLogs' => '/runtime/logs/backgroundTasks/',
     'pathToBackgroundTasksTmpFiles' => '/runtime/logs/backgroundTasks/tmp/',
