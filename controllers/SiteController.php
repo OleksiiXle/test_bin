@@ -37,7 +37,7 @@ class SiteController extends Controller
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['login' ],
+                    'actions' => ['login', 'signup', 'signup-confirm' ],
                     'roles' => ['?'],
                 ],
                 [
@@ -86,6 +86,50 @@ class SiteController extends Controller
     {
         Yii::$app->getUser()->logout();
         return $this->redirect('/site/index');
+    }
+
+    /**
+     * +++ Регистрация нового пользователя с подтверждением Емейла
+     * @return string
+     */
+    public function actionSignup()
+    {
+        $model = new Signup();
+        if (\Yii::$app->getRequest()->isPost) {
+            $data = \Yii::$app->getRequest()->post('Signup');
+            $model->setAttributes($data);
+            $model->first_name = $data['first_name'];
+            $model->middle_name =  $data['middle_name'];
+            $model->last_name =  $data['last_name'];
+
+            if ($user = $model->signup(true)) {
+                \Yii::$app->session->setFlash('success', \Yii::t('app', 'Check your email to confirm the registration'));
+                return $this->goHome();
+            } else {
+                \Yii::$app->session->setFlash('error', \Yii::t('app', 'Ошибка отправки токена'));
+            }
+        }
+        return $this->render('signup', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * +++ Подтверждение регистрации по токену
+     * @return string
+     */
+    public function actionSignupConfirm($token)
+    {
+        $signupService = new Signup();
+
+        try{
+            $signupService->confirmation($token);
+            \Yii::$app->session->setFlash('success', \Yii::t('app', 'Регистрация успешно подтверждена'));
+        } catch (\Exception $e){
+            \Yii::$app->session->setFlash('error', $e->getMessage());
+        }
+
+        return $this->goHome();
     }
 
 

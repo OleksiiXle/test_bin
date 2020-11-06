@@ -22,20 +22,22 @@ class UserM extends MainModel
       self::STATUS_ACTIVE => 'Активний',
     ];
 
-    const SCENARIO_CREATE  = 'create';
+    const SCENARIO_SIGNUP_BY_ADMIN  = 'signup_by_admin';
+    const SCENARIO_CONFIRM_INVITATION  = 'confirm_invitation';
     const SCENARIO_UPDATE  = 'update';
     const SCENARIO_ACTIVATE  = 'activate';
     const SCENARIO_DEACTIVATE  = 'deactivate';
-    const SCENARIO_RESET_PASSWORD  = 'resetPassword';
-
-
+/*
     const USER_NAME_PATTERN           = '/^[А-ЯІЇЄҐ]{1}[а-яіїєґ0-9_ \']+([-]?[А-ЯІЇЄҐ]{1}[а-яіїєґ0-9 \']+)?$/u'; //--маска для нимени
     const USER_NAME_ERROR_MESSAGE     = 'Використовуйте українські літери, починаючи із великої. 
                                          Апостроф - в англійській розкладці на букві є. Подвійні імена - через тире!'; //--сообщение об ошибке
-    const USER_PASSWORD_PATTERN       = '/^[a-zA-Z0-9_]+$/ui'; //--маска для пароля
-    const USER_PASSWORD_ERROR_MESSAGE = 'Припустимі символи - латиниця та цифри'; //--сообщение об ошибке
-    const USER_PHONE_PATTERN       = '/^[0-9, \-)(+]+$/ui'; //--маска для пароля
-    const USER_PHONE_ERROR_MESSAGE = 'Припустимі символи - латиниця та цифри'; //--сообщение об ошибке
+*/
+    const USER_NAME_PATTERN           = '/^[А-ЯІЇЄҐа-яіїєґ\'A-Za-z]+?$/u'; //--маска для нимени
+    const USER_NAME_ERROR_MESSAGE     = 'Допыстимы буквы, (\'). Двойные имена через тире'; //--сообщение об ошибке
+    const USER_PASSWORD_PATTERN       = '/^[a-zA-Z0-9~!@#$%^&*()_-]+$/ui'; //--маска для пароля
+    const USER_PASSWORD_ERROR_MESSAGE = 'Допыстимы буквы, цифры, спецсимволы ~!@#$%^&*()_-'; //--сообщение об ошибке
+    const USER_PHONE_PATTERN       = '/^[0-9, \-)(+]+$/ui'; //--маска для телефона
+    const USER_PHONE_ERROR_MESSAGE = 'Допустимые символы - цифры, скобки, тире, +'; //--сообщение об ошибке
 
 
     public $first_name;
@@ -48,6 +50,7 @@ class UserM extends MainModel
     public $oldPassword;
     public $newPassword;
     public $rememberMe = true;
+    public $invitation = 0;
 
     public $multyFild;  //TODO прописать валидацию
 
@@ -79,13 +82,18 @@ class UserM extends MainModel
     public function scenarios()
     {
         $ret = parent::scenarios();
-        $ret[self::SCENARIO_CREATE] = [
-            'username' , 'email', 'first_name', 'middle_name', 'last_name', 'password', 'retypePassword',
-            'status', 'phone',
+        $ret[self::SCENARIO_SIGNUP_BY_ADMIN] = [
+            //------------------------------------------------------------------------- user
+            'username', 'email', 'status',
+            'created_at', 'updated_at', 'created_by', 'updated_by', 'password_hash',
+            'password', 'retypePassword', 'password_reset_token', 'auth_key', 'rememberMe', 'invitation',
+            'multyFild',
+            //------------------------------------------------------------------------- user_data
+            'first_name', 'middle_name', 'last_name', 'phone',
         ];
         $ret[self::SCENARIO_UPDATE] = [
-            'email', 'first_name', 'middle_name', 'last_name',
-            'phone',
+            'first_name', 'middle_name', 'last_name', 'phone',
+            'multyFild',
         ];
         $ret[self::SCENARIO_ACTIVATE] = [
             'status'
@@ -93,7 +101,7 @@ class UserM extends MainModel
         $ret[self::SCENARIO_DEACTIVATE] = [
             'status'
         ];
-        $ret[self::SCENARIO_RESET_PASSWORD] = [
+        $ret[self::SCENARIO_CONFIRM_INVITATION] = [
         ];
         return $ret ;
     }
@@ -104,42 +112,52 @@ class UserM extends MainModel
      */
     public function rules()
     {
-        return [
-            ['username', 'filter', 'filter' => 'trim'],
-            ['email', 'filter', 'filter' => 'trim'],
-            //----------------------------------------------------------------------- ТИПЫ ДАННЫХ, РАЗМЕР
-            [['status', 'created_at', 'updated_at', ], 'integer'],
+        switch ($this->scenario) {
+            case self::SCENARIO_SIGNUP_BY_ADMIN:
+                return [
+                    //------------------------------------------------------------------------- user
+                    [['username' , 'email', 'password', 'retypePassword'], 'required'],
+                    [['username', 'email'], 'filter', 'filter' => 'trim'],
+                    [['status', 'created_at', 'updated_at', 'created_by', 'updated_by', 'invitation',], 'integer'],
+                    [['password_hash', 'password_reset_token', 'email' ], 'string', 'max' => 255],
+                    ['rememberMe',  'boolean'],
+                    ['email', 'email'],
+                    [['username', 'auth_key'], 'string', 'min' => 5, 'max' => 32],
+                    [['password', 'retypePassword', 'oldPassword' , 'newPassword'],  'string', 'min' => 3, 'max' => 20],
+                    ['username', 'validateUsername'],
+                    ['email', 'validateEmail'],
+                    [['username', 'password', 'oldPassword', 'retypePassword',  'newPassword' ], 'match', 'pattern' => self::USER_PASSWORD_PATTERN,
+                        'message' => self::USER_PASSWORD_ERROR_MESSAGE],
+                    [['status'], 'default', 'value' => self::STATUS_ACTIVE],
+                    [['status'], 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_WAIT]],
 
-            ['rememberMe', 'boolean'],
-            ['email', 'email'],
-
-            [['username', 'auth_key'], 'string', 'min' => 5, 'max' => 32],
-            [['password', 'retypePassword', 'oldPassword' , 'newPassword'],  'string', 'min' => 3, 'max' => 20],
-            [['first_name', 'middle_name', 'last_name', 'phone', 'password_hash', 'password_reset_token',
-                'email' ], 'string', 'max' => 255],
-
-            //------------------------------------------------------------------------ УНИКАЛЬНОСТЬ
-            ['username', 'validateUsername'],
-            ['email', 'validateEmail'],
-
-            //------------------------------------------------------------------------ МАСКИ ВВОДА
-            [['username', 'password', 'oldPassword', 'retypePassword',  'newPassword' ], 'match', 'pattern' => self::USER_PASSWORD_PATTERN,
-                'message' => self::USER_PASSWORD_ERROR_MESSAGE],
-            [['first_name', 'middle_name', 'last_name'],  'match', 'pattern' => self::USER_NAME_PATTERN,
-                'message' => self::USER_NAME_ERROR_MESSAGE],
-            ['phone',  'match', 'pattern' => self::USER_PHONE_PATTERN,
-                'message' => self::USER_PHONE_ERROR_MESSAGE],
-
-            [['status'], 'default', 'value' => self::STATUS_ACTIVE],
-            [['status'], 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE]],
-
-            //-------------------------------------------------------------------------------------- ОБЯЗАТЕЛЬНЫЕ ПОЛЯ
-            [['username' , 'email', 'first_name', 'middle_name', 'last_name', 'password', 'retypePassword'], 'required',
-                'on' => self::SCENARIO_CREATE],
-            [['first_name', 'middle_name', 'last_name'], 'required',
-                'on' => self::SCENARIO_UPDATE],
-
-        ];
+                    //------------------------------------------------------------------------- user_data
+                    [['first_name', 'last_name'], 'required',],
+                    [['first_name', 'middle_name', 'last_name', 'phone', 'email' ], 'string', 'max' => 255],
+                    [['first_name', 'middle_name', 'last_name'],  'match', 'pattern' => self::USER_NAME_PATTERN,
+                        'message' => self::USER_NAME_ERROR_MESSAGE],
+                    ['phone',  'match', 'pattern' => self::USER_PHONE_PATTERN,
+                        'message' => self::USER_PHONE_ERROR_MESSAGE],
+                ];
+            case self::SCENARIO_UPDATE:
+                return [
+                    //------------------------------------------------------------------------- user_data
+                    [['first_name', 'last_name'], 'required',],
+                    [['first_name', 'middle_name', 'last_name', 'phone'], 'string', 'max' => 255],
+                    [['first_name', 'middle_name', 'last_name'],  'match', 'pattern' => self::USER_NAME_PATTERN,
+                        'message' => self::USER_NAME_ERROR_MESSAGE],
+                    ['phone',  'match', 'pattern' => self::USER_PHONE_PATTERN,
+                        'message' => self::USER_PHONE_ERROR_MESSAGE],
+                ];
+            case self::SCENARIO_ACTIVATE:
+            case self::SCENARIO_DEACTIVATE:
+            case self::SCENARIO_CONFIRM_INVITATION:
+            return [
+                    //------------------------------------------------------------------------- user
+                    [['status', 'updated_at', 'updated_by',], 'integer'],
+                    [['status'], 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_WAIT]],
+                ];
+        }
     }
 
     /**
@@ -159,6 +177,7 @@ class UserM extends MainModel
             'created_at' => 'Створений',
             'updated_at' => 'Змінений',
             'refresh_permissions' => 'Потрібне оновлення дозвілів',
+            'invitation' => 'С приглашением по Email',
 
             //-- user_data
             'first_name' => 'Імя',
@@ -199,8 +218,6 @@ class UserM extends MainModel
             $this->addError('username', 'username вже зайнято');
         }
     }
-
-
 
 //*********************************************************************************************** ДАННЫЕ СВЯЗАННЫХ ТАБЛИЦ
 
@@ -577,25 +594,6 @@ class UserM extends MainModel
                     $userData->setAttributes((array) $this);
                 }
                 if ($userData->save()){
-                    $userDepartments = $multyFild['departments'];
-                    if (!$create){
-                        $depDep = UserDepartment::deleteAll(['user_id' => $this->id]);
-                    }
-                    foreach ($userDepartments as $newDep){
-                        $userDepartment = new UserDepartment();
-                        $userDepartment->user_id = $this->id;
-                        $userDepartment->department_id = $newDep['id'];
-                        $userDepartment->can_department = $newDep['can_department'];
-                        $userDepartment->can_position = $newDep['can_position'];
-                        $userDepartment->can_personal = $newDep['can_personal'];
-                        if (!$userDepartment->save()){
-                            foreach ($userDepartment->getErrors() as $key => $value){
-                                $this->addError('id', "$key -> $value[0]");
-                                $transaction->rollBack();
-                                return false;
-                            }
-                        }
-                    }
                     //-------------------------------- назначение роли
                     $auth = Yii::$app->authManager;
                     $userRolesOld = $auth->getRolesByUser($this->id);

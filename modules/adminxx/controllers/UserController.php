@@ -172,10 +172,10 @@ class UserController extends MainController
      * +++ Регистрация нового пользователя Администратором singup-by-admin
      * @return string
      */
-    public function actionSignupByAdmin()
+    public function actionSignupByAdmin($invitation = false)
     {
         $model = new UserM();
-        $model->scenario = UserM::SCENARIO_CREATE;
+        $model->scenario = UserM::SCENARIO_SIGNUP_BY_ADMIN;
         $defaultRoles = $model->defaultRoles;
         if ($model->load(Yii::$app->request->post())) {
             if ($model->updateUser()) {
@@ -189,13 +189,20 @@ class UserController extends MainController
             }
         }
 
-        return $this->render('updateUser', [
+      //  return $this->render('updateUser', [
+        return $this->render('signupByAdmin', [
             'model' => $model,
             'defaultRoles' => $defaultRoles,
             'userDepartments' => [],
             'userRoles' => [],
         ]);
     }
+
+
+
+
+
+
 
     /**
      * +++ Редактирование профиля пользователя администратором update-by-admin
