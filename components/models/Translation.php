@@ -32,12 +32,32 @@ class Translation extends MainModel
         'en-US' => 'English',
     ];
 
-
-  //  private $_languages;
-
     public $messageRU = '';
     public $messageUK = '';
     public $messageEN = '';
+
+    /**
+     * @return mixed
+     */
+    public function getLink1()
+    {
+        $this->_link1 = $this->translations[0]->message;
+
+        return $this->_link1;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLink2()
+    {
+        $this->_link2 = $this->translations[1]->message;
+
+        return $this->_link2;
+    }
+
+    private $_link1;
+    private $_link2;
 
     /**
      * @return mixed

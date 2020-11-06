@@ -3,6 +3,7 @@
 namespace app\components\models;
 
 use Yii;
+use app\models\MainModel;
 use yii\base\Exception;
 
 /**
@@ -14,23 +15,24 @@ use yii\base\Exception;
  * @property string $name
  * @property string $content
  */
-class Configs extends \yii\db\ActiveRecord
+class Configs extends MainModel
 {
 
     const CONTENT_PATTERN = '/^[A-Za-z0-9 -.@]+$/u'; //--маска для нимени
 
-    public $cacheKey = 'conf';
+    private $cacheKey = 'config';
 
-    public $adminEmail;
-    public $userControl;
-    public $guestControl;
-    public $guestControlDuration;
-    public $menuType;
-    public $permCacheKey = 'perm';
-    public $permCacheKeyDuration = 0;
-    public $passwordResetTokenExpire = 3600;  //const PASSWORD_RESET_TOKEN_EXPIRE = 3600;
-    public $userDefaultRole = 'user';  //const DEFAULT_ROLE = 'user';
-    public $rbacCacheSource = 'session';
+    public $adminEmail = null;
+    public $userControl = null;
+    public $guestControl = null;
+    public $guestControlDuration = null;
+    public $menuType = null;
+    public $permCacheKey = null;
+    public $permCacheKeyDuration = null;
+    public $passwordResetTokenExpire = null;  //const PASSWORD_RESET_TOKEN_EXPIRE = 3600;
+    public $userDefaultRole = null;  //const DEFAULT_ROLE = 'user';
+    public $rbacCacheSource = null;
+    public $signupWithoutEmailConfirm = null;
 
     const ITEMS_LIST = [
       'adminEmail',
@@ -42,7 +44,8 @@ class Configs extends \yii\db\ActiveRecord
       'permCacheKeyDuration',
       'passwordResetTokenExpire',
       'userDefaultRole',
-      'rbacCacheSource'
+      'rbacCacheSource',
+      'signupWithoutEmailConfirm',
     ];
 
     /**
@@ -67,23 +70,18 @@ class Configs extends \yii\db\ActiveRecord
             ['name', 'unique'],
             [['content',
                 'adminEmail',
-                'userControl',
-                'guestControl',
                 'guestControlDuration',
                 'menuType',
                 'permCacheKey',
                 'permCacheKeyDuration',
                 'passwordResetTokenExpire',
-                'userDefaultRole'
+                'userDefaultRole',
+                'userControl',
+                'guestControl',
+                'signupWithoutEmailConfirm',
             ],  'match', 'pattern' => self::CONTENT_PATTERN],
 
-
             [['adminEmail'], 'email'],
-
-
-
-
-
         ];
     }
 
@@ -97,8 +95,6 @@ class Configs extends \yii\db\ActiveRecord
             'owner' => Yii::t('app', 'Владелец'),
             'name' => Yii::t('app', 'Название'),
             'content' => Yii::t('app', 'Содержимое'),
-
-
             'adminEmail' => Yii::t('app', 'Email администратора системы'),
             'userControl' => Yii::t('app', 'Контролировать посещение сайта зарегистрированными пользователями'),
             'guestControl' => Yii::t('app', 'Контролировать посещение сайта гостями'),
@@ -108,31 +104,31 @@ class Configs extends \yii\db\ActiveRecord
             'permCacheKeyDuration' => Yii::t('app', 'Время хранения разрешений в кеше'),
             'passwordResetTokenExpire' => Yii::t('app', 'Время жизни токена сброса пароля'),
             'userDefaultRole' => Yii::t('app', 'Начальная роль нового зарегистрированного пользователя'),
-            'rbacCacheSource' => Yii::t('app', 'Місце для кешування даних аутентифікації'),
+            'rbacCacheSource' => Yii::t('app', 'Место для кеширования данных аутентификации'),
+            'signupWithoutEmailConfirm' => Yii::t('app', 'Регистрация нового пользователя только через подтверждения по Email'),
         ];
     }
 
     public function getConfigs()
     {
        // $ret = \Yii::$app->cache->delete($this->cacheKey);
-        $t=1;
-
+        $tmp=1;
+      //  self::deleteAll(['IN', 'name', self::ITEMS_LIST ]);
         try{
             $data = \Yii::$app->cache->get($this->cacheKey);
             //-- если в кеше сохранены настройки - берем их оттуда
             if (is_array($data)) {
                 $ok = true;
                 foreach (self::ITEMS_LIST as $item){
-                    if (!isset($data[$item])){
+                    if (isset($data[$item])){
+                        $this->{$item} = $data[$item]; //** todo после переделки убрать
+                    } else {
                         $ok=false;
                         break;
                     }
                 }
                 if ($ok){
-                    foreach (self::ITEMS_LIST as $item){
-                        $this->{$item} = $data[$item];
-                    }
-                    return true;
+                    return $data;
                 }
             }
             //-- если в кеше настроек нет - пробуем прочитать их из бд и сохоанить в кеш
@@ -142,20 +138,19 @@ class Configs extends \yii\db\ActiveRecord
                 ->all();
             if (is_array($data)) {
                 $ok = true;
+                $dataToCache = [];
                 foreach (self::ITEMS_LIST as $item){
-                    if (!isset($data[$item])){
+                    if (isset($data[$item])){
+                        $this->{$item} = $data[$item]['content'];
+                        $dataToCache[$item] = $data[$item]['content'];
+                    } else {
                         $ok=false;
                         break;
                     }
                 }
                 if ($ok){
-                    $dataToCache = [];
-                    foreach (self::ITEMS_LIST as $item){
-                        $this->{$item} = $data[$item]['content'];
-                        $dataToCache[$item] = $data[$item]['content'];
-                    }
                     $ret = \Yii::$app->cache->set($this->cacheKey, $dataToCache);
-                    return $ret;
+                    return $dataToCache;
                 }
             }
             //-- если в бд тоже нет настроек - очищаем бд и записываем туда настройки из params.php
@@ -171,16 +166,18 @@ class Configs extends \yii\db\ActiveRecord
                 $model->content = $params[$item];
                 if (!$model->save()){
                     $this->addErrors($model->getErrors());
-                    return false;
                 }
-
+            }
+            if ($model->hasErrors()) {
+                return false;
             }
             $ret = \Yii::$app->cache->set($this->cacheKey, $dataToCache);
-            return $ret;
 
-        } catch (Exception $e){
+            return $dataToCache;
+        } catch (\Exception $e){
             $this->addError('id', $e->getMessage());
         }
+
         return false;
     }
 
@@ -208,7 +205,7 @@ class Configs extends \yii\db\ActiveRecord
 
             \Yii::$app->cache->delete($this->cacheKey);
             $ret = \Yii::$app->cache->set($this->cacheKey, $dataToCache);
-            return $ret;
+            return $dataToCache;
         } catch (\Exception $e) {
             if ($transaction->isActive) {
                 $transaction->rollBack();
@@ -229,8 +226,8 @@ class Configs extends \yii\db\ActiveRecord
     public static function dictionaryrRacCacheSource()
     {
         return [
-            'session' => \Yii::t('app', 'Сессія'),
-            'cache' => \Yii::t('app', 'Кеш сайту'),
+            'session' => \Yii::t('app', 'Сессия'),
+            'cache' => \Yii::t('app', 'Кеш сайта'),
         ];
     }
 

@@ -46,14 +46,15 @@ $this->title = 'Налаштування';
                 //      ['options' => [ $model->guestControl => ['Selected' => true]]]);
                 echo $form->field($model, 'userControl')->checkbox();
                 echo $form->field($model, 'guestControl')->checkbox();
+                echo $form->field($model, 'signupWithoutEmailConfirm')->checkbox();
                 ?>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="form-group" align="center">
-            <?= Html::submitButton('Зберігти', ['class' => 'btn btn-primary', 'name' => 'signup-button']) ?>
-            <?= Html::submitButton('Відміна', ['class' => 'btn btn-danger', 'name' => 'reset-button']) ?>
+            <?= Html::submitButton(Yii::t('app', 'Сохранить'), ['class' => 'btn btn-primary', 'name' => 'signup-button']) ?>
+            <?= Html::submitButton(Yii::t('app', 'Отмена'), ['class' => 'btn btn-danger', 'name' => 'reset-button']) ?>
 
         </div>
     </div>

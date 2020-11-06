@@ -17,6 +17,7 @@ class ConfigsComponent extends Component
     private $_passwordResetTokenExpire = 3600;  //const PASSWORD_RESET_TOKEN_EXPIRE = 3600;
     private $_userDefaultRole = 'user';     //const DEFAULT_ROLE = 'user';
     private $_rbacCacheSource = 'session';//'cache';
+    private $_signupWithoutEmailConfirm;
 
     private $_userProfile = null;
     private $_positionSort = null;
@@ -71,6 +72,17 @@ class ConfigsComponent extends Component
             $this->getItems();
         }
         return $this->_guestControl;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSignupWithoutEmailConfirm()
+    {
+        if (!isset($this->_signupWithoutEmailConfirm)){
+            $this->getItems();
+        }
+        return $this->_signupWithoutEmailConfirm;
     }
 
     /**
@@ -150,95 +162,6 @@ class ConfigsComponent extends Component
         return $this->_rbacCacheSource;
     }
 
-
-
-    /**
-     * @param null $userProfile
-     */
-    public function setUserProfile($userProfile)
-    {
-        $this->_userProfile = $userProfile;
-        \Yii::$app->conservation->setConserveDB(UserProfile::USER_PROFILE_CONSERVE_NAME, $userProfile, UserProfile::USER_PROFILE_CONSERVE_DURATION);
-        $session = \Yii::$app->session;
-        $t = $session->set(UserProfile::USER_PROFILE_CONSERVE_NAME, $userProfile);
-        $tt = $session->get(UserProfile::USER_PROFILE_CONSERVE_NAME);
-
-
-        $this->_positionSort = $userProfile[UserProfile::POSITION_SORT_CONSERVE_NAME];
-    }
-
-    /**
-     * @return null
-     */
-    public function getUserProfile()
-    {
-        if ($this->_userProfile == null && \Yii::$app->user->getId() != null) {
-            $session = \Yii::$app->session;
-            //-- ищем профиль в сессии
-            if ($userProfile = $session->get(UserProfile::USER_PROFILE_CONSERVE_NAME)) {
-                //-- если профиль есть в сессии, проверяем, в наличии ли все аттрибуты профиля
-                $ok = true;
-                foreach (UserProfile::$itemsList as $item){
-                    if (!isset($userProfile[$item])){
-                        $ok=false;
-                        break;
-                    }
-                }
-            }
-
-            if (empty($userProfile) || !$ok) {
-                //-- если профиля в сессии нет или в нем не хватает аттрибутов
-                //-- пробуем читать профиль из консервы
-                $userProfile = \Yii::$app->conservation->getConserveDB(UserProfile::USER_PROFILE_CONSERVE_NAME);
-                if (empty($userProfile)) {
-                    //-- если консерва тоже пустая, ставим дефолтные значения
-                    $userProfile[UserProfile::POSITION_SORT_CONSERVE_NAME] = UserProfile::POSITION_SORT_DEFAULT;
-
-
-                    //-- записываем дефолтные значения в консерву
-                    \Yii::$app->conservation->setConserveDB(UserProfile::USER_PROFILE_CONSERVE_NAME, $userProfile, UserProfile::USER_PROFILE_CONSERVE_DURATION);
-                }
-                //-- записываем профиль в сессию
-                $session->set(UserProfile::USER_PROFILE_CONSERVE_NAME, $userProfile);
-            }
-
-            //------------------------------------------
-            //-- итого: в $userProfile - проффиль юсера, он сохранен в консерву и в сессию
-            //-- читаем его в геттеры
-            foreach (UserProfile::$itemsList as $item){
-                switch ($item) {
-                    case UserProfile::POSITION_SORT_CONSERVE_NAME:
-                        $this->_positionSort = $userProfile[$item];
-                        $this->_userProfile[UserProfile::POSITION_SORT_CONSERVE_NAME] = $userProfile[$item];
-                        break;
-                }
-            }
-        }
-        return $this->_userProfile;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPositionSort()
-    {
-        if ($this->_positionSort == null){
-            $this->getUserProfile();
-        }
-        return $this->_positionSort;
-    }
-
-    /**
-     * @param mixed $positionSort
-     */
-    public function setPositionSort($positionSort)
-    {
-        $this->_positionSort = $positionSort;
-        $userProfile = $this->getUserProfile();
-        $userProfile[UserProfile::POSITION_SORT_CONSERVE_NAME] = $positionSort;
-        $this->setUserProfile($userProfile);
-    }
-
     protected function getItems()
     {
         $t=1;
@@ -252,12 +175,14 @@ class ConfigsComponent extends Component
             || empty($this->_passwordResetTokenExpire)
             || empty($this->_userDefaultRole)
             || empty($this->_rbacCacheSource)
+            || empty($this->_signupWithoutEmailConfirm)
         ){
             $configs = new Configs();
             $configs->getConfigs();
             $this->_adminEmail = $configs->adminEmail;
             $this->_userControl = ($configs->userControl == 1);
             $this->_guestControl = ($configs->guestControl == 1);
+            $this->_signupWithoutEmailConfirm = ($configs->guestControl == 1);
             $this->_guestControlDuration = $configs->guestControlDuration;
             $this->_menuType = $configs->menuType;
             $this->_permCacheKey = $configs->permCacheKey;
@@ -266,6 +191,5 @@ class ConfigsComponent extends Component
             $this->_userDefaultRole = $configs->userDefaultRole;
             $this->_rbacCacheSource = $configs->rbacCacheSource;
         }
-
     }
 }

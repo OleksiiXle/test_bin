@@ -62,27 +62,37 @@ $this->title = Yii::t('app', 'Переводы');
                     ],
                     [
                         'class' => 'yii\grid\SerialColumn',
-                        'headerOptions' => ['style' => 'width: 3%;'],
-                        'contentOptions' => ['style' => 'width: 3%;'],
+                        'headerOptions' => ['style' => 'width: 2%;'],
+                        'contentOptions' => ['style' => 'width: 2%;'],
                     ],
                     [
                         'attribute' => 'id',
-                        'headerOptions' => ['style' => 'width: 3%;overflow: hidden; '],
-                        'contentOptions' => ['style' => 'width: 3%; overflow: hidden'],
+                        'headerOptions' => ['style' => 'width: 2%;overflow: hidden; '],
+                        'contentOptions' => ['style' => 'width: 2%; overflow: hidden'],
                     ],
                     [
                         'attribute' => 'tkey',
-                        'headerOptions' => ['style' => 'width: 3%;overflow: hidden; '],
-                        'contentOptions' => ['style' => 'width: 3%; overflow: hidden'],
+                        'headerOptions' => ['style' => 'width: 2%;overflow: hidden; '],
+                        'contentOptions' => ['style' => 'width: 2%; overflow: hidden'],
                     ],
                     [
                         'attribute' => 'language',
-                        'headerOptions' => ['style' => 'width: 10%;overflow: hidden; '],
-                        'contentOptions' => ['style' => 'width: 10%; overflow: hidden'],
+                        'headerOptions' => ['style' => 'width: 5%;overflow: hidden; '],
+                        'contentOptions' => ['style' => 'width: 5%; overflow: hidden'],
                     ],
                     [
                         'attribute' => 'message',
-                        'headerOptions' => ['style' => 'width: 40%;overflow: hidden; '],
+                        'headerOptions' => ['style' => 'width: 30%;overflow: hidden; '],
+                        'contentOptions' => ['style' => 'width: 10%; overflow: hidden'],
+                    ],
+                    [
+                        'attribute' => 'link1',
+                        'headerOptions' => ['style' => 'width: 25%;overflow: hidden; '],
+                        'contentOptions' => ['style' => 'width: 10%; overflow: hidden'],
+                    ],
+                    [
+                        'attribute' => 'link2',
+                        'headerOptions' => ['style' => 'width: 25%;overflow: hidden; '],
                         'contentOptions' => ['style' => 'width: 10%; overflow: hidden'],
                     ],
                     [
