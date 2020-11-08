@@ -4,14 +4,9 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\modules\adminxx\assets\AdminxxUpdateUserAsset;
-use yii\helpers\Json;
+use app\widgets\selectMultiXle\SelectMultiXleWidget;
 
 AdminxxUpdateUserAsset::register($this);
-
-$_userRoles = Json::htmlEncode($userRoles);
-$this->registerJs("
-    var _userRoles = {$_userRoles};
-",\yii\web\View::POS_HEAD);
 
 if ($model->isNewRecord){
     $update = false;
@@ -78,71 +73,12 @@ if ($model->isNewRecord){
             ]); ?>
             <?= $form->field($model, 'email'); ?>
             <?= $form->field($model, 'phone'); ?>
-            <?php
-            echo \app\widgets\selectMultiXle\SelectMultiXleWidget::widget([
-                    'modelName' => 'UseM',
+            <?= SelectMultiXleWidget::widget([
+                    'modelName' => 'UserM',
                     'textAreaAttribute' => 'userRolesToSet',
-                    'itemsArray' => [
-                            'item1' => 'item text1',
-                            'item2' => 'item text2',
-                            'item3' => 'item text3',
-                            'item4' => 'item text4',
-                            'item5' => 'item text5',
-                    ],
-            ]);
-            ?>
-
-            <!--*************************************************************************** РОЛИ ПОЛЬЗОВАТЕЛЯ -->
-            <div id="RolesArea">
-                <b>Ролі користувача</b>
-                <div id="userRoles">
-                </div>
-                <br>
-                <div id="addRoleBtn" align="center">
-                    <?= Html::button('Додати роль', [
-                        'class' => 'btn btn-primary',
-                        'onclick' => '$("#selectRoleArea").show();
-                                                      $("#addRoleBtn").hide();
-                                      '
-                    ])?>
-                </div>
-
-            </div>
-
-            <!--***************************************************************** ВЫБОР НОВОЙ РОЛИ ПОЛЬЗОВАТЕЛЯ -->
-            <div id="selectRoleArea" class="selectRoleArea" style="display: none;">
-                <!--***************************************************************** сЕЛЕКТ для выбора -->
-                <div class="row">
-                    <div class="col-md-10">
-                        <?php
-                        echo Html::listBox('defaultRoles', null, $defaultRoles, [
-                            'class' => 'form-control',
-                        ]);
-
-                        ?>
-                    </div>
-                    <div class="col-md-1" align="center">
-                        <?= Html::a('<span class="glyphicon glyphicon-plus"></span>', false,
-                            [
-                                'onclick' => 'addUserRole()',
-                                'title' => 'Додати роль',
-                            ]);
-                        ?>
-                    </div>
-                    <div class="col-md-1" align="center">
-                        <?= Html::a('<span class="glyphicon glyphicon-remove"></span>', false,
-                            [
-                                'onclick' => '$("#rolesArea").show();
-                                                      $("#selectRoleArea").hide();
-                                                      $("#addRoleBtn").show();
-                                                      ',
-                                'title' => 'Зховати список',
-                            ]);
-                        ?>
-                    </div>
-                </div>
-            </div>
-            <!--*************************************************************************** УПРАВЛЕНИЕ РОЛЯМИ ПОЛЬЗОВАТЕЛЯ -->
+                    'label' => 'Роли',
+                    'itemsArray' => $defaultRoles,
+            ]);?>
         </div>
     </div>
 
@@ -188,10 +124,8 @@ if ($model->isNewRecord){
     <div class="col-md-12 col-lg-12">
         <div class="row">
             <div class="form-group" align="center">
-                <?= Html::button('Зберігти', [
+                <?= Html::submitButton('Зберігти', [
                     'class' => 'btn btn-primary',
-                    'name' => 'signup-button',
-                    'onclick' => 'saveUser();'
                 ]) ?>
                 <?= Html::a('Відміна', '/adminxx/user',[
                     'class' => 'btn btn-danger', 'name' => 'reset-button'
@@ -199,12 +133,6 @@ if ($model->isNewRecord){
             </div>
         </div>
     </div>
-</div>
-<div class="row xContent">
-    <?= $form->field($model, 'multyFild')->textarea([
-        'rows' => '5'
-    ])->hiddenInput()->label(false);?>
-
 </div>
 
 <?php ActiveForm::end(); ?>

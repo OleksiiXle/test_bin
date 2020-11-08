@@ -178,6 +178,7 @@ class UserController extends MainController
         $model->scenario = UserM::SCENARIO_SIGNUP_BY_ADMIN;
         $defaultRoles = $model->defaultRoles;
         if ($model->load(Yii::$app->request->post())) {
+            $tmp = json_decode($model->userRolesToSet, true);
             if ($model->updateUser()) {
                 $session = \Yii::$app->session;
                 if ($session->get('searchIid')){

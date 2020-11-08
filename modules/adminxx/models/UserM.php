@@ -53,8 +53,6 @@ class UserM extends MainModel
     public $invitation = 0;
     public $userRolesToSet;
 
-    public $multyFild;  //TODO прописать валидацию
-
     private $_user = false;
     private $_created_at_str;
     private $_updated_at_str;
@@ -88,13 +86,13 @@ class UserM extends MainModel
             'username', 'email', 'status',
             'created_at', 'updated_at', 'created_by', 'updated_by', 'password_hash',
             'password', 'retypePassword', 'password_reset_token', 'auth_key', 'rememberMe', 'invitation',
-            'multyFild', 'userRolesToSet',
+            'userRolesToSet',
             //------------------------------------------------------------------------- user_data
             'first_name', 'middle_name', 'last_name', 'phone',
         ];
         $ret[self::SCENARIO_UPDATE] = [
             'first_name', 'middle_name', 'last_name', 'phone',
-            'multyFild', 'userRolesToSet',
+             'userRolesToSet',
         ];
         $ret[self::SCENARIO_ACTIVATE] = [
             'status'
@@ -570,13 +568,7 @@ class UserM extends MainModel
     public function updateUser()
     {
         $create = $this->isNewRecord;
-        $multyFild =json_decode($this->multyFild, true);
-        $userRoles = [];
-        foreach ($multyFild['roles'] as $key => $value){
-            $userRoles[$value['id']] = $value['name'];
-        }
-
-        //    return false;
+        $userRoles =json_decode($this->userRolesToSet, true);
         try {
             $transaction = \Yii::$app->db->beginTransaction();
             //-- создание пользователя
@@ -608,7 +600,7 @@ class UserM extends MainModel
                         }
                     }
                     //-- добавление ролей
-                    foreach ($userRoles as $role => $name){
+                    foreach ($userRoles as $role){
                         $userRole = $auth->getRole($role);
                         if (isset($userRole)){
                             if (!isset($userRolesOld[$role])){
@@ -627,6 +619,7 @@ class UserM extends MainModel
                     }
                     //------------------------------- все ок
                     $transaction->commit();
+                  //  $transaction->rollBack();
                     return true;
                 } else {
                     $this->addErrors($userData->getErrors());

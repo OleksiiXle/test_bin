@@ -3,17 +3,12 @@ $(document).ready ( function(){
 });
 */
 (function ($) {
-    $.fn.selectMultiXle = function (selectId, items, textAreaId) {
+    $.fn.selectMultiXle = function (selectId, textAreaAttributeId) {
+        let selectedItems = [];
         let key;
         let item;
-     //   console.log(selectId);
-    //    console.log(textAreaId);
-    //    console.log(typeof items);
-    //    console.log(items);
-        for (key in items){
-            console.log(key + ' = ' + items[key]);
-        }
 
+        //--выбор
         $(".choise-row-" + selectId).on('click', function () {
            // console.log(this.dataset.key);
             this.dataset.choised = '1';
@@ -24,9 +19,12 @@ $(document).ready ( function(){
             $(this).removeClass('active').addClass('no-active');
             $(item).removeClass('no-active').addClass('active');
             $("#no-selected-message-"+ selectId).removeClass('active').addClass('no-active');
-
+            selectedItems.push(key);
+           // console.log(selectedItems);
+            $("#" + textAreaAttributeId).val(JSON.stringify(selectedItems));
         });
 
+        //-- отмена выбора
         $(".selection-row-" + selectId).on('click', function () {
            // console.log(this.dataset.key);
             this.dataset.selected = '0';
@@ -39,10 +37,29 @@ $(document).ready ( function(){
             if ($("#selected_" + selectId + " div[data-selected='1']").length == 0 ){
                 $("#no-selected-message-"+ selectId).removeClass('no-active').addClass('active');
             }
-
-
-
+            let i = selectedItems.indexOf(key);
+            if (i > 0) {
+                selectedItems.splice(i, 1);
+            }
+         //   console.log(selectedItems);
+            $("#" + textAreaAttributeId).val(JSON.stringify(selectedItems));
         });
+
+        $("#show-list-btn-" + selectId).on('click', function () {
+            if ($("#choise_" + selectId).is(":hidden")) {
+                $("#choise_" + selectId).show("slow");
+                $(this).css("color", "#daa520");
+                $(this).find('span').removeClass('glyphicon glyphicon-chevron-down')
+                    .addClass('glyphicon glyphicon-chevron-up');
+                $(this).attr('title', 'Скрыть список выбора');
+            } else {
+                $("#choise_" + selectId).hide("slow");
+                $(this).css("color", "#00008b");
+                $(this).find('span').removeClass('glyphicon glyphicon-chevron-up')
+                    .addClass('glyphicon glyphicon-chevron-down');
+                $(this).attr('title', 'Показать список выбора');
+            }
+        })
 
     };
 })(window.jQuery);
