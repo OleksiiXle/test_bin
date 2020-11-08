@@ -78,6 +78,19 @@ if ($model->isNewRecord){
             ]); ?>
             <?= $form->field($model, 'email'); ?>
             <?= $form->field($model, 'phone'); ?>
+            <?php
+            echo \app\widgets\selectMultiXle\SelectMultiXleWidget::widget([
+                    'modelName' => 'UseM',
+                    'textAreaAttribute' => 'userRolesToSet',
+                    'itemsArray' => [
+                            'item1' => 'item text1',
+                            'item2' => 'item text2',
+                            'item3' => 'item text3',
+                            'item4' => 'item text4',
+                            'item5' => 'item text5',
+                    ],
+            ]);
+            ?>
 
             <!--*************************************************************************** РОЛИ ПОЛЬЗОВАТЕЛЯ -->
             <div id="RolesArea">

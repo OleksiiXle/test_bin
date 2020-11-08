@@ -1,0 +1,25 @@
+.choise-row, .selection-row{
+    cursor: pointer;
+}
+.selection-row{
+    color: blue;
+    font-weight: bold;
+}
+.choise-row{
+    font-style: italic;
+}
+
+.multi-selct-block {
+    float: left;
+    display: block;
+    width: 150px;
+    border: 1px solid blue;
+    margin: 2px;
+    background-color: white;
+}
+.no-active{
+    display: none;
+}
+.active{
+    display: block;
+}

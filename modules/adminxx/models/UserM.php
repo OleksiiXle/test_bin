@@ -51,6 +51,7 @@ class UserM extends MainModel
     public $newPassword;
     public $rememberMe = true;
     public $invitation = 0;
+    public $userRolesToSet;
 
     public $multyFild;  //TODO прописать валидацию
 
@@ -87,13 +88,13 @@ class UserM extends MainModel
             'username', 'email', 'status',
             'created_at', 'updated_at', 'created_by', 'updated_by', 'password_hash',
             'password', 'retypePassword', 'password_reset_token', 'auth_key', 'rememberMe', 'invitation',
-            'multyFild',
+            'multyFild', 'userRolesToSet',
             //------------------------------------------------------------------------- user_data
             'first_name', 'middle_name', 'last_name', 'phone',
         ];
         $ret[self::SCENARIO_UPDATE] = [
             'first_name', 'middle_name', 'last_name', 'phone',
-            'multyFild',
+            'multyFild', 'userRolesToSet',
         ];
         $ret[self::SCENARIO_ACTIVATE] = [
             'status'
@@ -178,6 +179,7 @@ class UserM extends MainModel
             'updated_at' => 'Змінений',
             'refresh_permissions' => 'Потрібне оновлення дозвілів',
             'invitation' => 'С приглашением по Email',
+            'userRolesToSet' => 'Роли',
 
             //-- user_data
             'first_name' => 'Імя',

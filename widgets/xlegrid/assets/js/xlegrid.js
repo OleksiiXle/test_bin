@@ -35,6 +35,7 @@ $(document).ready(function(){
 
 
     if (USE_PJAX) {
+      //  console.log($(PJAX_CONTAINER_ID + ' a'));
         $(document).on('click', PJAX_CONTAINER_ID + ' a', function(event) {
             if (!$(this).hasClass('no-pjax')){
                 event.preventDefault();
