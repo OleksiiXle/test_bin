@@ -147,8 +147,15 @@ class AdminxxController extends Controller
             $oldUser = UserM::findOne(['username' => $user['username']]);
             if (empty($oldUser)){
                 $model = new UserM();
-                //   $model->scenario = User::SCENARIO_REGISTRATION;
-                $model->setAttributes($user);
+                $model->scenario = UserM::SCENARIO_SIGNUP_BY_ADMIN;
+               // $model->setAttributes($user);
+                $model->username = $user['username'];
+                $model->email = $user['email'];
+                $model->password = $user['password'];
+                $model->retypePassword = $user['retypePassword'];
+                $model->first_name = $user['first_name'];
+                $model->middle_name = $user['middle_name'];
+                $model->last_name = $user['last_name'];
                 $model->setPassword($user['password']);
                 $model->generateAuthKey();
                 if (!$model->save()){

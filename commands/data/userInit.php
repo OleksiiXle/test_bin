@@ -1,54 +1,6 @@
 <?php
 return [
     [
-        'username' => 'adminSuper',
-        'email' => 'admin1@email.com',
-        'password' => '1234567890',
-        'retypePassword' => '1234567890',
-        'first_name' => 'Новый',
-        'middle_name' => 'Демиург',
-        'last_name' => 'Администратор',
-        'userRoles' => [
-            'adminSuper'
-        ],
-    ],
-    [
-        'username' => 'adminSystem',
-        'email' => 'admin2@email.com',
-        'password' => '1234567890',
-        'retypePassword' => '1234567890',
-        'first_name' => 'Технический',
-        'middle_name' => 'Системный',
-        'last_name' => 'Администратор',
-        'userRoles' => [
-            'adminSystem'
-        ],
-    ],
-    [
-        'username' => 'adminUsers',
-        'email' => 'admin3@email.com',
-        'password' => '1234567890',
-        'retypePassword' => '1234567890',
-        'first_name' => 'ПоПерсоналу',
-        'middle_name' => 'Обычный',
-        'last_name' => 'Администратор',
-        'userRoles' => [
-            'adminUsers'
-        ],
-    ],
-    [
-        'username' => 'adminUsersAdvanced',
-        'email' => 'admin4@email.com',
-        'password' => '1234567890',
-        'retypePassword' => '1234567890',
-        'first_name' => 'ПоПерсоналу',
-        'middle_name' => 'Расширенный',
-        'last_name' => 'Администратор',
-        'userRoles' => [
-            'adminUsersAdvanced'
-        ],
-    ],
-    [
         'username' => 'user1',
         'email' => 'user1@email.com',
         'password' => '1234567890',
