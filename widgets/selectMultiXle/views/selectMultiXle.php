@@ -1,3 +1,12 @@
+<?php
+use app\helpers\ViewHelper;
+
+ViewHelper::setTranslationsForJS($this, [
+    'Показать список выбора',
+    'Скрыть список выбора',
+], 'widget-selectMultiXle');
+
+?>
 <div class="form-group field-<?=$textAreaAttributeId?>">
     <label class="control-label" for="<?=$textAreaAttributeId?>">
         <?=$label?>
@@ -8,7 +17,7 @@
     <textarea id="<?=$textAreaAttributeId?>"
               class="form-control"
               name="<?=$textAreaAttributeName?>"
-              title="Показать список выбора"
+              title="<?=\Yii::t('app', 'Показать список выбора')?>"
               col="20" row="2" style="display: none">
 
     </textarea>
@@ -16,7 +25,7 @@
         <!--*************************************************************************** выбранные наимеования -->
         <div id="selected_<?=$selectId?>" class="selected-items">
             <span id="no-selected-message-<?=$selectId?>" class="selection-row">
-            No choised
+                <?=\Yii::t('app', 'Ничего не выбрано')?>
         </span>
             <?php foreach ($itemsArray as $key => $value) :?>
                 <div class="selection-row selection-row-<?=$selectId?> no-active"

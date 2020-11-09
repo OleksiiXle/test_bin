@@ -7,6 +7,7 @@ $(document).ready ( function(){
         let selectedItems = [];
         let key;
         let item;
+        console.log(translate('Показать список выбора'));
 
         //--выбор
         $(".choise-row-" + selectId).on('click', function () {
@@ -51,13 +52,13 @@ $(document).ready ( function(){
                 $(this).css("color", "#daa520");
                 $(this).find('span').removeClass('glyphicon glyphicon-chevron-down')
                     .addClass('glyphicon glyphicon-chevron-up');
-                $(this).attr('title', 'Скрыть список выбора');
+                $(this).attr('title', translate('Скрыть список выбора'));
             } else {
                 $("#choise_" + selectId).hide("slow");
                 $(this).css("color", "#00008b");
                 $(this).find('span').removeClass('glyphicon glyphicon-chevron-up')
                     .addClass('glyphicon glyphicon-chevron-down');
-                $(this).attr('title', 'Показать список выбора');
+                $(this).attr('title', translate('Показать список выбора'));
             }
         })
 

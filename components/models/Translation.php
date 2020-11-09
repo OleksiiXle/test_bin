@@ -90,8 +90,10 @@ class Translation extends MainModel
             [['links'], 'string', 'max' => 250],
             [['messageRU', 'messageUK', 'messageEN'], 'string', 'max' => 255],
             [['messageRU', 'messageUK', 'messageEN'], 'trim'],
+            /*
             [['messageRU', 'messageUK', 'messageEN'], 'match', 'pattern' => self::NAME_PATTERN,
                 'message' => Yii::t('app', self::NAME_ERROR_MESSAGE)],
+            */
 
         ];
     }
@@ -347,37 +349,38 @@ class Translation extends MainModel
        // $cache = Yii::$app->cache;
         $currentLanguage = Yii::$app->userProfile->language;
         if (!($data = $cache->get('jst')) || empty($data[$key]) || empty($data[$key][$currentLanguage])) {
-            $translationsToCache = [];
-            $items = self::find()
-                ->where(['language' => $currentLanguage, 'category' => 'app'])
+            foreach (self::LIST_LANGUAGES as $lang => $text) {
+                $translations[$lang] = [];
+            }
+            $tkeys = self::find()
+                ->select('tkey')
+                ->where(['category' => 'app'])
                 ->andWhere(['IN', 'message', $messages])
+                ->indexBy('tkey')
+                ->asArray()
                 ->all();
-            if (!empty($items)){
-                foreach ($items as $item){
-                    $tr = $item->translations;
-                    foreach ($tr as $translation){
-                        $translationsToCache[$translation->message] =  $item->message;
+            foreach ($tkeys as $tkey => $data){
+                $messages = self::find()
+                    ->where(['category' => 'app'])
+                    ->andWhere(['tkey' => $tkey])
+                    ->orderBy('language')
+                    ->all();
+                foreach ($messages as $message) {
+                    if (!empty($message->translations)) {
+                        foreach ($message->translations as $translation) {
+                            $translations[$message->language][$translation->message] = $message->message;
+                        }
                     }
                 }
-                if (!$data) {
-                    $data = [
-                        $key => [
-                            $currentLanguage => $translationsToCache,
-                        ]
-                    ];
-                } elseif (empty($data[$key])) {
-                    $data[$key] = [
-                        $currentLanguage => $translationsToCache,
-                    ];
-                } else {
-                    $data[$key][$currentLanguage] = $translationsToCache;
-                }
-                $cache->set('jst', $data);
-                return $translationsToCache;
-            } else {
-                return array_fill_keys ($messages , $messages);
             }
+            $translationsToCache = [
+                $key => $translations,
+            ];
+            $cache->set('jst', $translationsToCache);
+
+            return $translations[$currentLanguage];
         } else {
+
             return $data[$key][$currentLanguage];
         }
     }

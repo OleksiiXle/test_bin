@@ -12,15 +12,20 @@ use app\models\MainModel;
  */
 class UserM extends MainModel
 {
-    const STATUS_INACTIVE = 0;
-    const STATUS_WAIT = 5;
     const STATUS_ACTIVE = 10;
+    const STATUS_INACTIVE = 0;
+    const STATUS_WAITING_FOR_EMAIL_CONFIRM = 1;
+    const STATUS_WAITING_FOR_INVITATION_CONFIRM = 2;
 
-    const STATUS_DICT = [
-      self::STATUS_INACTIVE => 'Не активний',
-      self::STATUS_WAIT => 'Очікує на підтвердження',
-      self::STATUS_ACTIVE => 'Активний',
-    ];
+    public static function getStatuses()
+    {
+        return [
+            self::STATUS_ACTIVE => 'Активный',
+            self::STATUS_INACTIVE => Yii::t('app', 'Деактивирован'),
+            self::STATUS_WAITING_FOR_EMAIL_CONFIRM => Yii::t('app', 'Ожидает подтверждения регистрации по Email'),
+            self::STATUS_WAITING_FOR_INVITATION_CONFIRM => Yii::t('app', 'Ожидается подтверждение приглашения по Email'),
+        ];
+    }
 
     const SCENARIO_SIGNUP_BY_ADMIN  = 'signup_by_admin';
     const SCENARIO_CONFIRM_INVITATION  = 'confirm_invitation';
@@ -33,9 +38,9 @@ class UserM extends MainModel
                                          Апостроф - в англійській розкладці на букві є. Подвійні імена - через тире!'; //--сообщение об ошибке
 */
     const USER_NAME_PATTERN           = '/^[А-ЯІЇЄҐа-яіїєґ\'A-Za-z]+?$/u'; //--маска для нимени
-    const USER_NAME_ERROR_MESSAGE     = 'Допыстимы буквы, (\'). Двойные имена через тире'; //--сообщение об ошибке
+    const USER_NAME_ERROR_MESSAGE     = 'Допустимы буквы. Двойные имена через тире'; //--сообщение об ошибке
     const USER_PASSWORD_PATTERN       = '/^[a-zA-Z0-9~!@#$%^&*()_-]+$/ui'; //--маска для пароля
-    const USER_PASSWORD_ERROR_MESSAGE = 'Допыстимы буквы, цифры, спецсимволы ~!@#$%^&*()_-'; //--сообщение об ошибке
+    const USER_PASSWORD_ERROR_MESSAGE = 'Допустимы буквы, цифры, спецсимволы ~!@#$%^&*()_-'; //--сообщение об ошибке
     const USER_PHONE_PATTERN       = '/^[0-9, \-)(+]+$/ui'; //--маска для телефона
     const USER_PHONE_ERROR_MESSAGE = 'Допустимые символы - цифры, скобки, тире, +'; //--сообщение об ошибке
 
@@ -126,17 +131,16 @@ class UserM extends MainModel
                     ['username', 'validateUsername'],
                     ['email', 'validateEmail'],
                     [['username', 'password', 'oldPassword', 'retypePassword',  'newPassword' ], 'match', 'pattern' => self::USER_PASSWORD_PATTERN,
-                        'message' => self::USER_PASSWORD_ERROR_MESSAGE],
+                        'message' => Yii::t('app', self::USER_PASSWORD_ERROR_MESSAGE)],
                     [['status'], 'default', 'value' => self::STATUS_ACTIVE],
-                    [['status'], 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_WAIT]],
 
                     //------------------------------------------------------------------------- user_data
                     [['first_name', 'last_name'], 'required',],
                     [['first_name', 'middle_name', 'last_name', 'phone', 'email' ], 'string', 'max' => 255],
                     [['first_name', 'middle_name', 'last_name'],  'match', 'pattern' => self::USER_NAME_PATTERN,
-                        'message' => self::USER_NAME_ERROR_MESSAGE],
+                        'message' => Yii::t('app', self::USER_NAME_ERROR_MESSAGE)],
                     ['phone',  'match', 'pattern' => self::USER_PHONE_PATTERN,
-                        'message' => self::USER_PHONE_ERROR_MESSAGE],
+                        'message' => Yii::t('app', self::USER_PHONE_ERROR_MESSAGE)],
                 ];
             case self::SCENARIO_UPDATE:
                 return [
@@ -144,9 +148,9 @@ class UserM extends MainModel
                     [['first_name', 'last_name'], 'required',],
                     [['first_name', 'middle_name', 'last_name', 'phone'], 'string', 'max' => 255],
                     [['first_name', 'middle_name', 'last_name'],  'match', 'pattern' => self::USER_NAME_PATTERN,
-                        'message' => self::USER_NAME_ERROR_MESSAGE],
+                        'message' => Yii::t('app', self::USER_NAME_ERROR_MESSAGE)],
                     ['phone',  'match', 'pattern' => self::USER_PHONE_PATTERN,
-                        'message' => self::USER_PHONE_ERROR_MESSAGE],
+                        'message' => Yii::t('app', self::USER_PHONE_ERROR_MESSAGE)],
                 ];
             case self::SCENARIO_ACTIVATE:
             case self::SCENARIO_DEACTIVATE:
@@ -154,7 +158,6 @@ class UserM extends MainModel
             return [
                     //------------------------------------------------------------------------- user
                     [['status', 'updated_at', 'updated_by',], 'integer'],
-                    [['status'], 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_WAIT]],
                 ];
         }
     }
@@ -167,36 +170,34 @@ class UserM extends MainModel
         return [
             //-- user
             'id' => 'ID',
-            'username' => 'Логін',
-            'auth_key' => 'Ключ авторізації',
-            'password_hash' => 'Пароль',
-            'password_reset_token' => 'Токен збросу паролю',
-            'email' => 'Email',
-            'status' => 'Status',
-            'created_at' => 'Створений',
-            'updated_at' => 'Змінений',
-            'refresh_permissions' => 'Потрібне оновлення дозвілів',
-            'invitation' => 'С приглашением по Email',
-            'userRolesToSet' => 'Роли',
+            'username' => Yii::t('app', 'Логин'),
+            'auth_key' => Yii::t('app', 'Ключ авторизации'),
+            'password_hash' => Yii::t('app', 'Пароль'),
+            'password_reset_token' => Yii::t('app', 'Токен сброса пароля'),
+            'email' => Yii::t('app', 'Email'),
+            'status' => Yii::t('app', 'Статус'),
+            'created_at' => Yii::t('app', 'Создано'),
+            'updated_at' => Yii::t('app', 'Изменено'),
+            'refresh_permissions' => Yii::t('app', 'Необходимо обновление разоешений'),
+            'invitation' => Yii::t('app', 'С приглашением по Email'),
+            'userRolesToSet' => Yii::t('app', 'Роли'),
 
             //-- user_data
-            'first_name' => 'Імя',
-            'middle_name' => 'По батькові',
-            'last_name' => 'Прізвище',
-            'phone' => 'Телефон',
-            'last_rout' => 'Останній роут',
-            'last_rout_time' => 'Остання активність',
+            'first_name' => Yii::t('app', 'Имя'),
+            'middle_name' => Yii::t('app', 'Отчество'),
+            'last_name' => Yii::t('app', 'Фамилия'),
+            'phone' => Yii::t('app', 'Телефон'),
+            'last_rout' => Yii::t('app', 'Последний роут'),
+            'last_rout_time' => Yii::t('app', 'Последняя активность'),
 
             //---- служебные
-            'password' => 'Пароль',
-            'oldPassword' => 'Старий пароль',
-            'retypePassword' => 'Підтвердждення паролю',
+            'password' => Yii::t('app', 'Пароль'),
+            'oldPassword' => Yii::t('app', 'Старый пароль'),
+            'retypePassword' => Yii::t('app', 'Подтверждение пароля'),
 
             //----  геттеры
-            'created_at_str' => 'Створений',
-            'updated_at_str' => 'Змінений',
-            'time_login_str' => 'Увійшов',
-            'time_logout_str' => 'Вийшов',
+            'created_at_str' => Yii::t('app', 'Создано'),
+            'updated_at_str' => Yii::t('app', 'Изменено'),
 
         ];
     }
@@ -206,7 +207,7 @@ class UserM extends MainModel
         $checkCondition = ($this->isNewRecord) ? ['email' => $this->email] : 'email = "' . $this->email . '" AND id != ' . $this->id;
         $check = self::find()->where($checkCondition)->count();
         if (!empty($check)) {
-            $this->addError('email', 'Email вже зайнято');
+            $this->addError('email', Yii::t('app', 'Email уже занято'));
         }
     }
 
@@ -215,7 +216,7 @@ class UserM extends MainModel
         $checkCondition = ($this->isNewRecord) ? ['username' => $this->username] : 'username = ' . $this->username . ' AND id != ' . $this->id;
         $check = self::find()->where($checkCondition)->count();
         if (!empty($check)) {
-            $this->addError('username', 'username вже зайнято');
+            $this->addError('username', Yii::t('app', 'Логин уже занято'));
         }
     }
 
@@ -311,15 +312,6 @@ class UserM extends MainModel
             }
         }
         return $this->_userRoles;
-    }
-
-    public static function getStatusDict(){
-
-        return [
-            self::STATUS_INACTIVE => 'Не активний',
-           // self::STATUS_WAIT => \Yii::t('app', 'Очікує на підтвердження'),
-            self::STATUS_ACTIVE => 'Активний',
-        ];
     }
 
     public function getUserCreater()

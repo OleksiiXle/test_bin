@@ -6,8 +6,6 @@ use app\modules\adminxx\assets\AdminxxLayoutAsset;
 use app\assets\BackgroundTaskAsset;
 use yii\jui\JuiAsset;
 use app\helpers\DateHelper;
-use app\components\models\Translation;
-use yii\helpers\Url;
 
 AdminxxLayoutAsset::register($this);
 BackgroundTaskAsset::register($this);

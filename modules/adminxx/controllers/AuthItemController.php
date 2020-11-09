@@ -86,6 +86,7 @@ class AuthItemController extends MainController
      */
     public function actionUpdate($name )
     {
+        $tmp = 1;
         $model =  AuthItemX::find()
             ->where(['name' => $name])
             ->one();

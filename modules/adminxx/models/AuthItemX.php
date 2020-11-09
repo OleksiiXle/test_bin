@@ -65,7 +65,7 @@ class AuthItemX extends \yii\db\ActiveRecord
                 'message' => \Yii::t('app', UserM::USER_PASSWORD_ERROR_MESSAGE)],
             [['description'], 'match', 'pattern' => MainModel::PATTERN_TEXT,
                 'message' => \Yii::t('app', MainModel::PATTERN_TEXT_ERROR_MESSAGE)],
-            [['name', 'rule_name'], 'string', 'min' => 5, 'max' => 64],
+            [['name', 'rule_name'], 'string', 'min' => 4, 'max' => 64],
             [['description'], 'string', 'max' => 255],
             [['type', 'created_at', 'updated_at'], 'integer'],
         //  [['rule_name'], 'exist', 'skipOnError' => true, 'targetClass' => Aut::className(), 'targetAttribute' => ['rule_name' => 'name']],
