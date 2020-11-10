@@ -96,7 +96,7 @@ class UserM extends MainModel
             'first_name', 'middle_name', 'last_name', 'phone',
         ];
         $ret[self::SCENARIO_UPDATE] = [
-            'first_name', 'middle_name', 'last_name', 'phone',
+            'first_name', 'middle_name', 'last_name', 'phone', 'status',
              'userRolesToSet',
         ];
         $ret[self::SCENARIO_ACTIVATE] = [
@@ -780,5 +780,14 @@ class UserM extends MainModel
         return $result;
     }
 
+    public static function getStatusDict(){
 
+        return [
+            self::STATUS_INACTIVE => \Yii::t('app', 'Не активный'),
+            self::STATUS_WAITING_FOR_EMAIL_CONFIRM => \Yii::t('app', 'Ожидает подтверждения'),
+            self::STATUS_WAITING_FOR_INVITATION_CONFIRM => \Yii::t('app', 'Ожидает подтверждения'),
+            self::STATUS_ACTIVE => \Yii::t('app', 'Активный'),
+        ];
+
+    }
 }

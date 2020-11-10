@@ -1,17 +1,18 @@
+
 html,
-body {
-    height: 100%;
+body, .wrap {
+    /*height: 100%;*/
+    background: none;
 }
 
 .wrap {
-    min-height: 100%;
     height: auto;
     margin: 0 auto -60px;
-    padding: 0 0 60px;
 }
 
 .wrap > .container {
     padding: 70px 15px 20px;
+    overflow: scroll;
 }
 
 .footer {
@@ -114,10 +115,11 @@ a.desc:after {
     outline: none;
 }
 
-.xCard {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    background-color: lightgrey;
-    padding: 10px;
-    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+.top, .footer-bottom {
+    background: linear-gradient(to right, #272f33, #47565e, #272f33);
+}
+
+.footer-bottom{
+    height: 50px;
+    padding-top: 15px;
 }

@@ -260,6 +260,7 @@ class UserController extends MainController
     public function actionUpdateUserAssignments($id)
     {
         $model = UserM::findOne($id);
+        $model->scenario = UserM::SCENARIO_UPDATE;
         $ass = new Assignment($id);
         $assigments = $ass->getItemsXle();
         if (\Yii::$app->getRequest()->isPost) {

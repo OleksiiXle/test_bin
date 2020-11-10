@@ -94,7 +94,7 @@ $this->registerJs("
                 <?php
                 echo $form->field($model, 'status', ['inputOptions' =>
                     ['class' => 'form-control', 'tabindex' => '1']])
-                    ->dropDownList(\app\modules\adminxx\models\UserM::getStatusDict(),
+                    ->dropDownList(\app\modules\adminxx\models\UserM::getStatuses(),
                         ['options' => [ $model->status => ['Selected' => true]],])->label('Змінити статус') ;
                 ?>
                 <div class="form-group" align="center">

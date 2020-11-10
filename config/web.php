@@ -90,6 +90,9 @@ $config = [
         'adminxx' => [
             'class' => 'app\modules\adminxx\Adminxx',
         ],
+        'post' => [
+            'class' => 'app\modules\post\Post',
+        ],
     ],
     'as access' => [
         'class' => 'app\components\AccessControl',

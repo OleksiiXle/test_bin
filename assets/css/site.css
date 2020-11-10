@@ -1,7 +1,8 @@
+
 html,
 body, .wrap {
     /*height: 100%;*/
-    background: lightblue;
+    background: none;
 }
 
 .wrap {

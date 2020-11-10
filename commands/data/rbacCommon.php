@@ -32,7 +32,8 @@ return [
         'adminConfigUpdate'           => 'Изменение системных настроек',
 
         'menuAdminTranslateUpdate'    => '*** Изменение словарей (меню)',
-        'adminTranslateUpdate'        => 'Изменение словарей',
+        //***************************************************************** Посты
+        'postCRUD'                    => 'Изменение постов',
 
 
     ],
@@ -87,6 +88,7 @@ return [
         ],
         'user' => [
             'menuAll',
+            'postCRUD',
         ],
     ],
     'rolesChildren' => [

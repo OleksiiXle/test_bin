@@ -25,6 +25,7 @@ return [
      * max_file_uploads = 10
      * post_max_size = 5M
      */
+    'pathToFiles' => '/files',
 
     'image' => [
         'maxSize' => '5000000',

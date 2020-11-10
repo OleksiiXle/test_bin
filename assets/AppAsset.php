@@ -23,9 +23,12 @@ class AppAsset extends AssetBundle
 
     public $css = [
         'css/site.css',
+        'datepicker/css/daterangepicker.css',
     ];
     public $js = [
         'js/site.js',
+        'datepicker/js/moment-with-locales.min.js',
+        'datepicker/js/daterangepicker.js',
     ];
     public $jsOptions = array(
         'position' => \yii\web\View::POS_HEAD
