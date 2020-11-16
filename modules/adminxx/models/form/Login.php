@@ -50,6 +50,7 @@ class Login extends UserM
             $ret = Yii::$app->getUser()->login($this->getUser(), 3600 * 24 * 30/*$this->rememberMe ? 3600 * 24 * 30 : 0*/);
 
             AccessHelper::saveUserPermissionsToSession();
+            Yii::$app->userProfile->getProfileFromDb();
             return $ret;
         } else {
             return false;

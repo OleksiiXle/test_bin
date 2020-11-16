@@ -109,4 +109,22 @@ class UserProfileComponent extends Component
                 $this->profile = $profile;
         }
     }
+
+    public function getProfileFromDb()
+    {
+        $tmp = 1;
+        if (!Yii::$app->user->isGuest) {
+            $userProfileJSON = Yii::$app->db
+                ->createCommand("SELECT profile FROM user_data WHERE user_id=$this->userId;")
+                ->queryScalar();
+            if (!empty($userProfileJSON)){
+                $userProfile = json_decode($userProfileJSON, true);
+            } else {
+                foreach (self::ATTRIBUTES as $attribute => $defaultValue) {
+                    $this->{$attribute . 'Data'} = $userProfile[$attribute] = $defaultValue;
+                }
+            }
+            $this->profile = $userProfile;
+        }
+    }
 }

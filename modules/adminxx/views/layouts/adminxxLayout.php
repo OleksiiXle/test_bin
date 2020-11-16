@@ -41,7 +41,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => \yii\h
 
         <!--************************************************************************************************************* MENU BTN-->
         <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2" align="left" style="padding-left: 2px; padding-right: 0">
-            <!--  <button id="open-menu-btn" onclick="showModal(500,600, 'lokoko the best');" class="xMenuBtn" >-->
             <a href="/adminxx" title="На гоговну сторінку">
                  <span class ="img-rounded">
                         <img  src="<?=\yii\helpers\Url::to('@web/images/sun_61831.png');?>" height="40px" width="40px;">
@@ -66,7 +65,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => \yii\h
             <?php
             if (!Yii::$app->user->isGuest){
                 $icon = \yii\helpers\Url::to('@web/images/log_logout_door_1563.png');
-                echo Html::beginForm(['/site/logout'], 'post');
+                echo Html::beginForm(['/adminxx/user/logout'], 'post');
                 echo Html::submitButton(
                     '<span> <img  src="' . $icon . '" height="30px" width="30px;">' . Yii::$app->user->getIdentity()->username .  '</span>',
                     ['class' => 'btn btn-link ']

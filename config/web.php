@@ -8,6 +8,7 @@ $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'defaultRoute' => 'post',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
@@ -27,7 +28,7 @@ $config = [
         'user' => [
             'class' => 'app\components\UserX',
             'identityClass' => 'app\modules\adminxx\models\User',
-            'loginUrl' => ['site/login'],
+            'loginUrl' => ['adminxx/user/login'],
             'enableAutoLogin' => false,
         ],
 

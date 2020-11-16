@@ -36,7 +36,7 @@ class DefaultController extends MainController
         $dataProvider = new ActiveDataProvider([
             'query' => Post::find(),
             'pagination' => [
-                'pageSize' => 2,
+                'pageSize' => 20,
             ],
         ]);
         return $this->render('posts', [

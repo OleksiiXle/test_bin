@@ -34,12 +34,12 @@ class UserController extends MainController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => [ 'forget-password', 'test', ],
+                    'actions' => [ 'forget-password', 'test', 'login' ],
                     'roles' => ['?'],
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['test', 'change-password', 'update-profile', 'conservation'],
+                    'actions' => ['test', 'change-password', 'update-profile', 'conservation', 'logout'],
                     'roles' => ['@'],
                 ],
                 [
@@ -286,6 +286,7 @@ class UserController extends MainController
     public function actionLogin()
     {
       //  $this->layout = '@app/views/layouts/commonLayout.php';
+
         $model = new Login();
         if ($model->load(\Yii::$app->getRequest()->post()) && $model->login()) {
             $query = 'SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode, "ONLY_FULL_GROUP_BY,", ""))';
@@ -303,10 +304,13 @@ class UserController extends MainController
      *+++ Logout
      * @return string
      */
-    public function actionLogout(){
+    public function actionLogout()
+    {
+        Yii::$app->userProfile->language = Yii::$app->language;
+
         \Yii::$app->getUser()->logout();
-        //   return $this->goHome();
-        return $this->redirect('/site/index');
+        return $this->goHome();
+     //   return $this->redirect('/site/index');
     }
 
     /**

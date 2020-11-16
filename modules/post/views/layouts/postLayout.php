@@ -70,7 +70,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => \yii\h
             <?php
             if (!Yii::$app->user->isGuest){
                 $icon = \yii\helpers\Url::to('@web/images/log_logout_door_1563.png');
-                echo Html::beginForm(['/site/logout'], 'post');
+                echo Html::beginForm(['/adminxx/user/logout'], 'post');
                 echo Html::submitButton(
                     '<span> <img  src="' . $icon . '" height="30px" width="30px;">' . Yii::$app->user->getIdentity()->username .  '</span>',
                     ['class' => 'btn btn-link ']
