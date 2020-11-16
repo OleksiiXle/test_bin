@@ -18,7 +18,6 @@ return [
     'rbacCacheSource' => 'session', //cache
     'signupWithoutEmailConfirm' => '0',
     //----------------------------------------
-
     /*
      * memory_limit = 64M
      * upload_max_filesize = 5M

@@ -328,9 +328,16 @@ class AdminxxController extends Controller
         $auth = \Yii::$app->authManager;
 
         $model = new UserM();
-        $model->setAttributes($data);
+        $model->scenario = UserM::SCENARIO_SIGNUP_BY_ADMIN;
+
+        //  $model->setAttributes($data);
+        $model->username = $data['username'];
+        $model->email = $data['email'];
         $model->password = $password;
         $model->retypePassword = $password;
+        $model->first_name = $data['first_name'];
+        $model->middle_name = $data['middle_name'];
+        $model->last_name = $data['last_name'];
         $model->setPassword($password);
         $model->generateAuthKey();
         if (!$model->validate()){
@@ -359,7 +366,13 @@ class AdminxxController extends Controller
 
 
         $userData = new UserData();
-        $userData->setAttributes($data);
+      //  $userData->setAttributes($data);
+        $userData->user_id = $model->id;
+        $userData->emails = $model->email;
+        $userData->first_name = $data['first_name'];
+        $userData->middle_name = $data['middle_name'];
+        $userData->last_name = $data['last_name'];
+
         $userData->user_id = $model->id;
         if (!$userData->save()){
             echo var_dump($userData->getErrors()) . PHP_EOL;
